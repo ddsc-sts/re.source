@@ -36,14 +36,6 @@ hamburgerBtn.addEventListener('click', (e) => {
   lucide.createIcons();
 });
 
-document.addEventListener('click', () => {
-  menuOpen = false;
-  dropdownMenu.classList.remove('open');
-  hamburgerBtn.classList.remove('open');
-  hamburgerIcon.setAttribute('data-lucide', 'menu');
-  lucide.createIcons();
-});
-
 // ── CATEGORY DROPDOWN ──
 const categoryTrigger  = document.getElementById('categoryTrigger');
 const categoryDropdown = document.getElementById('categoryDropdown');
@@ -60,7 +52,15 @@ function selectCategory(name) {
   categoryDropdown.classList.remove('open');
 }
 
-document.addEventListener('click', () => {
+// ── FECHAR MENUS AO CLICAR FORA ──
+document.addEventListener('click', (e) => {
+  if (!dropdownMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+    menuOpen = false;
+    dropdownMenu.classList.remove('open');
+    hamburgerBtn.classList.remove('open');
+    hamburgerIcon.setAttribute('data-lucide', 'menu');
+    lucide.createIcons();
+  }
   categoryDropdown.classList.remove('open');
 });
 
