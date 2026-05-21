@@ -1,5 +1,7 @@
 Melhorias a serem feitas no Site:
 
+O que está com * = Importante 
+
 FrontEnd:
 
 -No menu hamburguer, quando clica fica um X
@@ -12,6 +14,5 @@ colocado modo dark manter no login
 
 BackEnd: 
 
--O cadastro não registra no banco, concertar essa parte
-
--Após testar o cadastro, testar se o login esta funcionando
+-Fazer Fazer aq mesma coisa que foi feito com o cadastro no login 
+-Após testar o cadastro, testar se o login esta funcionando *
