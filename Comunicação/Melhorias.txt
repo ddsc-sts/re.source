@@ -1,0 +1,31 @@
+Melhorias a serem feitas no Site:
+
+O que está com * = Importante 
+
+FrontEnd:
+
+-Fazer a index.html, onde ficara a parte em que os usuarios
+cadastrados estarão *  Leo Gay
+
+-Modificar erros minunciosos na imagem 1.1 e na imagem 1.2, retirar o botao de anunciar
+que aparece na index
+
+-No menu hamburguer, quando clica fica um X
+mesmo você saindo do menu, corrigir isso, 
+
+-Ajustar o css do login para caso o usuario tenha
+colocado modo dark manter no login
+
+-Criar as outras partes de html necessarias
+
+BackEnd: 
+
+-Validar no banco se o login e existe e logar na conta  
+
+-Ajustar  logica sobre a empresa, exemplo como será feito os anuncios, login e Informações sobre a empresa *
+
+-Fazer a Verificação no email *
+
+-Ajustar sobre o Cnpj para ter ficticio 
+
+-Aplicar js no login para os erros, para melhorar a visibilidade 
