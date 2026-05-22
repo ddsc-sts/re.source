@@ -1,90 +1,101 @@
 <?php
 
-// BackEnd/auth/verificar.php — valida o token e ativa a conta
+// BackEnd/auth/verificar.php — valida o token e cadastra o usuário no banco
 
+session_start();
 require_once __DIR__ . "/../config/conexao.php";
 
 $token = trim($_GET['token'] ?? '');
 
 // ── Sem token na URL ──────────────────────────────────────────
 if (!$token) {
-    header("Location: /cadastro.php?erro=" . urlencode("Link de verificação inválido."));
-    exit;
+    exibirErro("Link inválido", "Este link de confirmação não existe ou é inválido.");
 }
 
-// ── Busca o token no banco ────────────────────────────────────
-$stmt = $pdo->prepare("
-    SELECT ev.id,
-           ev.user_id,
-           ev.expires_at,
-           ev.used_at,
-           u.email,
-           u.name
-    FROM   email_verifications ev
-    JOIN   users u ON u.id = ev.user_id
-    WHERE  ev.token = ?
-    LIMIT  1
-");
-$stmt->execute([$token]);
-$registro = $stmt->fetch();
+// ── Busca dados pendentes na sessão ──────────────────────────
+$pendente = $_SESSION['cadastro_pendente'] ?? null;
 
-// ── Token não encontrado ──────────────────────────────────────
-if (!$registro) {
+if (!$pendente) {
+    exibirErro("Sessão expirada", "Seus dados de cadastro expiraram. Por favor, <a href='/cadastro.php'>cadastre-se novamente</a>.");
+}
+
+// ── Valida o token ────────────────────────────────────────────
+$tokenHash = hash('sha256', $token);
+
+if (!hash_equals($pendente['token_hash'], $tokenHash)) {
     exibirErro("Link inválido", "Este link de confirmação não existe ou já foi removido.");
 }
 
-// ── Token já utilizado ────────────────────────────────────────
-if ($registro['used_at'] !== null) {
-    exibirSucesso($registro['name'], $registro['email'], true);
-}
-
 // ── Token expirado ────────────────────────────────────────────
-if (strtotime($registro['expires_at']) < time()) {
-    // Apaga o token expirado e oferece reenvio
-    $pdo->prepare("DELETE FROM email_verifications WHERE id = ?")->execute([$registro['id']]);
+if (time() > $pendente['expires_at']) {
+    unset($_SESSION['cadastro_pendente']);
     exibirErro(
         "Link expirado",
-        "Seu link de confirmação expirou. <a href='/reenviar.php?email=" . urlencode($registro['email']) . "'>Clique aqui para receber um novo link.</a>"
+        "Seu link de confirmação expirou. <a href='/cadastro.php'>Clique aqui para se cadastrar novamente.</a>"
     );
 }
 
-// ── Tudo certo — ativa a conta ────────────────────────────────
+// ── Tudo certo — agora cadastra no banco ──────────────────────
 $pdo->beginTransaction();
 try {
 
-    // Marca e-mail como verificado no usuário
-    $pdo->prepare("UPDATE users SET email_verified_at = NOW() WHERE id = ?")
-        ->execute([$registro['user_id']]);
+    $pdo->prepare(
+        "INSERT INTO addresses (zip_code, street, number, district, city, state)
+         VALUES ('','','','','',?)"
+    )->execute([$pendente['estado']]);
+    $addressId = $pdo->lastInsertId();
 
-    // Marca token como usado
-    $pdo->prepare("UPDATE email_verifications SET used_at = NOW() WHERE id = ?")
-        ->execute([$registro['id']]);
+    $nomeCompleto = $pendente['nome'] . ' ' . $pendente['sobrenome'];
 
-    // Ativa a empresa vinculada ao usuário
-    $pdo->prepare("
-        UPDATE companies SET status = 'active'
-        WHERE id = (SELECT company_id FROM users WHERE id = ?)
-    ")->execute([$registro['user_id']]);
+    $pdo->prepare(
+        "INSERT INTO companies (cnpj, razao_social, email, phone, address_id, plan_id, responsible_name, email_verified_at)
+         VALUES (?,?,?,?,?,1,?,NOW())"
+    )->execute([
+        $pendente['cnpj'],
+        $pendente['razao'],
+        $pendente['email'],
+        $pendente['telefone'],
+        $addressId,
+        $nomeCompleto,
+    ]);
+    $companyId = $pdo->lastInsertId();
+
+    $pdo->prepare(
+        "INSERT INTO users (company_id, name, email, password_hash, role)
+         VALUES (?,?,?,?,'admin_company')"
+    )->execute([
+        $companyId,
+        $nomeCompleto,
+        $pendente['email'],
+        $pendente['password_hash'],
+    ]);
 
     $pdo->commit();
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     $pdo->rollBack();
+
+    // E-mail ou CNPJ já cadastrado (usuário clicou no link duas vezes)
+    if ($e->getCode() === '23000') {
+        unset($_SESSION['cadastro_pendente']);
+        exibirSucesso($pendente['nome'], $pendente['email'], true);
+    }
+
     exibirErro("Erro interno", "Não foi possível ativar sua conta. Tente novamente ou entre em contato com o suporte.");
 }
 
-exibirSucesso($registro['name'], $registro['email'], false);
+// ── Limpa sessão e mostra sucesso ─────────────────────────────
+unset($_SESSION['cadastro_pendente']);
+exibirSucesso($pendente['nome'], $pendente['email'], false);
 
 // ── Funções de resposta visual ────────────────────────────────
 
 function exibirSucesso(string $nome, string $email, bool $jaAtivado): void {
-    $titulo  = $jaAtivado ? "Conta já ativa" : "E-mail confirmado!";
-    $msg     = $jaAtivado
+    $titulo = $jaAtivado ? "Conta já ativa" : "E-mail confirmado!";
+    $msg    = $jaAtivado
         ? "Sua conta já estava ativa. Você pode fazer login normalmente."
         : "Sua conta foi ativada com sucesso. Bem-vindo(a) ao Re.Source!";
-    $icone   = "✅";
-    $cor     = "#157347";
-    renderPagina($icone, $titulo, $msg, $nome, $email, $cor, "/login.php", "Fazer login agora");
+    renderPagina("✅", $titulo, $msg, $nome, $email, "#157347", "/login.php", "Fazer login agora");
 }
 
 function exibirErro(string $titulo, string $msg): void {
@@ -118,7 +129,7 @@ function renderPagina(string $icone, string $titulo, string $msg, string $nome, 
         <span class="logo">Re.Source</span>
         <div class="icone"><?= $icone ?></div>
         <h1><?= htmlspecialchars($titulo) ?></h1>
-        <?php if ($nome): ?>
+        <?php if ($email): ?>
           <div class="email-tag"><?= htmlspecialchars($email) ?></div>
         <?php endif; ?>
         <p><?= $msg ?></p>

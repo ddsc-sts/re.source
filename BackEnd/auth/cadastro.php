@@ -1,7 +1,10 @@
 <?php
 
 // BackEnd/auth/cadastro.php — processa POST do formulário
+// FLUXO: valida → salva em sessão → envia e-mail → cadastra só após confirmação
 
+ob_start();
+session_start();
 require_once __DIR__ . "/../config/conexao.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -9,17 +12,12 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-// ── Detecta se é uma requisição AJAX (fetch com X-Requested-With) ──
 $isXhr = ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
 
-/**
- * Encerra a execução devolvendo erro.
- * XHR  → JSON  { ok: false, erro: "...", campos: [...] }
- * Form → redirect para cadastro.php?erro=...
- */
 function voltarComErro(string $msg, array $campos = []): void {
     global $isXhr;
     if ($isXhr) {
+        ob_clean();
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['ok' => false, 'erro' => $msg, 'campos' => $campos]);
     } else {
@@ -28,14 +26,10 @@ function voltarComErro(string $msg, array $campos = []): void {
     exit;
 }
 
-/**
- * Encerra com sucesso.
- * XHR  → JSON  { ok: true, redirect: "..." }
- * Form → redirect para pendente.php
- */
 function voltarComSucesso(string $url): void {
     global $isXhr;
     if ($isXhr) {
+        ob_clean();
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['ok' => true, 'redirect' => $url]);
     } else {
@@ -57,7 +51,7 @@ $razao     = trim($_POST["razao_social"] ?? '');
 
 // ── 2. Validações básicas ─────────────────────────────────────
 $erros  = [];
-$campos = [];   // [ ['field' => 'nome', 'msg' => '...'], ... ]
+$campos = [];
 
 if (!$nome) {
     $erros[]  = "Nome é obrigatório.";
@@ -91,12 +85,9 @@ if (!$estado) {
     $erros[]  = "Estado é obrigatório.";
     $campos[] = ['field' => 'estado', 'msg' => 'Selecione seu estado.'];
 }
+if ($erros) voltarComErro(implode(" · ", $erros), $campos);
 
-if ($erros) {
-    voltarComErro(implode(" · ", $erros), $campos);
-}
-
-// ── 3. E-mail corporativo (RN-04) ─────────────────────────────
+// ── 3. E-mail corporativo ─────────────────────────────────────
 $dominiosBloqueados = $pdo->query("SELECT domain FROM blocked_email_domains")
                           ->fetchAll(PDO::FETCH_COLUMN);
 $dominio = explode("@", $email)[1] ?? '';
@@ -107,84 +98,70 @@ if (in_array($dominio, $dominiosBloqueados)) {
     );
 }
 
-// ── 4. CNPJ único (RN-02) ─────────────────────────────────────
+// ── 4. E-mail já cadastrado? ──────────────────────────────────
+$stmt = $pdo->prepare("SELECT id FROM companies WHERE email = ?");
+$stmt->execute([$email]);
+if ($stmt->rowCount() > 0) {
+    voltarComErro(
+        "Este e-mail já está cadastrado na plataforma.",
+        [['field' => 'email', 'msg' => 'Este e-mail já está cadastrado.']]
+    );
+}
+
+// ── 5. CNPJ já cadastrado? ────────────────────────────────────
 $stmt = $pdo->prepare("SELECT id FROM companies WHERE cnpj = ?");
 $stmt->execute([$cnpj]);
 if ($stmt->rowCount() > 0) {
     voltarComErro(
-        "CNPJ já cadastrado na plataforma.",
+        "Este CNPJ já está cadastrado na plataforma.",
         [['field' => 'cnpj', 'msg' => 'CNPJ já cadastrado na plataforma.']]
     );
 }
 
-// ── 5. Validação ReceitaWS (RF-02, RN-03) ─────────────────────
-$apiResp = @file_get_contents(
-    "https://www.receitaws.com.br/v1/cnpj/{$cnpj}",
-    false,
-    stream_context_create(['http' => ['timeout' => 5]])
-);
-if (!$apiResp) {
-    voltarComErro("Não foi possível validar o CNPJ agora. Tente novamente.");
+// ── 6. Validação local dos dígitos do CNPJ ───────────────────
+function cnpjValido(string $cnpj): bool {
+    if (preg_match('/^(\d)\1{13}$/', $cnpj)) return false;
+    $calc = function(string $cnpj, int $len): int {
+        $soma = 0; $pos = $len - 7;
+        for ($i = $len; $i >= 1; $i--) {
+            $soma += (int)$cnpj[$len - $i] * $pos--;
+            if ($pos < 2) $pos = 9;
+        }
+        $resto = $soma % 11;
+        return $resto < 2 ? 0 : 11 - $resto;
+    };
+    return $calc($cnpj, 12) === (int)$cnpj[12]
+        && $calc($cnpj, 13) === (int)$cnpj[13];
 }
-
-$dadosCnpj = json_decode($apiResp, true);
-if (($dadosCnpj['status'] ?? '') === 'ERROR' ||
-    strtoupper($dadosCnpj['situacao'] ?? '') !== 'ATIVA') {
-    $situacao = $dadosCnpj['situacao'] ?? 'não encontrado';
+if (!cnpjValido($cnpj)) {
     voltarComErro(
-        "CNPJ com situação '$situacao'. Apenas CNPJs ATIVOS são aceitos.",
-        [['field' => 'cnpj', 'msg' => "CNPJ $situacao. Apenas CNPJs ativos são aceitos."]]
+        "CNPJ inválido. Verifique os números informados.",
+        [['field' => 'cnpj', 'msg' => 'CNPJ inválido.']]
     );
 }
-if (!$razao && !empty($dadosCnpj['nome'])) $razao = $dadosCnpj['nome'];
 
-$pdo->prepare(
-    "INSERT INTO cnpj_validations (cnpj, status, razao_social, api_response_json)
-     VALUES (?,?,?,?)"
-)->execute([$cnpj, $dadosCnpj['situacao'], $dadosCnpj['nome'] ?? null, $apiResp]);
-
-// ── 6. Hash senha (RNF-03) ────────────────────────────────────
+// ── 7. Hash da senha ─────────────────────────────────────────
 $passwordHash = password_hash($senha, PASSWORD_BCRYPT, ['cost' => 12]);
 
-// ── 7. Transação: addresses → companies → users ───────────────
-$pdo->beginTransaction();
+// ── 8. Salva dados em sessão (ainda NÃO grava no banco) ───────
+$token     = bin2hex(random_bytes(32));   // 64 hex chars — enviado no link
+$tokenHash = hash('sha256', $token);      // armazenado na sessão para comparar
+$expiresAt = time() + 86400;              // 24 horas
 
-try {
-    $pdo->prepare(
-        "INSERT INTO addresses (zip_code, street, number, district, city, state)
-         VALUES ('','','','','',?)"
-    )->execute([$estado]);
-    $addressId = $pdo->lastInsertId();
+$_SESSION['cadastro_pendente'] = [
+    'token_hash'    => $tokenHash,
+    'expires_at'    => $expiresAt,
+    'nome'          => $nome,
+    'sobrenome'     => $sobrenome,
+    'email'         => $email,
+    'password_hash' => $passwordHash,
+    'telefone'      => $telefone,
+    'estado'        => $estado,
+    'cnpj'          => $cnpj,
+    'razao'         => $razao,
+];
 
-    $pdo->prepare(
-        "INSERT INTO companies (cnpj, razao_social, email, phone, address_id, plan_id, responsible_name)
-         VALUES (?,?,?,?,?,1,?)"
-    )->execute([$cnpj, $razao, $email, $telefone, $addressId, "$nome $sobrenome"]);
-    $companyId = $pdo->lastInsertId();
-
-    $pdo->prepare(
-        "INSERT INTO users (company_id, name, email, password_hash, role)
-         VALUES (?,?,?,?,'admin_company')"
-    )->execute([$companyId, "$nome $sobrenome", $email, $passwordHash]);
-    $userId = $pdo->lastInsertId();
-
-    $pdo->commit();
-
-} catch (Exception $e) {
-    $pdo->rollBack();
-    voltarComErro("Erro interno ao salvar. Tente novamente.");
-}
-
-// ── 8. Gerar token de confirmação (RF-03) ─────────────────────
-$token     = bin2hex(random_bytes(32));   // 64 hex chars
-$expiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
-
-$pdo->prepare(
-    "INSERT INTO email_verifications (user_id, token, expires_at)
-     VALUES (?, ?, ?)"
-)->execute([$userId, $token, $expiresAt]);
-
-// ── 9. Enviar e-mail de confirmação ───────────────────────────
+// ── 9. Envia e-mail de confirmação ────────────────────────────
 $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
          . '://' . $_SERVER['HTTP_HOST'];
 
@@ -203,7 +180,7 @@ $corpo = "
     <div style='padding:2rem;'>
       <h2 style='color:#1a1a1a;margin-top:0;'>Olá, $nomeCompleto!</h2>
       <p style='color:#444;line-height:1.6;'>
-        Seu cadastro foi recebido com sucesso. Para ativar sua conta e começar a usar a plataforma, clique no botão abaixo:
+        Para ativar sua conta e começar a usar a plataforma, clique no botão abaixo:
       </p>
       <div style='text-align:center;margin:2rem 0;'>
         <a href='$linkConfirmacao'
@@ -230,9 +207,7 @@ $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 $headers .= "From: Re.Source <noreply@re.source.com.br>\r\n";
 $headers .= "Reply-To: suporte@re.source.com.br\r\n";
 
-mail($email, $assunto, $corpo, $headers);
-// ⚠️  Em produção use PHPMailer + SMTP.
+@mail($email, $assunto, $corpo, $headers);
 
-// ── 10. Sucesso ───────────────────────────────────────────────
-$redirectUrl = "/pendente.php?email=" . urlencode($email);
-voltarComSucesso($redirectUrl);
+// ── 10. Redireciona para tela de pendente ────────────────────
+voltarComSucesso("/pendente.php?email=" . urlencode($email));

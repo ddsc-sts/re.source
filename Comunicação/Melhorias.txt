@@ -4,6 +4,8 @@ O que está com * = Importante
 
 FrontEnd:
 
+-Na 2.1.png mostra qu o cadastro.errors.css esta feio ajustar isso
+
 -Fazer a index.html, onde ficara a parte em que os usuarios
 cadastrados estarão *  Leo Gay
 
