@@ -89,7 +89,7 @@
   
   /* Benefícios */
   .aside-benefits {
-    display: flex;
+    display: fixed;
     flex-direction: column;
     gap: 1.25rem;
     margin-bottom: 2.5rem;
