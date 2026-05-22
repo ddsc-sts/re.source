@@ -10,9 +10,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
+<<<<<<< HEAD
   <!-- Caminhos relativos à RAIZ (onde fica o cadastro.php que inclui este HTML) -->
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/cadastro.css" />
+=======
+>>>>>>> 0f8cabb77686721f1335f168s5881d16f71d649c9
 </head>
 <body>
 
@@ -79,7 +82,6 @@
           <p class="card-sub">Preencha os dados abaixo para começar</p>
         </div>
 
-        <!-- Alertas vindos via query string do BackEnd/auth/cadastro.php -->
         <div id="alertBox" style="display:none"></div>
 
         <div class="account-type-group">
@@ -94,7 +96,6 @@
           </button>
         </div>
 
-        <!-- action relativo à raiz → BackEnd/auth/cadastro.php -->
         <form class="form-body" id="formCadastro" action="BackEnd/auth/cadastro.php" method="POST">
 
           <div class="form-row">
@@ -250,141 +251,9 @@
     <a href="#" style="color:var(--green);">Política de Privacidade</a>
   </footer>
 
-  <script>
-    lucide.createIcons();
+  <!-- Inicializa ícones e carrega o JS do formulário -->
+  <script>lucide.createIcons();</script>
+  <script src="BackEnd/js/cadastro.js"></script>
 
-    // ── Alerta via query string ──
-    const params   = new URLSearchParams(window.location.search);
-    const alertBox = document.getElementById('alertBox');
-    if (params.get('erro')) {
-      alertBox.style.display = 'block';
-      alertBox.className = 'alert alert-erro';
-      alertBox.textContent = params.get('erro');
-    }
-    if (params.get('sucesso')) {
-      alertBox.style.display = 'block';
-      alertBox.className = 'alert alert-sucesso';
-      alertBox.textContent = params.get('sucesso');
-    }
-
-    // ── Tema ──
-    const html = document.documentElement;
-    const themeIcon = document.getElementById('themeIcon');
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const dark = html.getAttribute('data-theme') === 'dark';
-      html.setAttribute('data-theme', dark ? 'light' : 'dark');
-      themeIcon.setAttribute('data-lucide', dark ? 'sun' : 'moon');
-      lucide.createIcons();
-    });
-
-    // ── Tipo de conta ──
-    const typeBtns  = document.querySelectorAll('.type-btn');
-    const docLabel  = document.querySelector('#docField label');
-    const docInput  = document.getElementById('cnpj');
-    const razaoField = document.getElementById('razaoField');
-    const razaoLabel = razaoField.querySelector('label');
-
-    typeBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        typeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const t = btn.dataset.type;
-        if (t === 'pessoa') {
-          docLabel.innerHTML = 'CPF <span class="req">*</span>';
-          docInput.placeholder = '000.000.000-00';
-          docInput.maxLength = 14;
-          razaoField.style.display = 'none';
-        } else {
-          docLabel.innerHTML = 'CNPJ <span class="req">*</span>';
-          docInput.placeholder = '00.000.000/0001-00';
-          docInput.maxLength = 18;
-          razaoField.style.display = '';
-          razaoLabel.innerHTML = (t === 'cooperativa' ? 'Nome da Cooperativa' : 'Razão Social') + ' <span class="req">*</span>';
-        }
-      });
-    });
-
-    // ── Máscara CNPJ/CPF ──
-    docInput.addEventListener('input', e => {
-      let v = e.target.value.replace(/\D/g, '');
-      const isPessoa = document.querySelector('.type-btn.active').dataset.type === 'pessoa';
-      if (isPessoa) {
-        v = v.slice(0,11).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
-      } else {
-        v = v.slice(0,14).replace(/(\d{2})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1/$2').replace(/(\d{4})(\d{1,2})$/,'$1-$2');
-      }
-      e.target.value = v;
-    });
-
-    // ── Máscara Telefone ──
-    document.getElementById('telefone').addEventListener('input', e => {
-      let v = e.target.value.replace(/\D/g,'').slice(0,11);
-      v = v.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{1,4})$/,'$1-$2');
-      e.target.value = v;
-    });
-
-    // ── Mostrar/ocultar senha ──
-    function setupTogglePw(btnId, inputId) {
-      const btn = document.getElementById(btnId);
-      const inp = document.getElementById(inputId);
-      btn.addEventListener('click', () => {
-        const show = inp.type === 'password';
-        inp.type = show ? 'text' : 'password';
-        btn.querySelector('i').setAttribute('data-lucide', show ? 'eye-off' : 'eye');
-        lucide.createIcons();
-      });
-    }
-    setupTogglePw('toggleSenha', 'senha');
-    setupTogglePw('toggleConf', 'senhaConf');
-
-    // ── Força de senha ──
-    const senhaInput = document.getElementById('senha');
-    const bar        = document.querySelectorAll('#strengthBar span');
-    const lbl        = document.getElementById('strengthLabel');
-    const levels     = ['Muito fraca','Fraca','Razoável','Forte'];
-    const colors     = ['#dc3545','#fd7e14','#ffc107','#157347'];
-    senhaInput.addEventListener('input', () => {
-      const v = senhaInput.value;
-      let score = 0;
-      if (v.length >= 8)          score++;
-      if (/[A-Z]/.test(v))        score++;
-      if (/[0-9]/.test(v))        score++;
-      if (/[^A-Za-z0-9]/.test(v)) score++;
-      bar.forEach((s, i) => { s.style.background = i < score ? colors[score-1] : ''; });
-      lbl.textContent = v.length ? (levels[score-1] || '') : '';
-      lbl.style.color = colors[score-1] || '';
-    });
-
-    // ── Checkboxes customizados ──
-    document.querySelectorAll('.check-label input').forEach(cb => {
-      cb.addEventListener('change', () => cb.closest('.check-label').classList.toggle('checked', cb.checked));
-      if (cb.checked) cb.closest('.check-label').classList.add('checked');
-    });
-
-    // ── Submit ──
-    document.getElementById('formCadastro').addEventListener('submit', e => {
-      const btn    = document.getElementById('btnSubmit');
-      const email  = document.getElementById('email').value;
-      const senha  = document.getElementById('senha').value;
-      const termos = document.getElementById('chkTermos').checked;
-
-      if (!email || !senha || !termos) {
-        e.preventDefault();
-        btn.classList.add('shake');
-        btn.innerHTML = '<i data-lucide="rocket"></i><span>Preencha os campos obrigatórios</span>';
-        lucide.createIcons();
-        setTimeout(() => {
-          btn.classList.remove('shake');
-          btn.innerHTML = '<i data-lucide="rocket"></i><span>Criar minha conta</span>';
-          lucide.createIcons();
-        }, 2000);
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i><span>Criando conta…</span>';
-      lucide.createIcons();
-    });
-  </script>
 </body>
 </html>
