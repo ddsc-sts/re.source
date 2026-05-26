@@ -1,3 +1,3 @@
 <?php
-include 'FrontEnd/templates/index.html';
+include 'FrontEnd/templates/base.html';
 ?>
