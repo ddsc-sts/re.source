@@ -1,172 +1,120 @@
 <?php
+// BackEnd/auth/login.php — processa POST do formulário de login
 
+ob_start();
 session_start();
+require_once __DIR__ . "/../config/conexao.php";
 
-require_once '../config/conexao.php';
+header('Content-Type: application/json; charset=utf-8');
 
-header('Content-Type: application/json');
+// Detecta raiz do projeto automaticamente
+$raiz = rtrim(str_replace('BackEnd/auth/login.php', '', $_SERVER['SCRIPT_NAME']), '/');
 
-$email = trim($_POST['email'] ?? '');
+$email = strtolower(trim($_POST['email'] ?? ''));
 $senha = $_POST['password'] ?? '';
 
 if (empty($email) || empty($senha)) {
-
-    echo json_encode([
-        'success' => false,
-        'message' => 'Preencha todos os os campos.'
-    ]);
-
+    ob_clean();
+    echo json_encode(['success' => false, 'message' => 'Preencha todos os campos.']);
     exit;
 }
 
 try {
 
-    $sql = "
-        SELECT 
-            users.id,
-            users.company_id,
-            users.name,
-            users.email,
-            users.password_hash,
-            users.role,
-            users.is_active,
-            companies.status AS company_status
-        FROM users
-        INNER JOIN companies 
-            ON companies.id = users.company_id
-        WHERE users.email = :email
+    $stmt = $pdo->prepare("
+        SELECT
+            u.id,
+            u.company_id,
+            u.name,
+            u.email,
+            u.password_hash,
+            u.role,
+            u.is_active,
+            c.status AS company_status
+        FROM users u
+        INNER JOIN companies c ON c.id = u.company_id
+        WHERE u.email = :email
         LIMIT 1
-    ";
-
-    $stmt = $pdo->prepare($sql);
-
-    $stmt->execute([
-        ':email' => $email
-    ]);
-
+    ");
+    $stmt->execute([':email' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // usuário não encontrado
+    // Usuário não encontrado
     if (!$user) {
-
-        echo json_encode([
-            'success' => false,
-            'message' => 'E-mail ou senha inválidos.'
-        ]);
-
+        ob_clean();
+        echo json_encode(['success' => false, 'message' => 'E-mail ou senha inválidos.']);
         exit;
     }
 
-    // usuário desativado
+    // Usuário desativado
     if (!$user['is_active']) {
-
-        echo json_encode([
-            'success' => false,
-            'message' => 'Usuário desativado.'
-        ]);
-
+        ob_clean();
+        echo json_encode(['success' => false, 'message' => 'Usuário desativado. Entre em contato com o suporte.']);
         exit;
     }
 
-    // empresa suspensa
+    // Empresa suspensa ou inativa
     if ($user['company_status'] !== 'active') {
-
-        echo json_encode([
-            'success' => false,
-            'message' => 'Empresa suspensa.'
-        ]);
-
+        ob_clean();
+        echo json_encode(['success' => false, 'message' => 'Empresa suspensa ou inativa. Entre em contato com o suporte.']);
         exit;
     }
 
-    // verifica senha
+    // Senha incorreta
     if (!password_verify($senha, $user['password_hash'])) {
-
-        echo json_encode([
-            'success' => false,
-            'message' => 'E-mail ou senha inválidos.'
-        ]);
-
+        ob_clean();
+        echo json_encode(['success' => false, 'message' => 'E-mail ou senha inválidos.']);
         exit;
     }
 
-    // segurança
+    // ── Tudo certo — inicia sessão ────────────────────────────
     session_regenerate_id(true);
 
-    // sessão do usuário
     $_SESSION['user'] = [
-        'id' => $user['id'],
+        'id'         => $user['id'],
         'company_id' => $user['company_id'],
-        'name' => $user['name'],
-        'email' => $user['email'],
-        'role' => $user['role']
+        'name'       => $user['name'],
+        'email'      => $user['email'],
+        'role'       => $user['role'],
     ];
 
-    // token de sessão segura
-    $token = bin2hex(random_bytes(32));
-
-    // hash do token
+    // Token remember me
+    $token     = bin2hex(random_bytes(32));
     $tokenHash = hash('sha256', $token);
 
-    // salva no banco
-    $insertSession = $pdo->prepare("
-        INSERT INTO user_sessions (
-            user_id,
-            token_hash,
-            ip_address,
-            user_agent,
-            expires_at
-        ) VALUES (
-            :user_id,
-            :token_hash,
-            :ip_address,
-            :user_agent,
-            DATE_ADD(NOW(), INTERVAL 30 DAY)
-        )
-    ");
-
-    $insertSession->execute([
-        ':user_id' => $user['id'],
+    $pdo->prepare("
+        INSERT INTO user_sessions (user_id, token_hash, ip_address, user_agent, expires_at)
+        VALUES (:user_id, :token_hash, :ip, :ua, DATE_ADD(NOW(), INTERVAL 30 DAY))
+    ")->execute([
+        ':user_id'    => $user['id'],
         ':token_hash' => $tokenHash,
-        ':ip_address' => $_SERVER['REMOTE_ADDR'],
-        ':user_agent' => $_SERVER['HTTP_USER_AGENT']
+        ':ip'         => $_SERVER['REMOTE_ADDR'] ?? '',
+        ':ua'         => $_SERVER['HTTP_USER_AGENT'] ?? '',
     ]);
 
-    // cookie remember me
-    setcookie(
-        'remember_token',
-        $token,
-        [
-            'expires' => time() + (60 * 60 * 24 * 30),
-            'path' => '/',
-            'httponly' => true,
-            'secure' => false,
-            'samesite' => 'Lax'
-        ]
-    );
-
-    // atualiza último login
-    $updateLogin = $pdo->prepare("
-        UPDATE users
-        SET last_login_at = NOW()
-        WHERE id = :id
-    ");
-
-    $updateLogin->execute([
-        ':id' => $user['id']
+    setcookie('remember_token', $token, [
+        'expires'  => time() + (60 * 60 * 24 * 30),
+        'path'     => '/',
+        'httponly' => true,
+        'secure'   => false,
+        'samesite' => 'Lax',
     ]);
 
+    // Atualiza último login
+    $pdo->prepare("UPDATE users SET last_login_at = NOW() WHERE id = :id")
+        ->execute([':id' => $user['id']]);
+
+    ob_clean();
     echo json_encode([
-        'success' => true,
-        'message' => 'Login realizado com sucesso.',
-        'redirect' => '/re.source/dashboard.php'
+        'success'  => true,
+        'message'  => 'Login realizado com sucesso.',
+        'redirect' => $raiz . '/base.php',
     ]);
 
 } catch (PDOException $e) {
-
+    ob_clean();
     echo json_encode([
         'success' => false,
-        'message' => 'Erro interno no servidor.',
-        'error' => $e->getMessage()
+        'message' => 'Erro interno no servidor. Tente novamente.',
     ]);
 }

@@ -617,3 +617,7 @@
     transition: color 0.2s;
   }
   .login-link a:hover { color: var(--green-d); text-decoration: underline; }
+
+  .cnpj-tag-ok      { color: #157347; font-size: .8rem; }
+.cnpj-tag-erro    { color: #dc3545; font-size: .8rem; }
+.cnpj-tag-loading { color: #6c757d; font-size: .8rem; }

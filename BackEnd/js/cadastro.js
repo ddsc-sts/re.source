@@ -1,6 +1,7 @@
 /**
  * FrontEnd/js/cadastro.js
  * Gerencia o formulário de cadastro: máscaras, validações,
+ * busca automática de CNPJ via BrasilAPI,
  * submit via fetch → exibe erros inline sem recarregar a página.
  */
 
@@ -17,7 +18,6 @@
   const $  = id => document.getElementById(id);
   const qs = sel => document.querySelector(sel);
 
-  /** Exibe o alertBox global */
   function showAlert(msg, type = 'erro') {
     const box = $('alertBox');
     box.className = `alert alert-${type}`;
@@ -26,14 +26,12 @@
     box.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  /** Esconde o alertBox global */
   function hideAlert() {
     const box = $('alertBox');
     box.style.display = 'none';
     box.textContent = '';
   }
 
-  /** Marca um campo como inválido e exibe mensagem abaixo dele */
   function setFieldError(inputEl, msg) {
     const wrap = inputEl.closest('.form-field') ?? inputEl.parentElement;
     wrap.classList.add('field-error');
@@ -46,7 +44,6 @@
     hint.textContent = msg;
   }
 
-  /** Remove marcação de erro de um campo */
   function clearFieldError(inputEl) {
     const wrap = inputEl.closest('.form-field') ?? inputEl.parentElement;
     wrap.classList.remove('field-error');
@@ -54,7 +51,6 @@
     if (hint) hint.textContent = '';
   }
 
-  /** Remove todos os erros de campo */
   function clearAllErrors() {
     document.querySelectorAll('.form-field.field-error').forEach(f => {
       f.classList.remove('field-error');
@@ -63,7 +59,6 @@
     });
   }
 
-  /* ─── Lucide reload helper ──────────────────────────────────── */
   function reloadIcons() {
     if (window.lucide) lucide.createIcons();
   }
@@ -122,10 +117,87 @@
            .replace(/(\d{3})(\d)/, '$1.$2')
            .replace(/(\d{3})(\d)/, '$1/$2')
            .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+
+      // Dispara busca quando CNPJ estiver completo (14 dígitos)
+      const digits = v.replace(/\D/g, '');
+      if (digits.length === 14) buscarCNPJ(digits);
     }
     e.target.value = v;
     clearFieldError(docInput);
   });
+
+  /* ─── Busca CNPJ via BrasilAPI ──────────────────────────────── */
+  // Mapa UF → sigla (a API retorna nome da UF em algumas versões,
+  // mas normalmente já retorna a sigla — mantemos o mapa como fallback)
+  const UF_MAP = {
+    'AC':'AC','AL':'AL','AP':'AP','AM':'AM','BA':'BA','CE':'CE',
+    'DF':'DF','ES':'ES','GO':'GO','MA':'MA','MT':'MT','MS':'MS',
+    'MG':'MG','PA':'PA','PB':'PB','PR':'PR','PE':'PE','PI':'PI',
+    'RJ':'RJ','RN':'RN','RS':'RS','RO':'RO','RR':'RR','SC':'SC',
+    'SP':'SP','SE':'SE','TO':'TO',
+  };
+
+  function setCnpjStatus(type, msg) {
+    const tag = $('cnpjStatus');
+    if (!tag) return;
+    tag.textContent = msg;
+    tag.className   = 'input-tag cnpj-tag-' + type; // ok | erro | loading
+  }
+
+  async function buscarCNPJ(digits) {
+    const isPessoa = qs('.type-btn.active').dataset.type === 'pessoa';
+    if (isPessoa) return;
+
+    setCnpjStatus('loading', '⏳ Consultando...');
+
+    try {
+      const res  = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digits}`);
+      const data = await res.json();
+
+      if (!res.ok || data.message) {
+        setCnpjStatus('erro', '✗ CNPJ não encontrado');
+        setFieldError(docInput, data.message ?? 'CNPJ inválido ou não encontrado.');
+        return;
+      }
+
+      // ── Preenche Razão Social ────────────────────────────────
+      const razaoInput = $('razao');
+      if (razaoInput && data.razao_social) {
+        razaoInput.value = data.razao_social;
+        clearFieldError(razaoInput);
+      }
+
+      // ── Preenche Estado ──────────────────────────────────────
+      const estadoSelect = $('estado');
+      const uf = data.uf ? (UF_MAP[data.uf] ?? data.uf) : null;
+      if (estadoSelect && uf) {
+        // Procura o option correspondente e seleciona
+        const opt = Array.from(estadoSelect.options).find(o => o.value === uf || o.text === uf);
+        if (opt) {
+          estadoSelect.value = opt.value;
+          clearFieldError(estadoSelect);
+        }
+      }
+
+      // ── Preenche Telefone (se vier e estiver vazio) ──────────
+      const telInput = $('telefone');
+      if (telInput && !telInput.value && data.ddd_telefone_1) {
+        // Formata: ex "1133334444" → "(11) 33334-444" / "(11) 3333-4444"
+        let tel = data.ddd_telefone_1.replace(/\D/g, '').slice(0, 11);
+        tel = tel.replace(/(\d{2})(\d)/, '($1) $2')
+                 .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
+                 .replace(/(\d{4})(\d{1,4})$/, '$1-$2');
+        telInput.value = tel;
+        clearFieldError(telInput);
+      }
+
+      setCnpjStatus('ok', '✓ CNPJ válido');
+      clearFieldError(docInput);
+
+    } catch {
+      setCnpjStatus('erro', '✗ Falha na consulta');
+    }
+  }
 
   /* ─── Máscara Telefone ──────────────────────────────────────── */
   $('telefone').addEventListener('input', e => {
@@ -187,10 +259,6 @@
   });
 
   /* ─── Validação client-side ─────────────────────────────────── */
-  /**
-   * Retorna array de {field, msg} com os erros encontrados.
-   * field = id do input (ou null para erro global).
-   */
   function validateForm() {
     const erros = [];
 
@@ -262,37 +330,31 @@
     hideAlert();
     clearAllErrors();
 
-    /* 1. Validação client-side */
     const erros = validateForm();
     if (erros.length) {
       erros.forEach(({ field, msg }) => {
         if (field) setFieldError($(field), msg);
       });
-      // Mostra no alertBox o primeiro erro sem campo associado, ou resumo
       const global = erros.find(er => !er.field);
       showAlert(global ? global.msg : erros.map(er => er.msg).join(' · '));
       shakBtn();
       return;
     }
 
-    /* 2. Envia para o back-end */
     setBtnLoading(true);
 
     try {
       const resp = await fetch(form.action, {
-        method: 'POST',
-        body:   new FormData(form),
+        method:  'POST',
+        body:    new FormData(form),
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
       });
 
-      /* O PHP vai responder JSON quando detectar XHR */
       const data = await resp.json();
 
       if (data.ok) {
-        /* Sucesso → redireciona para a página de pendente */
         window.location.href = data.redirect ?? '/pendente.php';
       } else {
-        /* Erro(s) vindos do servidor */
         if (Array.isArray(data.campos)) {
           data.campos.forEach(({ field, msg }) => {
             const el = $(field);
