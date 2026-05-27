@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redefinir Senha — Re.Source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="/RE.SOURCE/FrontEnd/css/style.css">
+  <link rel="stylesheet" href="/RE.SOURCE/FrontEnd/css/login.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-top">
+      <div class="header-top-inner">
+        <a href="/" class="logo">
+          <span><img src="../img/logo.png" alt="Re.Source" /></span>
+        </a>
+        <div class="header-actions">
+          <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+            <i data-lucide="sun" id="themeIcon"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="register-main">
+
+    <aside class="register-aside">
+      <div class="aside-content">
+        <div class="aside-badge">
+          <span class="esg-dot"></span>
+          <span>Plataforma ESG Certificada</span>
+        </div>
+        <h2 class="aside-title">Quase lá! Crie sua nova senha.</h2>
+        <p class="aside-desc">Escolha uma senha forte para proteger sua conta na plataforma de economia circular.</p>
+        <ul class="aside-benefits">
+          <li>
+            <span class="benefit-icon"><i data-lucide="shield-check"></i></span>
+            <div>
+              <strong>Mínimo 8 caracteres</strong>
+              <span>Use letras, números e símbolos</span>
+            </div>
+          </li>
+          <li>
+            <span class="benefit-icon"><i data-lucide="lock"></i></span>
+            <div>
+              <strong>Sessões encerradas</strong>
+              <span>Por segurança, todos os acessos ativos serão desconectados</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="aside-orb aside-orb-1"></div>
+      <div class="aside-orb aside-orb-2"></div>
+    </aside>
+
+    <section class="register-panel">
+      <div class="register-card">
+
+        <!-- TELA: TOKEN INVÁLIDO -->
+        <div id="screenInvalid" class="auth-screen" style="display:none;">
+          <div class="sent-container">
+            <div class="sent-icon-wrap" style="background:rgba(220,53,69,.1);">
+              <i data-lucide="x-circle" style="color:#dc3545;"></i>
+            </div>
+            <h1 class="card-title">Link inválido</h1>
+            <p class="sent-desc" style="margin-bottom:1.5rem;">
+              Este link de recuperação é inválido ou já expirou.<br>Solicite um novo.
+            </p>
+            <a href="login.html" class="btn-submit" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
+              <i data-lucide="arrow-left"></i>
+              <span>Voltar ao login</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- TELA: FORMULÁRIO DE NOVA SENHA -->
+        <div id="screenReset" class="auth-screen" style="display:none;">
+          <div class="card-header">
+            <div class="screen-icon-wrap">
+              <i data-lucide="key-round"></i>
+            </div>
+            <h1 class="card-title">Criar nova senha</h1>
+            <p class="card-sub">Defina uma senha segura para sua conta</p>
+          </div>
+
+          <div class="alert-box alert-danger" id="resetAlert" style="display:none;margin-bottom:1rem;"></div>
+
+          <div class="form-body">
+            <div class="form-field">
+              <label for="novaSenha">Nova senha <span class="req">*</span></label>
+              <div class="input-wrap">
+                <i data-lucide="lock" class="input-icon"></i>
+                <input type="password" id="novaSenha" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+                <button class="toggle-pw" type="button" id="toggleNova" aria-label="Mostrar senha">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
+              <p class="field-error" id="novaSenhaError"></p>
+            </div>
+
+            <div class="form-field">
+              <label for="confirmarSenha">Confirmar senha <span class="req">*</span></label>
+              <div class="input-wrap">
+                <i data-lucide="lock" class="input-icon"></i>
+                <input type="password" id="confirmarSenha" placeholder="Repita a nova senha" autocomplete="new-password" />
+                <button class="toggle-pw" type="button" id="toggleConfirmar" aria-label="Mostrar senha">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
+              <p class="field-error" id="confirmarSenhaError"></p>
+            </div>
+
+            <!-- Indicador de força da senha -->
+            <div class="password-strength" id="strengthWrap" style="margin-bottom:1rem;display:none;">
+              <div class="strength-bar">
+                <div class="strength-fill" id="strengthFill"></div>
+              </div>
+              <span class="strength-label" id="strengthLabel"></span>
+            </div>
+
+            <button class="btn-submit" id="btnReset" type="button">
+              <i data-lucide="check-circle-2"></i>
+              <span>Salvar nova senha</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TELA: SUCESSO -->
+        <div id="screenSuccess" class="auth-screen" style="display:none;">
+          <div class="sent-container">
+            <div class="sent-icon-wrap">
+              <i data-lucide="check-circle-2"></i>
+            </div>
+            <h1 class="card-title">Senha redefinida!</h1>
+            <p class="sent-desc">Sua senha foi atualizada com sucesso.<br>Você será redirecionado para o login.</p>
+            <div class="token-timer">
+              <i data-lucide="clock"></i>
+              <span>Redirecionando em <strong id="redirectCount">3</strong>s…</span>
+            </div>
+            <a href="login.html" class="btn-submit btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;">
+              <i data-lucide="log-in"></i>
+              <span>Ir para o login</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- TELA: LOADING (validando token) -->
+        <div id="screenLoading" class="auth-screen active">
+          <div class="sent-container">
+            <div class="sent-icon-wrap">
+              <i data-lucide="loader-2" class="spin"></i>
+            </div>
+            <p class="sent-desc">Validando link…</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer style="text-align:center;padding:1.5rem;font-size:0.8rem;color:#6C757D;background:var(--white);border-top:1px solid var(--border-color);">
+    © 2026 Re.Source · Todos os direitos reservados ·
+    <a href="#" style="color:var(--green);">Política de Privacidade</a>
+  </footer>
+
+  <style>
+    /* Força da senha */
+    .password-strength { display:flex; align-items:center; gap:.75rem; }
+    .strength-bar { flex:1; height:4px; background:var(--border-color); border-radius:99px; overflow:hidden; }
+    .strength-fill { height:100%; border-radius:99px; transition: width .3s, background .3s; }
+    .strength-label { font-size:.75rem; font-weight:600; white-space:nowrap; }
+  </style>
+
+  <script>
+    lucide.createIcons();
+
+    // ── Tema ──
+    const html = document.documentElement;
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const dark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', dark ? 'light' : 'dark');
+      document.getElementById('themeIcon').setAttribute('data-lucide', dark ? 'sun' : 'moon');
+      lucide.createIcons();
+    });
+
+    // ── Utils ──
+    function showScreen(id) {
+      document.querySelectorAll('.auth-screen').forEach(s => {
+        s.classList.remove('active');
+        s.style.display = 'none';
+      });
+      const el = document.getElementById(id);
+      el.style.display = '';
+      el.classList.add('active');
+      lucide.createIcons();
+    }
+
+    function setError(id, msg) {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = msg; el.style.display = msg ? 'flex' : 'none'; }
+    }
+
+    function setInputState(inputId, state) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      input.classList.remove('input-ok', 'input-err');
+      if (state) input.classList.add(state);
+    }
+
+    // ── Pega token da URL ──
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get('token') || '';
+    const base   = window.location.pathname.replace(/reset\.php.*$|reset\.html.*$/, '');
+
+    // ── Valida token ao carregar ──
+    async function validarToken() {
+      if (!token) { showScreen('screenInvalid'); return; }
+      try {
+        const res  = await fetch(`${base}BackEnd/auth/reset.php?token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        showScreen(data.success ? 'screenReset' : 'screenInvalid');
+      } catch {
+        showScreen('screenInvalid');
+      }
+    }
+    validarToken();
+
+    // ── Toggle senha ──
+    function makeToggle(btnId, inputId) {
+      document.getElementById(btnId).addEventListener('click', () => {
+        const input = document.getElementById(inputId);
+        const show  = input.type === 'password';
+        input.type  = show ? 'text' : 'password';
+        document.querySelector(`#${btnId} i`).setAttribute('data-lucide', show ? 'eye-off' : 'eye');
+        lucide.createIcons();
+      });
+    }
+    makeToggle('toggleNova', 'novaSenha');
+    makeToggle('toggleConfirmar', 'confirmarSenha');
+
+    // ── Força da senha ──
+    document.getElementById('novaSenha').addEventListener('input', function () {
+      const val   = this.value;
+      const wrap  = document.getElementById('strengthWrap');
+      const fill  = document.getElementById('strengthFill');
+      const label = document.getElementById('strengthLabel');
+
+      if (!val) { wrap.style.display = 'none'; return; }
+      wrap.style.display = 'flex';
+
+      let score = 0;
+      if (val.length >= 8)              score++;
+      if (val.length >= 12)             score++;
+      if (/[A-Z]/.test(val))            score++;
+      if (/[0-9]/.test(val))            score++;
+      if (/[^A-Za-z0-9]/.test(val))     score++;
+
+      const levels = [
+        { pct: '20%', color: '#dc3545', text: 'Muito fraca' },
+        { pct: '40%', color: '#fd7e14', text: 'Fraca'       },
+        { pct: '60%', color: '#ffc107', text: 'Média'       },
+        { pct: '80%', color: '#20c997', text: 'Forte'       },
+        { pct: '100%',color: '#157347', text: 'Muito forte' },
+      ];
+      const lv = levels[Math.min(score, 4)];
+      fill.style.width      = lv.pct;
+      fill.style.background = lv.color;
+      label.textContent     = lv.text;
+      label.style.color     = lv.color;
+    });
+
+    // ── Submit redefinição ──
+    document.getElementById('btnReset').addEventListener('click', async () => {
+      const nova      = document.getElementById('novaSenha').value;
+      const confirmar = document.getElementById('confirmarSenha').value;
+      let valid = true;
+
+      setError('novaSenhaError', '');
+      setError('confirmarSenhaError', '');
+      setInputState('novaSenha', null);
+      setInputState('confirmarSenha', null);
+      document.getElementById('resetAlert').style.display = 'none';
+
+      if (!nova) {
+        setError('novaSenhaError', 'Informe a nova senha.');
+        setInputState('novaSenha', 'input-err');
+        valid = false;
+      } else if (nova.length < 8) {
+        setError('novaSenhaError', 'A senha deve ter no mínimo 8 caracteres.');
+        setInputState('novaSenha', 'input-err');
+        valid = false;
+      }
+
+      if (!confirmar) {
+        setError('confirmarSenhaError', 'Confirme a nova senha.');
+        setInputState('confirmarSenha', 'input-err');
+        valid = false;
+      } else if (nova !== confirmar) {
+        setError('confirmarSenhaError', 'As senhas não coincidem.');
+        setInputState('confirmarSenha', 'input-err');
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      const btn = document.getElementById('btnReset');
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i><span>Salvando…</span>';
+      lucide.createIcons();
+
+      try {
+        const fd = new FormData();
+        fd.append('token',            token);
+        fd.append('password',         nova);
+        fd.append('password_confirm', confirmar);
+
+        const res  = await fetch(`${base}BackEnd/auth/reset.php`, { method: 'POST', body: fd });
+        const data = await res.json();
+
+        if (data.success) {
+          showScreen('screenSuccess');
+          let count = 3;
+          const iv = setInterval(() => {
+            count--;
+            document.getElementById('redirectCount').textContent = count;
+            if (count <= 0) {
+              clearInterval(iv);
+              location.href = `${base}login.html`;
+            }
+          }, 1000);
+        } else {
+          const alert = document.getElementById('resetAlert');
+          alert.textContent = data.message || 'Erro ao redefinir senha.';
+          alert.style.display = 'block';
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="check-circle-2"></i><span>Salvar nova senha</span>';
+          lucide.createIcons();
+        }
+
+      } catch {
+        const alert = document.getElementById('resetAlert');
+        alert.textContent = 'Falha na comunicação com o servidor.';
+        alert.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check-circle-2"></i><span>Salvar nova senha</span>';
+        lucide.createIcons();
+      }
+    });
+
+    // Enter dispara submit
+    ['novaSenha','confirmarSenha'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('btnReset').click();
+      });
+    });
+  </script>
+</body>
+</html>

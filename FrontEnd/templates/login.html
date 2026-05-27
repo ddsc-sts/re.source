@@ -374,7 +374,7 @@
       if (e.key === 'Enter') document.getElementById('btnSendRecover').click();
     });
 
-    // ── RECUPERAÇÃO (mantida simulada por ora) ──
+    // ── RECUPERAÇÃO ──
     let countdownInterval = null;
 
     function startCountdown() {
@@ -394,19 +394,38 @@
       }, 1000);
     }
 
-    function sendRecoverEmail(email) {
+    async function sendRecoverEmail(email) {
       const btn = document.getElementById('btnSendRecover');
       btn.disabled = true;
       btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i><span>Enviando…</span>';
       lucide.createIcons();
-      setTimeout(() => {
-        document.getElementById('sentEmailDisplay').textContent = email;
-        showScreen('screenSent');
-        startCountdown();
+
+      try {
+        const fd = new FormData();
+        fd.append('email', email);
+
+        const res  = await fetch(base + 'BackEnd/auth/recover.php', { method: 'POST', body: fd });
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); }
+        catch { setError('recoverEmailError', 'Resposta inesperada do servidor.'); return; }
+
+        if (data.success) {
+          document.getElementById('sentEmailDisplay').textContent = email;
+          showScreen('screenSent');
+          startCountdown();
+        } else {
+          setError('recoverEmailError', data.message || 'Erro ao enviar. Tente novamente.');
+          setInputState('recoverEmail', 'input-err');
+        }
+
+      } catch {
+        setError('recoverEmailError', 'Falha na comunicação com o servidor.');
+      } finally {
         btn.disabled = false;
         btn.innerHTML = '<i data-lucide="send"></i><span>Enviar link de recuperação</span>';
         lucide.createIcons();
-      }, 1800);
+      }
     }
 
     document.getElementById('btnSendRecover').addEventListener('click', () => {

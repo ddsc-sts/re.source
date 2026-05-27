@@ -4,30 +4,38 @@ O que está com * = Importante
 
 FrontEnd:
 
--Na 2.1.png mostra qu o cadastro.errors.css esta feio ajustar isso
-
--Fazer a index.html, onde ficara a parte em que os usuarios
-cadastrados estarão *  Leo Gay
-
--Modificar erros minunciosos na imagem 1.1 e na imagem 1.2, retirar o botao de anunciar
+*-Modificar erros minunciosos na imagem 1.1 e na imagem 1.2, retirar o botao de anunciar
 que aparece na index
 
--No menu hamburguer, quando clica fica um X
+*-No menu hamburguer, quando clica fica um X
 mesmo você saindo do menu, corrigir isso, 
 
--Ajustar o css do login para caso o usuario tenha
-colocado modo dark manter no login
+*-Criar as outras partes de html necessarias
 
--Criar as outras partes de html necessarias
+Arrumar os redirecionamentos
+
+arrumar os três risquinhos no base.php
+
+retirar a pessoa física do cadastro 
+
+arrumar a hero das paginas
+
+colocar no rodape da base a logo
+
+melhorar o visual do index
+
 
 BackEnd: 
 
--Validar no banco se o login e existe e logar na conta  
+Daniel:
 
--Ajustar  logica sobre a empresa, exemplo como será feito os anuncios, login e Informações sobre a empresa *
+-Ajustar  logica sobre a empresa, exemplo como será feito 
+os anuncios, login e Informações sobre a empresa *
 
--Fazer a Verificação no email *
+* arrumar o esqueceu sua senha
 
--Ajustar sobre o Cnpj para ter ficticio 
+coperativo somente login com linkedin
 
--Aplicar js no login para os erros, para melhorar a visibilidade 
+
+
+ 
