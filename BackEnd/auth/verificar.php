@@ -1,41 +1,63 @@
 <?php
 
-// BackEnd/auth/verificar.php — valida o token e cadastra o usuário no banco
+// BackEnd/auth/verificar.php — valida código de 6 dígitos e cadastra no banco
 
+ob_start();
 session_start();
 require_once __DIR__ . "/../config/conexao.php";
 
-$token = trim($_GET['token'] ?? '');
+$isXhr = ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
 
-// ── Sem token na URL ──────────────────────────────────────────
-if (!$token) {
-    exibirErro("Link inválido", "Este link de confirmação não existe ou é inválido.");
+function responderErro(string $msg): void {
+    global $isXhr;
+    if ($isXhr) {
+        ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'erro' => $msg]);
+    } else {
+        $email = urlencode($_SESSION['cadastro_pendente']['email'] ?? '');
+        header("Location: /pendente.php?email=$email&erro=" . urlencode($msg));
+    }
+    exit;
 }
 
-// ── Busca dados pendentes na sessão ──────────────────────────
-$pendente = $_SESSION['cadastro_pendente'] ?? null;
+function responderSucesso(string $url): void {
+    global $isXhr;
+    if ($isXhr) {
+        ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => true, 'redirect' => $url]);
+    } else {
+        header("Location: $url");
+    }
+    exit;
+}
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: /cadastro.php");
+    exit;
+}
+
+$codigoDigitado = trim($_POST['codigo'] ?? '');
+$pendente       = $_SESSION['cadastro_pendente'] ?? null;
+
+// ── Sessão expirou ────────────────────────────────────────────
 if (!$pendente) {
-    exibirErro("Sessão expirada", "Seus dados de cadastro expiraram. Por favor, <a href='/cadastro.php'>cadastre-se novamente</a>.");
+    responderErro("Sessão expirada. Faça o cadastro novamente.");
 }
 
-// ── Valida o token ────────────────────────────────────────────
-$tokenHash = hash('sha256', $token);
-
-if (!hash_equals($pendente['token_hash'], $tokenHash)) {
-    exibirErro("Link inválido", "Este link de confirmação não existe ou já foi removido.");
-}
-
-// ── Token expirado ────────────────────────────────────────────
+// ── Código expirou ────────────────────────────────────────────
 if (time() > $pendente['expires_at']) {
     unset($_SESSION['cadastro_pendente']);
-    exibirErro(
-        "Link expirado",
-        "Seu link de confirmação expirou. <a href='/cadastro.php'>Clique aqui para se cadastrar novamente.</a>"
-    );
+    responderErro("Código expirado. Faça o cadastro novamente.");
 }
 
-// ── Tudo certo — agora cadastra no banco ──────────────────────
+// ── Código errado ─────────────────────────────────────────────
+if ($codigoDigitado !== $pendente['codigo']) {
+    responderErro("Código incorreto. Verifique e tente novamente.");
+}
+
+// ── Tudo certo — cadastra no banco ────────────────────────────
 $pdo->beginTransaction();
 try {
 
@@ -74,69 +96,12 @@ try {
 
 } catch (\Throwable $e) {
     $pdo->rollBack();
-
-    // E-mail ou CNPJ já cadastrado (usuário clicou no link duas vezes)
     if ($e->getCode() === '23000') {
         unset($_SESSION['cadastro_pendente']);
-        exibirSucesso($pendente['nome'], $pendente['email'], true);
+        responderSucesso("/login.php?aviso=" . urlencode("Esta conta já está ativa. Faça login."));
     }
-
-    exibirErro("Erro interno", "Não foi possível ativar sua conta. Tente novamente ou entre em contato com o suporte.");
+    responderErro("Erro interno ao salvar. Tente novamente.");
 }
 
-// ── Limpa sessão e mostra sucesso ─────────────────────────────
 unset($_SESSION['cadastro_pendente']);
-exibirSucesso($pendente['nome'], $pendente['email'], false);
-
-// ── Funções de resposta visual ────────────────────────────────
-
-function exibirSucesso(string $nome, string $email, bool $jaAtivado): void {
-    $titulo = $jaAtivado ? "Conta já ativa" : "E-mail confirmado!";
-    $msg    = $jaAtivado
-        ? "Sua conta já estava ativa. Você pode fazer login normalmente."
-        : "Sua conta foi ativada com sucesso. Bem-vindo(a) ao Re.Source!";
-    renderPagina("✅", $titulo, $msg, $nome, $email, "#157347", "/login.php", "Fazer login agora");
-}
-
-function exibirErro(string $titulo, string $msg): void {
-    renderPagina("❌", $titulo, $msg, '', '', "#dc3545", "/cadastro.php", "Voltar ao cadastro");
-}
-
-function renderPagina(string $icone, string $titulo, string $msg, string $nome, string $email, string $cor, string $btnHref, string $btnLabel): void {
-    ?>
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title><?= htmlspecialchars($titulo) ?> — Re.Source</title>
-      <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="/FrontEnd/css/style.css">
-      <style>
-        body { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f4f7f4; font-family:Inter,sans-serif; padding:2rem; }
-        .card { background:#fff; border-radius:16px; box-shadow:0 4px 24px rgba(0,0,0,.08); padding:3rem 2.5rem; max-width:440px; width:100%; text-align:center; }
-        .icone { font-size:3.5rem; margin-bottom:1rem; }
-        h1 { font-family:Sora,sans-serif; color:#1a1a1a; margin:.5rem 0 1rem; font-size:1.6rem; }
-        p { color:#555; line-height:1.7; margin-bottom:1.5rem; }
-        p a { color:#157347; font-weight:600; }
-        .email-tag { display:inline-block; background:#f0f7f3; color:#157347; border-radius:6px; padding:.3rem .8rem; font-size:.9rem; font-weight:600; margin-bottom:1.5rem; }
-        .btn { display:inline-block; padding:.85rem 2rem; border-radius:8px; color:#fff; font-weight:700; text-decoration:none; font-size:1rem; }
-        .logo { font-family:Sora,sans-serif; font-weight:800; color:#157347; font-size:1.3rem; margin-bottom:2rem; display:block; }
-      </style>
-    </head>
-    <body>
-      <div class="card">
-        <span class="logo">Re.Source</span>
-        <div class="icone"><?= $icone ?></div>
-        <h1><?= htmlspecialchars($titulo) ?></h1>
-        <?php if ($email): ?>
-          <div class="email-tag"><?= htmlspecialchars($email) ?></div>
-        <?php endif; ?>
-        <p><?= $msg ?></p>
-        <a href="<?= $btnHref ?>" class="btn" style="background:<?= $cor ?>;"><?= $btnLabel ?></a>
-      </div>
-    </body>
-    </html>
-    <?php
-    exit;
-}
+responderSucesso("/login.php?sucesso=" . urlencode("Conta criada com sucesso! Faça login."));

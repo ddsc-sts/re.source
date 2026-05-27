@@ -1,10 +1,12 @@
- -- ============================================================
+-- ============================================================
 --  Re.Source — Marketplace B2B de Materiais Industriais
 --  SQL FINAL CONSOLIDADO — v3.1
---  Ajustes: responsible_name em companies, domínios bloqueados
---  completos, alinhamento total com requisitos v1.0
 --  MySQL 8.0+
 -- ============================================================
+
+CREATE DATABASE IF NOT EXISTS resource
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
 
 USE resource;
 
@@ -14,7 +16,7 @@ SET SQL_MODE = 'STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVIS
 -- ============================================================
 -- 1. PLANOS
 -- ============================================================
-CREATE TABLE plans (
+CREATE TABLE IF NOT EXISTS plans (
     id                  INT UNSIGNED     NOT NULL AUTO_INCREMENT,
     name                VARCHAR(60)      NOT NULL,
     max_active_listings INT              NOT NULL DEFAULT 3,
@@ -25,23 +27,23 @@ CREATE TABLE plans (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO plans (name, max_active_listings, transaction_fee_pct, freight_fee_pct, monthly_price) VALUES
-    ('Freemium',  3,   5.00, 8.00,   0.00),  -- RN-07: 3 anúncios ativos
-    ('Basic',     15,  4.00, 7.00, 149.00),
-    ('Pro',       999, 3.00, 5.00, 399.00);
+INSERT IGNORE INTO plans (id, name, max_active_listings, transaction_fee_pct, freight_fee_pct, monthly_price) VALUES
+    (1, 'Freemium',  3,   5.00, 8.00,   0.00),
+    (2, 'Basic',     15,  4.00, 7.00, 149.00),
+    (3, 'Pro',       999, 3.00, 5.00, 399.00);
 
 
 -- ============================================================
 -- 2. ENDEREÇOS
 -- ============================================================
-CREATE TABLE addresses (
+CREATE TABLE IF NOT EXISTS addresses (
     id          INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-    zip_code    VARCHAR(9)    NOT NULL,
-    street      VARCHAR(200)  NOT NULL,
-    number      VARCHAR(20)   NOT NULL,
+    zip_code    VARCHAR(9)    NOT NULL DEFAULT '',
+    street      VARCHAR(200)  NOT NULL DEFAULT '',
+    number      VARCHAR(20)   NOT NULL DEFAULT '',
     complement  VARCHAR(100)      NULL,
-    district    VARCHAR(100)  NOT NULL,
-    city        VARCHAR(100)  NOT NULL,
+    district    VARCHAR(100)  NOT NULL DEFAULT '',
+    city        VARCHAR(100)  NOT NULL DEFAULT '',
     state       CHAR(2)       NOT NULL,
     lat         DECIMAL(10,7)     NULL,
     lng         DECIMAL(10,7)     NULL,
@@ -55,24 +57,24 @@ CREATE TABLE addresses (
 -- ============================================================
 -- 3. EMPRESAS
 -- ============================================================
-CREATE TABLE companies (
+CREATE TABLE IF NOT EXISTS companies (
     id                    INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-    cnpj                  CHAR(14)      NOT NULL,               -- apenas dígitos, sem máscara
+    cnpj                  CHAR(14)      NOT NULL,
     razao_social          VARCHAR(200)  NOT NULL,
     nome_fantasia         VARCHAR(200)      NULL,
-    slug                  VARCHAR(150)      NULL,               -- URLs amigáveis
-    email                 VARCHAR(150)  NOT NULL,               -- RN-04: e-mail corporativo
-    phone                 VARCHAR(20)   NOT NULL,               -- dígitos apenas
-    responsible_name      VARCHAR(150)  NOT NULL,               -- RF-01: responsável pelo cadastro
+    slug                  VARCHAR(150)      NULL,
+    email                 VARCHAR(150)  NOT NULL,
+    phone                 VARCHAR(20)   NOT NULL DEFAULT '',
+    responsible_name      VARCHAR(150)  NOT NULL,
     address_id            INT UNSIGNED      NULL,
     logo_url              VARCHAR(500)      NULL,
-    segment               VARCHAR(100)      NULL,               -- RF-01: ramo de atuação
+    segment               VARCHAR(100)      NULL,
     status                ENUM('active','suspended','inactive') NOT NULL DEFAULT 'active',
-    plan_id               INT UNSIGNED  NOT NULL DEFAULT 1,     -- 1 = Freemium
-    email_verified_at     TIMESTAMP         NULL,               -- RF-03: confirmação de e-mail
+    plan_id               INT UNSIGNED  NOT NULL DEFAULT 1,
+    email_verified_at     TIMESTAMP         NULL,
     onboarding_completed  TINYINT(1)    NOT NULL DEFAULT 0,
-    suspended_at          TIMESTAMP         NULL,               -- RN-24
-    deactivated_at        TIMESTAMP         NULL,               -- RF-06
+    suspended_at          TIMESTAMP         NULL,
+    deactivated_at        TIMESTAMP         NULL,
     created_at            TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at            TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -88,34 +90,35 @@ CREATE TABLE companies (
 -- ============================================================
 -- 4. USUÁRIOS
 -- ============================================================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id              INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     company_id      INT UNSIGNED  NOT NULL,
-    name            VARCHAR(120)  NOT NULL,                     -- nome + sobrenome concatenados
+    name            VARCHAR(120)  NOT NULL,
     email           VARCHAR(150)  NOT NULL,
-    password_hash   VARCHAR(255)  NOT NULL,                     -- RNF-03: bcrypt cost 12+
+    password_hash   VARCHAR(255)  NOT NULL,
     role            ENUM('admin_company','operator') NOT NULL DEFAULT 'admin_company',
     is_active       TINYINT(1)    NOT NULL DEFAULT 1,
     last_login_at   TIMESTAMP         NULL,
-    deleted_at      TIMESTAMP         NULL,                     -- soft delete (LGPD — RNF-05)
+    deleted_at      TIMESTAMP         NULL,
     created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE  idx_user_email   (email),
-    INDEX   idx_user_login   (email, is_active),               -- performance no login
+    INDEX   idx_user_login   (email, is_active),
     INDEX   idx_user_company (company_id),
     CONSTRAINT fk_users_company FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 -- ============================================================
--- 5. TOKENS DE VERIFICAÇÃO DE E-MAIL (RF-03)
+-- 5. VERIFICAÇÕES DE E-MAIL
+--    (mantida no banco — usada como fallback/auditoria)
 -- ============================================================
-CREATE TABLE email_verifications (
+CREATE TABLE IF NOT EXISTS email_verifications (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id     INT UNSIGNED    NOT NULL,
-    token_hash  CHAR(64)        NOT NULL,                       -- SHA-256 do token enviado
-    expires_at  TIMESTAMP       NOT NULL,                       -- 24h após cadastro
+    token_hash  CHAR(64)        NOT NULL,
+    expires_at  TIMESTAMP       NOT NULL,
     used_at     TIMESTAMP           NULL,
     created_at  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -126,15 +129,15 @@ CREATE TABLE email_verifications (
 
 
 -- ============================================================
--- 6. SESSÕES DE LOGIN (RF-04 / RNF-03)
+-- 6. SESSÕES DE LOGIN
 -- ============================================================
-CREATE TABLE user_sessions (
+CREATE TABLE IF NOT EXISTS user_sessions (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id     INT UNSIGNED    NOT NULL,
-    token_hash  CHAR(64)        NOT NULL,                       -- SHA-256 do token real
+    token_hash  CHAR(64)        NOT NULL,
     ip_address  VARCHAR(45)         NULL,
     user_agent  TEXT                NULL,
-    expires_at  TIMESTAMP       NOT NULL,                       -- RNF-03: 8h
+    expires_at  TIMESTAMP       NOT NULL,
     created_at  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE  idx_session_token (token_hash),
@@ -145,13 +148,13 @@ CREATE TABLE user_sessions (
 
 
 -- ============================================================
--- 7. TOKENS DE RECUPERAÇÃO DE SENHA (RF-04)
+-- 7. RECUPERAÇÃO DE SENHA
 -- ============================================================
-CREATE TABLE password_resets (
+CREATE TABLE IF NOT EXISTS password_resets (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id     INT UNSIGNED    NOT NULL,
-    token_hash  CHAR(64)        NOT NULL,                       -- SHA-256 do token real
-    expires_at  TIMESTAMP       NOT NULL,                       -- RF-04: 1 hora
+    token_hash  CHAR(64)        NOT NULL,
+    expires_at  TIMESTAMP       NOT NULL,
     used_at     TIMESTAMP           NULL,
     created_at  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -162,17 +165,16 @@ CREATE TABLE password_resets (
 
 
 -- ============================================================
--- 8. DOMÍNIOS DE E-MAIL BLOQUEADOS (RN-04)
+-- 8. DOMÍNIOS DE E-MAIL BLOQUEADOS
 -- ============================================================
-CREATE TABLE blocked_email_domains (
+CREATE TABLE IF NOT EXISTS blocked_email_domains (
     id      INT UNSIGNED NOT NULL AUTO_INCREMENT,
     domain  VARCHAR(100) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE idx_domain (domain)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Lista completa alinhada com RN-04
-INSERT INTO blocked_email_domains (domain) VALUES
+INSERT IGNORE INTO blocked_email_domains (domain) VALUES
     ('gmail.com'),
     ('hotmail.com'),
     ('outlook.com'),
@@ -188,9 +190,9 @@ INSERT INTO blocked_email_domains (domain) VALUES
 
 
 -- ============================================================
--- 9. CATEGORIAS DE MATERIAIS (RF-09)
+-- 9. CATEGORIAS DE MATERIAIS
 -- ============================================================
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     parent_id   INT UNSIGNED     NULL,
     name        VARCHAR(100) NOT NULL,
@@ -204,8 +206,7 @@ CREATE TABLE categories (
     CONSTRAINT fk_categories_parent FOREIGN KEY (parent_id) REFERENCES categories (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- RF-09: categorias predefinidas pelo admin
-INSERT INTO categories (parent_id, name, slug) VALUES
+INSERT IGNORE INTO categories (parent_id, name, slug) VALUES
     (NULL, 'Têxtil',        'textil'),
     (NULL, 'Metal',         'metal'),
     (NULL, 'Plástico',      'plastico'),
@@ -219,9 +220,9 @@ INSERT INTO categories (parent_id, name, slug) VALUES
 
 
 -- ============================================================
--- 10. ANÚNCIOS (RF-07 / RF-08 / RF-11)
+-- 10. ANÚNCIOS
 -- ============================================================
-CREATE TABLE listings (
+CREATE TABLE IF NOT EXISTS listings (
     id                  INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     company_id          INT UNSIGNED  NOT NULL,
     created_by_user_id  INT UNSIGNED      NULL,
@@ -231,15 +232,15 @@ CREATE TABLE listings (
     category_id         INT UNSIGNED  NOT NULL,
     quantity            DECIMAL(12,3) NOT NULL,
     unit                ENUM('kg','ton','m2','m3','unidade','litro','outro') NOT NULL DEFAULT 'kg',
-    price               DECIMAL(12,2)     NULL,                -- RN-11: obrigatório em offer
+    price               DECIMAL(12,2)     NULL,
     is_negotiable       TINYINT(1)    NOT NULL DEFAULT 0,
     status              ENUM('draft','active','paused','negotiating','concluded','expired') NOT NULL DEFAULT 'draft',
     location_state      CHAR(2)           NULL,
     location_city       VARCHAR(100)      NULL,
-    expires_at          TIMESTAMP         NULL,                -- RF-12: padrão 30 dias
-    expiry_notified     TINYINT(1)    NOT NULL DEFAULT 0,      -- RF-12: notificação 3 dias antes
+    expires_at          TIMESTAMP         NULL,
+    expiry_notified     TINYINT(1)    NOT NULL DEFAULT 0,
     views_count         INT UNSIGNED  NOT NULL DEFAULT 0,
-    deleted_at          TIMESTAMP         NULL,                -- soft delete (RF-14)
+    deleted_at          TIMESTAMP         NULL,
     created_at          TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -250,9 +251,9 @@ CREATE TABLE listings (
     INDEX    idx_listing_location  (location_state, location_city),
     INDEX    idx_listing_expires   (expires_at),
     INDEX    idx_listing_deleted   (deleted_at),
-    FULLTEXT idx_listing_fts       (title, description),       -- RF-15: busca full-text
+    FULLTEXT idx_listing_fts       (title, description),
     CONSTRAINT chk_offer_price CHECK (
-        (type = 'offer' AND price IS NOT NULL) OR (type = 'demand') -- RN-11
+        (type = 'offer' AND price IS NOT NULL) OR (type = 'demand')
     ),
     CONSTRAINT fk_listings_company  FOREIGN KEY (company_id)         REFERENCES companies (id) ON DELETE CASCADE,
     CONSTRAINT fk_listings_category FOREIGN KEY (category_id)        REFERENCES categories (id),
@@ -261,13 +262,13 @@ CREATE TABLE listings (
 
 
 -- ============================================================
--- 11. IMAGENS DOS ANÚNCIOS (RF-10)
+-- 11. IMAGENS DOS ANÚNCIOS
 -- ============================================================
-CREATE TABLE listing_images (
+CREATE TABLE IF NOT EXISTS listing_images (
     id          INT UNSIGNED     NOT NULL AUTO_INCREMENT,
     listing_id  INT UNSIGNED     NOT NULL,
     url         VARCHAR(500)     NOT NULL,
-    `order`     TINYINT UNSIGNED NOT NULL DEFAULT 0,           -- RF-10: até 10 imagens
+    `order`     TINYINT UNSIGNED NOT NULL DEFAULT 0,
     created_at  TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     INDEX idx_li_listing (listing_id),
@@ -276,9 +277,9 @@ CREATE TABLE listing_images (
 
 
 -- ============================================================
--- 12. FAVORITOS (RF-20)
+-- 12. FAVORITOS
 -- ============================================================
-CREATE TABLE favorites (
+CREATE TABLE IF NOT EXISTS favorites (
     id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     company_id  INT UNSIGNED NOT NULL,
     listing_id  INT UNSIGNED NOT NULL,
@@ -291,15 +292,15 @@ CREATE TABLE favorites (
 
 
 -- ============================================================
--- 13. NEGOCIAÇÕES (RF-21 / RF-25 / RN-12)
+-- 13. NEGOCIAÇÕES
 -- ============================================================
-CREATE TABLE negotiations (
+CREATE TABLE IF NOT EXISTS negotiations (
     id                INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     listing_id        INT UNSIGNED  NOT NULL,
     buyer_company_id  INT UNSIGNED  NOT NULL,
     seller_company_id INT UNSIGNED  NOT NULL,
     status            ENUM('open','proposal_sent','accepted','concluded','cancelled') NOT NULL DEFAULT 'open',
-    protocol_number   VARCHAR(30)       NULL UNIQUE,           -- RN-14: gerado ao aceitar
+    protocol_number   VARCHAR(30)       NULL UNIQUE,
     proposed_quantity DECIMAL(12,3)     NULL,
     proposed_price    DECIMAL(12,2)     NULL,
     proposed_total    DECIMAL(12,2)     NULL,
@@ -309,11 +310,11 @@ CREATE TABLE negotiations (
     created_at        TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    UNIQUE  idx_neg_unique_pair (listing_id, buyer_company_id), -- RN-12: uma por par
+    UNIQUE  idx_neg_unique_pair (listing_id, buyer_company_id),
     INDEX   idx_neg_buyer       (buyer_company_id),
     INDEX   idx_neg_seller      (seller_company_id),
     INDEX   idx_neg_status      (status),
-    CONSTRAINT chk_self_negotiation CHECK (buyer_company_id <> seller_company_id), -- RN-08
+    CONSTRAINT chk_self_negotiation CHECK (buyer_company_id <> seller_company_id),
     CONSTRAINT fk_neg_listing FOREIGN KEY (listing_id)        REFERENCES listings  (id),
     CONSTRAINT fk_neg_buyer   FOREIGN KEY (buyer_company_id)  REFERENCES companies (id),
     CONSTRAINT fk_neg_seller  FOREIGN KEY (seller_company_id) REFERENCES companies (id)
@@ -321,9 +322,9 @@ CREATE TABLE negotiations (
 
 
 -- ============================================================
--- 14. PROPOSTAS FORMAIS (RF-24 / RF-25 / RN-13)
+-- 14. PROPOSTAS FORMAIS
 -- ============================================================
-CREATE TABLE proposals (
+CREATE TABLE IF NOT EXISTS proposals (
     id                INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     negotiation_id    INT UNSIGNED  NOT NULL,
     sender_company_id INT UNSIGNED  NOT NULL,
@@ -343,15 +344,15 @@ CREATE TABLE proposals (
 
 
 -- ============================================================
--- 15. MENSAGENS DO CHAT (RF-22 / RF-23)
+-- 15. MENSAGENS DO CHAT
 -- ============================================================
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     negotiation_id  INT UNSIGNED    NOT NULL,
     sender_user_id  INT UNSIGNED    NOT NULL,
     content         TEXT                NULL,
     file_url        VARCHAR(500)        NULL,
-    file_type       ENUM('pdf','jpeg','png','xlsx') NULL,       -- RF-23
+    file_type       ENUM('pdf','jpeg','png','xlsx') NULL,
     read_at         TIMESTAMP           NULL,
     edited_at       TIMESTAMP           NULL,
     created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -365,9 +366,9 @@ CREATE TABLE messages (
 
 
 -- ============================================================
--- 16. TRANSPORTADORAS (RF-44)
+-- 16. TRANSPORTADORAS
 -- ============================================================
-CREATE TABLE carriers (
+CREATE TABLE IF NOT EXISTS carriers (
     id                INT UNSIGNED NOT NULL AUTO_INCREMENT,
     name              VARCHAR(150) NOT NULL,
     api_url           VARCHAR(500) NOT NULL,
@@ -379,19 +380,19 @@ CREATE TABLE carriers (
 
 
 -- ============================================================
--- 17. FRETES (RF-29 a RF-33)
+-- 17. FRETES
 -- ============================================================
-CREATE TABLE freights (
+CREATE TABLE IF NOT EXISTS freights (
     id                      INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     negotiation_id          INT UNSIGNED  NOT NULL,
     carrier_id              INT UNSIGNED      NULL,
-    origin_address_id       INT UNSIGNED      NULL,             -- RN-18: endereço do anunciante
+    origin_address_id       INT UNSIGNED      NULL,
     destination_address_id  INT UNSIGNED      NULL,
-    modality                ENUM('rodoviario','expresso','dedicado','outro') NULL, -- RF-30
+    modality                ENUM('rodoviario','expresso','dedicado','outro') NULL,
     quote_value             DECIMAL(10,2)     NULL,
-    platform_fee            DECIMAL(10,2)     NULL,             -- RN-19: % sobre frete
+    platform_fee            DECIMAL(10,2)     NULL,
     total_value             DECIMAL(10,2)     NULL,
-    tracking_code           VARCHAR(100)      NULL,             -- RF-32
+    tracking_code           VARCHAR(100)      NULL,
     tracking_url            VARCHAR(500)      NULL,
     status                  ENUM('quoted','contracted','in_transit','delivered','cancelled') NOT NULL DEFAULT 'quoted',
     contracted_at           TIMESTAMP         NULL,
@@ -407,9 +408,9 @@ CREATE TABLE freights (
 
 
 -- ============================================================
--- 18. TRANSAÇÕES FINANCEIRAS (RF-34 a RF-38)
+-- 18. TRANSAÇÕES FINANCEIRAS
 -- ============================================================
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
     id              INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     negotiation_id  INT UNSIGNED      NULL,
     company_id      INT UNSIGNED  NOT NULL,
@@ -418,8 +419,8 @@ CREATE TABLE transactions (
     status          ENUM('pending','paid','overdue','cancelled') NOT NULL DEFAULT 'pending',
     due_date        DATE              NULL,
     paid_at         TIMESTAMP         NULL,
-    gateway_ref     VARCHAR(200)      NULL,                     -- RF-36: ref. do gateway
-    receipt_url     VARCHAR(500)      NULL,                     -- RF-37: recibo PDF
+    gateway_ref     VARCHAR(200)      NULL,
+    receipt_url     VARCHAR(500)      NULL,
     created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -433,9 +434,9 @@ CREATE TABLE transactions (
 
 
 -- ============================================================
--- 19. NOTIFICAÇÕES (RF-27)
+-- 19. NOTIFICAÇÕES
 -- ============================================================
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     company_id  INT UNSIGNED    NOT NULL,
     user_id     INT UNSIGNED        NULL,
@@ -446,11 +447,11 @@ CREATE TABLE notifications (
                     'proposal_refused',
                     'negotiation_concluded',
                     'negotiation_cancelled',
-                    'listing_expiring',       -- RF-12: 3 dias antes
+                    'listing_expiring',
                     'listing_expired',
                     'freight_status_updated',
-                    'payment_due',            -- RN-24
-                    'account_suspended'       -- RN-24
+                    'payment_due',
+                    'account_suspended'
                 ) NOT NULL,
     title       VARCHAR(200)    NOT NULL,
     body        TEXT                NULL,
@@ -468,18 +469,18 @@ CREATE TABLE notifications (
 
 
 -- ============================================================
--- 20. UPLOADS CENTRALIZADOS (RF-10 / RF-23 / RNF-15)
+-- 20. UPLOADS CENTRALIZADOS
 -- ============================================================
-CREATE TABLE uploads (
+CREATE TABLE IF NOT EXISTS uploads (
     id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     company_id       INT UNSIGNED        NULL,
     user_id          INT UNSIGNED        NULL,
-    entity_type      VARCHAR(60)         NULL,                  -- listing, message, company
+    entity_type      VARCHAR(60)         NULL,
     entity_id        INT UNSIGNED        NULL,
     original_name    VARCHAR(255)    NOT NULL,
     stored_name      VARCHAR(255)    NOT NULL,
     url              VARCHAR(500)    NOT NULL,
-    storage_provider ENUM('s3','r2','minio','local') NOT NULL DEFAULT 's3', -- RNF-15
+    storage_provider ENUM('s3','r2','minio','local') NOT NULL DEFAULT 's3',
     checksum_sha256  CHAR(64)            NULL,
     mime_type        VARCHAR(100)    NOT NULL,
     size_bytes       INT UNSIGNED    NOT NULL,
@@ -494,12 +495,12 @@ CREATE TABLE uploads (
 
 
 -- ============================================================
--- 21. CACHE DE VALIDAÇÕES DE CNPJ (RF-02 / RN-03)
+-- 21. CACHE DE VALIDAÇÕES DE CNPJ
 -- ============================================================
-CREATE TABLE cnpj_validations (
+CREATE TABLE IF NOT EXISTS cnpj_validations (
     id                INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    cnpj              CHAR(14)     NOT NULL,                    -- apenas dígitos
-    status            VARCHAR(30)  NOT NULL,                    -- ex: ATIVA, SUSPENSA
+    cnpj              CHAR(14)     NOT NULL,
+    status            VARCHAR(30)  NOT NULL,
     razao_social      VARCHAR(200)     NULL,
     api_response_json JSON             NULL,
     validated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -509,9 +510,9 @@ CREATE TABLE cnpj_validations (
 
 
 -- ============================================================
--- 22. LOG DE AUDITORIA (RF-45 / RNF-05 LGPD)
+-- 22. LOG DE AUDITORIA
 -- ============================================================
-CREATE TABLE audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id         INT UNSIGNED        NULL,
     company_id      INT UNSIGNED        NULL,
@@ -535,9 +536,9 @@ CREATE TABLE audit_logs (
 
 
 -- ============================================================
--- 23. HISTÓRICO DE STATUS DOS ANÚNCIOS (RF-11)
+-- 23. HISTÓRICO DE STATUS DOS ANÚNCIOS
 -- ============================================================
-CREATE TABLE listing_status_history (
+CREATE TABLE IF NOT EXISTS listing_status_history (
     id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     listing_id  INT UNSIGNED NOT NULL,
     from_status VARCHAR(30)      NULL,
@@ -552,9 +553,9 @@ CREATE TABLE listing_status_history (
 
 
 -- ============================================================
--- 24. ALERTAS DE BUSCA (RF — pós-MVP / H7 Nielsen)
+-- 24. ALERTAS DE BUSCA
 -- ============================================================
-CREATE TABLE search_alerts (
+CREATE TABLE IF NOT EXISTS search_alerts (
     id               INT UNSIGNED NOT NULL AUTO_INCREMENT,
     company_id       INT UNSIGNED NOT NULL,
     filters_json     JSON         NOT NULL,
@@ -571,20 +572,17 @@ CREATE TABLE search_alerts (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
--- RESUMO FINAL — v3.1
--- 24 tabelas:
---   plans, addresses, companies, users,
---   email_verifications (*novo — RF-03),
---   user_sessions, password_resets, blocked_email_domains,
---   categories, listings, listing_images, favorites,
---   negotiations, proposals, messages,
---   carriers, freights, transactions,
+-- RESUMO — v3.1
+-- 24 tabelas: plans, addresses, companies, users,
+--   email_verifications, user_sessions, password_resets,
+--   blocked_email_domains, categories, listings,
+--   listing_images, favorites, negotiations, proposals,
+--   messages, carriers, freights, transactions,
 --   notifications, uploads, cnpj_validations,
 --   audit_logs, listing_status_history, search_alerts
 --
--- Diferenças v3.0 → v3.1:
---   + companies.responsible_name  (RF-01)
---   + email_verifications         (RF-03 — tabela nova)
---   + blocked_email_domains lista completa com 12 domínios (RN-04)
---   + Comentários alinhados a RF/RN do documento v1.0
+-- Fluxo de cadastro (v3.1):
+--   Dados ficam em $_SESSION até confirmação do e-mail.
+--   Só após clicar no link o usuário é gravado no banco
+--   via BackEnd/auth/verificar.php
 -- ============================================================
