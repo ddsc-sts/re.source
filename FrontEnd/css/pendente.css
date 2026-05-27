@@ -1,0 +1,215 @@
+/* ══════════════════════════════════════════
+   pendente.css — standalone
+   Mesma identidade visual do Re.Source
+   sem depender do style.css
+══════════════════════════════════════════ */
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Variáveis próprias ── */
+:root {
+  --green:      #157347;
+  --green-d:    #0D4A2E;
+  --dark:       #343A40;
+  --muted:      #6C757D;
+  --bg:         #F8F9FA;
+  --white:      #ffffff;
+  --border:     #dee2e6;
+  --radius:     .6rem;
+  --font:       'Sora', sans-serif;
+}
+
+/* ── Page ── */
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  color: var(--dark);
+  padding: 1.5rem;
+}
+
+/* ── Card ── */
+.pendente-card {
+  background: var(--white);
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,.08);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+
+/* ── Logo ── */
+.logo-wrap { text-decoration: none; display: inline-block; margin-bottom: 1rem; }
+.logo-text  { font-family: var(--font); font-size: 1.4rem; color: var(--green); }
+.logo-text strong { font-weight: 700; }
+
+/* ── Envelope ── */
+.envelope-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: .5rem auto 1.25rem;
+}
+.envelope-icon svg { width: 72px; height: 72px; }
+
+.ping {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 14px; height: 14px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: ping 1.4s ease-in-out infinite;
+}
+@keyframes ping {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.7); opacity: 0; }
+}
+
+/* ── Textos ── */
+.pendente-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: .5rem;
+}
+.pendente-sub {
+  font-size: .925rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
+}
+.pendente-sub strong { color: var(--dark); word-break: break-all; }
+
+/* ── Alertas ── */
+.alert-box {
+  padding: .75rem 1rem;
+  border-radius: var(--radius);
+  font-size: .875rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+.alert-danger  { background: #fff1f0; color: #c0392b; border: 1px solid #f5c6cb; }
+.alert-success { background: #f0fff4; color: #157347; border: 1px solid #c3e6cb; }
+
+/* ── Inputs código ── */
+.code-inputs {
+  display: flex;
+  gap: .6rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.code-digit {
+  width: 52px;
+  height: 60px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--dark);
+  background: var(--white);
+  font-family: var(--font);
+  transition: border-color .18s, box-shadow .18s;
+  -moz-appearance: textfield;
+}
+.code-digit::-webkit-outer-spin-button,
+.code-digit::-webkit-inner-spin-button { -webkit-appearance: none; }
+.code-digit:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(21,115,71,.15);
+}
+.code-digit.digit-error {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220,53,69,.15);
+  animation: shake .3s ease;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-4px); }
+  75%       { transform: translateX(4px); }
+}
+
+/* ── Botão verificar ── */
+.btn-verificar {
+  width: 100%;
+  padding: .85rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font);
+  background: var(--green);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  transition: background .2s, opacity .2s;
+  margin-bottom: 1.25rem;
+}
+.btn-verificar:hover:not(:disabled) { background: var(--green-d); }
+.btn-verificar:disabled { opacity: .55; cursor: not-allowed; }
+
+/* spinner */
+.btn-spinner {
+  width: 18px; height: 18px;
+  border: 3px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Reenviar ── */
+.reenviar-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  font-size: .875rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--green);
+  font-size: .875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color .18s;
+}
+.btn-link:hover:not(:disabled) { color: var(--green-d); }
+.btn-link:disabled { color: var(--muted); cursor: not-allowed; text-decoration: none; }
+
+.reenviar-countdown { font-size: .8rem; color: var(--muted); min-width: 36px; }
+
+/* ── Voltar ── */
+.link-voltar {
+  display: inline-block;
+  font-size: .85rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .18s;
+  margin-top: .5rem;
+}
+.link-voltar:hover { color: var(--dark); }
+
+/* ── Responsivo ── */
+@media (max-width: 480px) {
+  .pendente-card { padding: 2rem 1.25rem; }
+  .code-digit { width: 42px; height: 52px; font-size: 1.3rem; }
+  .pendente-title { font-size: 1.25rem; }
+}

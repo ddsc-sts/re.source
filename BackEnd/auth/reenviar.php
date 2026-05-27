@@ -1,72 +1,48 @@
 <?php
+// BackEnd/auth/reenviar.php — gera novo código e reenvia via Mailtrap SMTP
 
-// BackEnd/auth/reenviar.php — reenvia o e-mail de confirmação
+ob_start();
+session_start();
+require_once __DIR__ . "/../config/mailer.php";
 
-require_once __DIR__ . "/../config/conexao.php";
+$isXhr = ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+function jsonOk(string $msg): void {
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['ok' => true, 'msg' => $msg]);
+    exit;
+}
+
+function jsonErro(string $msg): void {
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['ok' => false, 'erro' => $msg]);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$isXhr) {
     header("Location: /cadastro.php");
     exit;
 }
 
-$email = strtolower(trim($_POST["email"] ?? ''));
+$pendente = &$_SESSION['cadastro_pendente'];
+if (!$pendente) jsonErro("Sessão expirada. Refaça o cadastro.");
 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    header("Location: /cadastro.php?erro=" . urlencode("E-mail inválido."));
-    exit;
+// Cooldown de 60s
+$ultimoEnvio = $pendente['ultimo_envio'] ?? 0;
+if ((time() - $ultimoEnvio) < 60) {
+    $falta = 60 - (time() - $ultimoEnvio);
+    jsonErro("Aguarde {$falta}s antes de reenviar.");
 }
 
-// Busca o usuário pelo e-mail (ainda não verificado)
-$stmt = $pdo->prepare("SELECT id, name, email_verified_at FROM users WHERE email = ? LIMIT 1");
-$stmt->execute([$email]);
-$user = $stmt->fetch();
+// Novo código
+$novoCodigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+$pendente['codigo']       = $novoCodigo;
+$pendente['expires_at']   = time() + 3600;
+$pendente['ultimo_envio'] = time();
 
-// Resposta genérica — não revela se o e-mail existe (segurança)
-$msgPendente = "/pendente.php?email=" . urlencode($email);
+$enviou = enviarEmailCodigo($pendente['email'], $pendente['nome'], $novoCodigo);
+if (!$enviou) jsonErro("Falha ao enviar o e-mail. Tente novamente.");
 
-if (!$user) {
-    header("Location: $msgPendente");
-    exit;
-}
-
-// Se já verificou, manda direto pro login
-if ($user['email_verified_at'] !== null) {
-    header("Location: /login.php?info=" . urlencode("Sua conta já está ativa. Faça login."));
-    exit;
-}
-
-// Remove tokens antigos deste usuário
-$pdo->prepare("DELETE FROM email_verifications WHERE user_id = ?")->execute([$user['id']]);
-
-// Gera novo token
-$token     = bin2hex(random_bytes(32));
-$expiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
-
-$pdo->prepare("INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?,?,?)")
-    ->execute([$user['id'], $token, $expiresAt]);
-
-// Monta e envia o e-mail
-$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-         . '://' . $_SERVER['HTTP_HOST'];
-
-$link = $baseUrl . "/BackEnd/auth/verificar.php?token=" . $token;
-
-$headers  = "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-$headers .= "From: Re.Source <noreply@re.source.com.br>\r\n";
-
-$corpo = "
-<html><body style='font-family:Inter,sans-serif;padding:2rem;'>
-  <h2>Reenvio de confirmação</h2>
-  <p>Olá, {$user['name']}! Clique abaixo para confirmar seu e-mail:</p>
-  <a href='$link' style='background:#157347;color:#fff;padding:.9rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;'>
-    ✅ Confirmar meu e-mail
-  </a>
-  <p style='color:#aaa;font-size:.85rem;margin-top:1.5rem;'>Link válido por 24 horas.</p>
-</body></html>
-";
-
-mail($email, "Novo link de confirmação — Re.Source", $corpo, $headers);
-
-header("Location: $msgPendente");
-exit;
+jsonOk("Novo código enviado para {$pendente['email']}.");

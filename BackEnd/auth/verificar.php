@@ -1,30 +1,31 @@
 <?php
-
 // BackEnd/auth/verificar.php — valida código de 6 dígitos e cadastra no banco
 
 ob_start();
 session_start();
 require_once __DIR__ . "/../config/conexao.php";
 
-$isXhr = ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
+$isXhr = ($_SERVER['HTTP_X_REQUESTED_With'] ?? '') === 'XMLHttpRequest'
+      || ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
+
+$raiz = rtrim(str_replace('BackEnd/auth/verificar.php', '', $_SERVER['SCRIPT_NAME']), '/');
 
 function responderErro(string $msg): void {
-    global $isXhr;
+    global $isXhr, $raiz;
+    ob_clean();
     if ($isXhr) {
-        ob_clean();
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['ok' => false, 'erro' => $msg]);
     } else {
-        $email = urlencode($_SESSION['cadastro_pendente']['email'] ?? '');
-        header("Location: /pendente.php?email=$email&erro=" . urlencode($msg));
+        header("Location: {$raiz}/pendente.php?erro=" . urlencode($msg));
     }
     exit;
 }
 
 function responderSucesso(string $url): void {
     global $isXhr;
+    ob_clean();
     if ($isXhr) {
-        ob_clean();
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['ok' => true, 'redirect' => $url]);
     } else {
@@ -34,25 +35,33 @@ function responderSucesso(string $url): void {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: /cadastro.php");
+    header("Location: {$raiz}/cadastro.php");
     exit;
 }
 
+// Coleta o código — aceita tanto POST['codigo'] quanto JSON body
 $codigoDigitado = trim($_POST['codigo'] ?? '');
-$pendente       = $_SESSION['cadastro_pendente'] ?? null;
+if ($codigoDigitado === '') {
+    // tenta ler do body JSON (fallback)
+    $body = json_decode(file_get_contents('php://input'), true);
+    $codigoDigitado = trim($body['codigo'] ?? '');
+}
 
-// ── Sessão expirou ────────────────────────────────────────────
+$pendente = $_SESSION['cadastro_pendente'] ?? null;
+
 if (!$pendente) {
     responderErro("Sessão expirada. Faça o cadastro novamente.");
 }
 
-// ── Código expirou ────────────────────────────────────────────
 if (time() > $pendente['expires_at']) {
     unset($_SESSION['cadastro_pendente']);
     responderErro("Código expirado. Faça o cadastro novamente.");
 }
 
-// ── Código errado ─────────────────────────────────────────────
+if ($codigoDigitado === '') {
+    responderErro("Nenhum código recebido. Tente novamente.");
+}
+
 if ($codigoDigitado !== $pendente['codigo']) {
     responderErro("Código incorreto. Verifique e tente novamente.");
 }
@@ -98,10 +107,10 @@ try {
     $pdo->rollBack();
     if ($e->getCode() === '23000') {
         unset($_SESSION['cadastro_pendente']);
-        responderSucesso("/login.php?aviso=" . urlencode("Esta conta já está ativa. Faça login."));
+        responderSucesso("{$raiz}/login.php?aviso=" . urlencode("Esta conta já está ativa. Faça login."));
     }
     responderErro("Erro interno ao salvar. Tente novamente.");
 }
 
 unset($_SESSION['cadastro_pendente']);
-responderSucesso("/login.php?sucesso=" . urlencode("Conta criada com sucesso! Faça login."));
+responderSucesso("{$raiz}/login.php?sucesso=" . urlencode("Conta criada com sucesso! Faça login."));
