@@ -1,4 +1,4 @@
-```css
+
 /* ───────────────── RESET ───────────────── */
 *,
 *::before,
@@ -325,6 +325,8 @@ header {
   top: 50%;
   transform: translateY(-50%);
   color: var(--muted);
+  background: transparent;
+  border: none;
 }
 
 .toggle-pw i {
