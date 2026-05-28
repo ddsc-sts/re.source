@@ -4,25 +4,35 @@ O que está com * = Importante
 
 FrontEnd:
 
-*-Modificar erros minunciosos na imagem 1.1 e na imagem 1.2, retirar o botao de anunciar
-que aparece na index
 
-*-No menu hamburguer, quando clica fica um X
+Leo:
+
+arrumar os três risquinhos no base.php/*-No menu hamburguer, quando clica fica um X
 mesmo você saindo do menu, corrigir isso, 
+
+colocar no rodape da base a logo
 
 *-Criar as outras partes de html necessarias
 
-Arrumar os redirecionamentos
+*-Modificar erros minunciosos na imagem 1.1 e na imagem 1.2, retirar o botao de anunciar
+que aparece na index
 
-arrumar os três risquinhos no base.php
+
+Geder:
 
 retirar a pessoa física do cadastro 
 
 arrumar a hero das paginas
 
-colocar no rodape da base a logo
-
 melhorar o visual do index
+
+retirar botao de modo dark do login e cadastro
+
+Arrumar os redirecionamentos
+
+arrumar oque se pede na imagem 2.1
+
+
 
 
 BackEnd: 
