@@ -15,16 +15,6 @@
   --border-color: #eee;
 }
 
-/* ── DARK THEME ── */
-[data-theme="dark"] {
-  --dark:   #E8E8E8;
-  --muted:  #9A9A9A;
-  --bg:     #1A1A2E;
-  --white:  #16213E;
-  --border-color: #2a2a4a;
-  --shadow-card: 0 12px 30px rgba(0,0,0,0.4);
-}
-
 html { font-size: 16px; scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
@@ -39,7 +29,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 img { display: block; }
 ul { list-style: none; }
 
-/* ── HEADER ── */
+/* ═══════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════ */
 header {
   position: sticky;
   top: 0;
@@ -52,8 +44,10 @@ header {
 .header-top {
   border-bottom: 1px solid var(--bg);
   transition: border-color 0.3s;
+  background: var(--bg);
 }
 
+/* ─── Flexbox: logo esquerda | hamburger direita | nav absolutamente centrada ─── */
 .header-top-inner {
   max-width: 1280px;
   margin: 0 auto;
@@ -61,41 +55,29 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
-}
-
-.logo img { height: 48px; }
-
-/* Header actions (theme toggle + hamburger) */
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* ── THEME TOGGLE ── */
-.theme-toggle {
-  width: 40px;
-  height: 40px;
-  border-radius: 0.5rem;
+  position: relative;       /* âncora para a nav absoluta */
   background: var(--bg);
-  color: var(--dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, color 0.2s;
-  flex-shrink: 0;
 }
-.theme-toggle:hover {
-  background: var(--green);
-  color: #ffffff;
-}
-.theme-toggle i { width: 20px; height: 20px; display: block; }
 
+/* Logo maior */
+.logo img {
+  height: 86px; /* era 48px */
+}
+
+/*
+  Nav centralizada de forma absoluta em relação ao .header-top
+  (que é full-width), garantindo alinhamento com a search bar
+  abaixo — ambas ficam centradas na largura da página.
+*/
 nav.desktop-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 2rem;
+  /* Garante que não sobreponha logo/hamburger em telas menores */
+  pointer-events: auto;
 }
 
 nav.desktop-nav a {
@@ -105,26 +87,68 @@ nav.desktop-nav a {
   font-size: 0.875rem;
   color: var(--dark);
   transition: opacity 0.2s;
+  white-space: nowrap;
 }
 nav.desktop-nav a:hover { opacity: 0.6; }
 nav.desktop-nav a i { width: 16px; height: 16px; }
 
+/* ─── Actions: só hamburger agora ─── */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  position: relative;
+}
+
 .hamburger {
+  position: relative;
   padding: 0.6rem;
   border-radius: 0.5rem;
   background: var(--bg);
   color: var(--dark);
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 .hamburger.open { background: var(--green); color: var(--white); }
-.hamburger i { width: 24px; height: 24px; display: block; }
 
-/* Dropdown */
+.hamburger i {
+  width: 24px;
+  height: 24px;
+  display: block;
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hamburger .icon-close {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  opacity: 0;
+  transform: rotate(-180deg);
+}
+
+.hamburger .icon-menu {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+.hamburger.open .icon-menu {
+  opacity: 0;
+  transform: rotate(180deg);
+}
+
+.hamburger.open .icon-close {
+  display: block;
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+/* ─── Dropdown ─── */
 .dropdown-menu {
   display: none;
   position: absolute;
   top: calc(100% + 8px);
-  right: 1.5rem;
+  left: 1200px;
   width: 288px;
   background: var(--white);
   border-radius: 0.75rem;
@@ -154,10 +178,15 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   transition: background 0.3s;
 }
 
-.dropdown-menu .menu-btn {
+/*
+  CORREÇÃO: o CSS original só selecionava "button.menu-btn",
+  mas os links são <a> — adicionado "a.menu-btn" aqui.
+*/
+.dropdown-menu button.menu-btn,
+.dropdown-menu a.menu-btn {
   display: block;
   width: calc(100% - 1rem);
-  margin: 0 0.5rem;
+  margin: 0 0.5rem 0.25rem;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   text-align: left;
@@ -165,7 +194,8 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   color: var(--dark);
   transition: background 0.15s;
 }
-.dropdown-menu button.menu-btn:hover { background: var(--bg); }
+.dropdown-menu .menu-btn:hover,
+.dropdown-menu a.menu-btn:hover { background: var(--bg); }
 
 .dropdown-divider { border-top: 1px solid var(--border-color); margin: 0.75rem 0; }
 
@@ -188,7 +218,7 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   box-shadow: 0 4px 12px rgba(21,115,71,0.35);
 }
 
-/* Search Bar */
+/* ─── Search Bar ─── */
 .search-bar-wrap {
   background: var(--bg);
   transition: background 0.3s;
@@ -306,7 +336,9 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
 .search-btn:hover { background: var(--green-d); }
 .search-btn i { width: 20px; height: 20px; }
 
-/* ── HERO BANNER ── */
+/* ═══════════════════════════════════════════════════
+   HERO BANNER
+═══════════════════════════════════════════════════ */
 .hero {
   position: relative;
   height: 600px;
@@ -383,7 +415,6 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
 .esg-badge span.label { font-weight: 600; font-family: var(--font-main); color: #343A40; font-size: 0.875rem; }
 .esg-badge span.tag { font-size: 0.7rem; background: #F8F9FA; color: #6C757D; padding: 2px 8px; border-radius: 9999px; }
 
-/* Dots */
 .hero-dots {
   position: absolute;
   bottom: 30px;
@@ -404,7 +435,9 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
 }
 .hero-dot.active { background: var(--green); transform: scale(1.3); }
 
-/* ── CATEGORY GRID ── */
+/* ═══════════════════════════════════════════════════
+   CATEGORY GRID
+═══════════════════════════════════════════════════ */
 .category-section {
   max-width: 1280px;
   margin: 0 auto;
@@ -475,7 +508,9 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   letter-spacing: 0.04em;
 }
 
-/* ── WASTE LISTINGS ── */
+/* ═══════════════════════════════════════════════════
+   WASTE LISTINGS
+═══════════════════════════════════════════════════ */
 .listings-section {
   background: var(--white);
   transition: background 0.3s;
@@ -576,19 +611,34 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   transition: color 0.3s;
 }
 
-/* ── FOOTER ── */
+/* ═══════════════════════════════════════════════════
+   FOOTER — redesenhado para harmonia e legibilidade
+═══════════════════════════════════════════════════ */
+
+/*
+  Paleta do rodapé: verde escuro que dialoga com a identidade
+  do site, em vez do cinza neutro anterior.
+  --footer-bg:        fundo principal (verde bem escuro)
+  --footer-surface:   stats bar, levemente mais claro
+  --footer-text:      texto principal — off-white legível
+  --footer-muted:     texto secundário — bege esverdeado
+  --footer-border:    separadores sutis
+*/
 footer {
-  background: var(--dark);
-  color: #ffffff;
-  transition: background 0.3s;
+  --footer-bg:      #0f2419;
+  --footer-surface: #162e1e;
+  --footer-text:    #e8f0ea;
+  --footer-muted:   #8aaa93;
+  --footer-border:  rgba(255,255,255,0.08);
+
+  background: var(--footer-bg);
+  color: var(--footer-text);
 }
 
-[data-theme="dark"] footer {
-  background: #0d0d1a;
-}
-
+/* ─── Stats bar ─── */
 .stats-bar {
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: var(--footer-surface);
+  border-bottom: 1px solid var(--footer-border);
 }
 .stats-inner {
   max-width: 1280px;
@@ -605,7 +655,7 @@ footer {
   font-family: var(--font-main);
   font-size: clamp(1.5rem, 3vw, 2.25rem);
   font-weight: 700;
-  color: var(--green);
+  color: #4fd68a; /* verde brilhante, legível no fundo escuro */
   margin-bottom: 0.4rem;
 }
 .stat-label {
@@ -613,9 +663,10 @@ footer {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #6C757D;
+  color: var(--footer-muted);
 }
 
+/* ─── Main footer ─── */
 .footer-main {
   max-width: 1280px;
   margin: 0 auto;
@@ -626,9 +677,31 @@ footer {
 }
 @media (min-width: 768px) { .footer-main { grid-template-columns: 1fr 1fr 1fr 1fr; } }
 
-.footer-logo img { height: 48px; margin-bottom: 1rem; }
-.footer-desc { font-size: 0.875rem; color: #6C757D; line-height: 1.6; }
+/* ─── Logo no rodapé ─── */
+.footer-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255,255,255,0.10); /* fundo suave para logo PNG transparente */
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 0.75rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(4px);
+}
+.footer-logo-wrap img {
+  height: 44px;
+  /* Inverte a logo para ficar branca no fundo escuro,
+     ideal para PNGs transparentes com texto/ícone escuro */
+  filter: brightness(0) invert(1);
+}
 
+.footer-desc {
+  font-size: 0.875rem;
+  color: var(--footer-muted);
+  line-height: 1.6;
+}
+
+/* ─── Colunas de links ─── */
 .footer-col h4 {
   font-family: var(--font-main);
   font-size: 0.7rem;
@@ -636,50 +709,79 @@ footer {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 1rem;
-  color: #ffffff;
+  color: var(--footer-text); /* era branco, mantido */
 }
 
 .footer-col ul { display: flex; flex-direction: column; gap: 0.5rem; }
 .footer-col ul a {
   font-size: 0.875rem;
-  color: #6C757D;
+  color: var(--footer-muted);
   transition: color 0.2s;
 }
-.footer-col ul a:hover { color: var(--green); }
+.footer-col ul a:hover { color: #4fd68a; }
 
-.footer-contact { font-size: 0.875rem; color: #6C757D; line-height: 1.8; margin-bottom: 1.25rem; }
-.footer-contact a { color: var(--green); transition: color 0.2s; }
-.footer-contact a:hover { color: #2ECC71; }
-
-.social-icons { display: flex; gap: 0.75rem; }
-.social-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 0.5rem;
-  background: rgba(21,115,71,0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--green);
-  transition: background 0.2s, transform 0.2s;
+/* ─── Contato ─── */
+.footer-contact {
+  font-size: 0.875rem;
+  color: var(--footer-muted);
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
 }
-.social-btn:hover { background: var(--green); color: #ffffff; transform: translateY(-2px); }
-.social-btn i { width: 18px; height: 18px; }
+.footer-contact a {
+  color: #4fd68a;
+  transition: color 0.2s;
+}
+.footer-contact a:hover { color: #7de8a6; }
 
+/* ─── Botão grande do WhatsApp ─── */
+.whatsapp-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: #25D366; /* cor oficial do WhatsApp */
+  color: #ffffff;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+  width: 100%;
+  justify-content: center;
+}
+.whatsapp-contact-btn:hover {
+  background: #1ebe57;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37,211,102,0.35);
+}
+.whatsapp-contact-btn svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* ─── Footer bottom ─── */
 .footer-bottom {
   max-width: 1280px;
   margin: 0 auto;
   padding: 1.5rem;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid var(--footer-border);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.825rem;
-  color: #6C757D;
+  color: var(--footer-muted);
 }
 @media (min-width: 768px) { .footer-bottom { flex-direction: row; justify-content: space-between; } }
-.footer-bottom .project { font-weight: 600; color: var(--green); }
+.footer-bottom .project { font-weight: 600; color: #4fd68a; }
 
-/* ── Responsive nav hide ── */
-@media (max-width: 767px) { nav.desktop-nav { display: none; } }
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE — nav desktop oculta no mobile
+═══════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  nav.desktop-nav { display: none; }
+}

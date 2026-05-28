@@ -34,6 +34,7 @@ function selectCategory(name) {
 
 // ── FECHAR MENUS AO CLICAR FORA ──
 document.addEventListener('click', (e) => {
+  // Fecha o menu hamburguer se clicou fora
   if (!dropdownMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
     menuOpen = false;
     dropdownMenu.classList.remove('open');
@@ -41,13 +42,16 @@ document.addEventListener('click', (e) => {
     hamburgerIcon.setAttribute('data-lucide', 'menu');
     lucide.createIcons();
   }
-  categoryDropdown.classList.remove('open');
+  // Fecha o dropdown de categoria se clicou fora
+  if (!categoryTrigger.contains(e.target) && !categoryDropdown.contains(e.target)) {
+    categoryDropdown.classList.remove('open');
+  }
 });
 
 // ── HERO SLIDER ──
-const slides   = document.querySelectorAll('.slide');
-const dots     = document.querySelectorAll('.hero-dot');
-let current    = 0;
+const slides = document.querySelectorAll('.slide');
+const dots   = document.querySelectorAll('.hero-dot');
+let current  = 0;
 let sliderTimer;
 
 function goTo(idx) {
