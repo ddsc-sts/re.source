@@ -26,8 +26,6 @@ arrumar a hero das paginas
 
 melhorar o visual do index
 
-retirar botao de modo dark do login e cadastro
-
 Arrumar os redirecionamentos
 
 arrumar oque se pede na imagem 2.1

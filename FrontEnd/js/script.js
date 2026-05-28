@@ -1,26 +1,6 @@
 // ── Init Lucide Icons ──
 lucide.createIcons();
 
-// ── THEME TOGGLE ──
-const themeToggleBtn  = document.getElementById('themeToggleBtn');
-const themeIcon       = document.getElementById('themeIcon');
-const htmlEl          = document.documentElement;
-
-// Load saved preference
-const savedTheme = localStorage.getItem('resource-theme') || 'light';
-htmlEl.setAttribute('data-theme', savedTheme);
-themeIcon.setAttribute('data-lucide', savedTheme === 'dark' ? 'sun' : 'moon');
-lucide.createIcons();
-
-themeToggleBtn.addEventListener('click', () => {
-  const current = htmlEl.getAttribute('data-theme');
-  const next    = current === 'dark' ? 'light' : 'dark';
-  htmlEl.setAttribute('data-theme', next);
-  localStorage.setItem('resource-theme', next);
-  themeIcon.setAttribute('data-lucide', next === 'dark' ? 'sun' : 'moon');
-  lucide.createIcons();
-});
-
 // ── HAMBURGER ──
 const hamburgerBtn  = document.getElementById('hamburgerBtn');
 const hamburgerIcon = document.getElementById('hamburgerIcon');

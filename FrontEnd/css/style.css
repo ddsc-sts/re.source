@@ -154,7 +154,7 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   transition: background 0.3s;
 }
 
-.dropdown-menu button.menu-btn {
+.dropdown-menu .menu-btn {
   display: block;
   width: calc(100% - 1rem);
   margin: 0 0.5rem;
