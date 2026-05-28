@@ -32,24 +32,22 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 try {
 
-    // Busca usuário pelo e-mail
     $stmt = $pdo->prepare("SELECT id, name FROM users WHERE email = :email AND is_active = 1 LIMIT 1");
     $stmt->execute([':email' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Responde sempre com sucesso para não revelar quais e-mails existem
     if (!$user) {
         responder(true, 'Se este e-mail estiver cadastrado, você receberá o link em breve.');
     }
 
-    // Invalida tokens anteriores deste usuário
+    // Invalida tokens anteriores
     $pdo->prepare("UPDATE password_resets SET used_at = NOW() WHERE user_id = :uid AND used_at IS NULL")
         ->execute([':uid' => $user['id']]);
 
     // Gera token seguro
-    $token     = bin2hex(random_bytes(32));          // 64 chars, URL-safe
+    $token     = bin2hex(random_bytes(32));
     $tokenHash = hash('sha256', $token);
-    $expiresAt = date('Y-m-d H:i:s', time() + 3600); // 1 hora
+    $expiresAt = date('Y-m-d H:i:s', time() + 3600);
 
     $pdo->prepare("
         INSERT INTO password_resets (user_id, token_hash, expires_at)
@@ -60,12 +58,11 @@ try {
         ':exp'  => $expiresAt,
     ]);
 
-    // Monta link de redefinição
+    // ✅ CORRIGIDO: aponta para BackEnd/auth/reset.php (onde o arquivo realmente existe)
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $link   = "{$scheme}://{$host}{$raiz}/reset.php?token={$token}";
+    $link   = "{$scheme}://{$host}{$raiz}/BackEnd/auth/reset.php?token={$token}";
 
-    // Envia e-mail usando seu mailer
     $enviado = enviarEmailRecuperacao($email, $user['name'], $link);
 
     if (!$enviado) {
