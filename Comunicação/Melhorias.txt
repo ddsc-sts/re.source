@@ -25,12 +25,15 @@ colocar no rodape da base a logo
 melhorar o visual do index
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Arrumar os redirecionamentos
 
 arrumar oque se pede na imagem 2.1
 
 
 
+=======
+>>>>>>> parent of 661fdf4 (melhorias)
 =======
 >>>>>>> parent of 661fdf4 (melhorias)
 
