@@ -32,9 +32,8 @@ Daniel:
 -Ajustar  logica sobre a empresa, exemplo como será feito 
 os anuncios, login e Informações sobre a empresa *
 
-* arrumar o esqueceu sua senha
 
-coperativo somente login com linkedin
+
 
 
 

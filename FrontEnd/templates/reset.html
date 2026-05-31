@@ -216,7 +216,7 @@
     // ── Pega token da URL ──
     const params = new URLSearchParams(window.location.search);
     const token  = params.get('token') || '';
-    const base   = window.location.pathname.replace(/reset\.php.*$|reset\.html.*$/, '');
+    const base = window.location.pathname.replace(/FrontEnd\/templates\/reset\.html.*$/, '');
 
     // ── Valida token ao carregar ──
     async function validarToken() {
@@ -331,7 +331,7 @@
             document.getElementById('redirectCount').textContent = count;
             if (count <= 0) {
               clearInterval(iv);
-              location.href = `${base}login.html`;
+              location.href = `${base}login.php`;
             }
           }, 1000);
         } else {
