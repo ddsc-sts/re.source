@@ -1,10 +1,10 @@
 melhorias:
 
-Daniel 💀 - retirar botão de modo dark do cadastro e login sem quebrar a logica de java script pois buga tudo,
 
-Daniel 💀 -retirar botões de logar/cadastrar pelas redes socias do login e cadastro sem quebrar a logica de java script pois buga tudo,
 
-Daniel 💀 - retirar cadastro de pessoa física do cadastro,
+
+
+
 
 Géder👺 - arrumar css dos checkbox do termos de uso e receber novidades do cadastro,
 

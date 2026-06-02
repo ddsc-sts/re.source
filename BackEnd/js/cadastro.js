@@ -11,7 +11,6 @@
   /* ─── Injeta CSS de erros inline ───────────────────────────── */
   const _style = document.createElement('link');
   _style.rel   = 'stylesheet';
-  // ✅ caminho absoluto
   _style.href  = '/RE.SOURCE/FrontEnd/css/cadastro-errors.css';
   document.head.appendChild(_style);
 
@@ -64,16 +63,6 @@
     if (window.lucide) lucide.createIcons();
   }
 
-  /* ─── Tema ─────────────────────────────────────────────────── */
-  const html      = document.documentElement;
-  const themeIcon = $('themeIcon');
-  $('themeToggle').addEventListener('click', () => {
-    const dark = html.getAttribute('data-theme') === 'dark';
-    html.setAttribute('data-theme', dark ? 'light' : 'dark');
-    themeIcon.setAttribute('data-lucide', dark ? 'sun' : 'moon');
-    reloadIcons();
-  });
-
   /* ─── Tipo de conta ─────────────────────────────────────────── */
   const form       = $('formCadastro');
   const typeBtns   = document.querySelectorAll('.type-btn');
@@ -82,7 +71,6 @@
   const razaoField = $('razaoField');
   const razaoLabel = razaoField.querySelector('label');
 
-  // ✅ Atualiza o ?tipo= na action conforme o botão selecionado
   function updateFormAction(tipo) {
     form.action = `/RE.SOURCE/BackEnd/auth/cadastro.php?tipo=${tipo}`;
   }
@@ -93,45 +81,31 @@
       btn.classList.add('active');
       const t = btn.dataset.type;
 
-      // ✅ Atualiza action ao trocar tipo
       updateFormAction(t);
 
-      if (t === 'pessoa') {
-        docLabel.innerHTML = 'CPF <span class="req">*</span>';
-        docInput.placeholder = '000.000.000-00';
-        docInput.maxLength = 14;
-        razaoField.style.display = 'none';
-      } else {
-        docLabel.innerHTML = 'CNPJ <span class="req">*</span>';
-        docInput.placeholder = '00.000.000/0001-00';
-        docInput.maxLength = 18;
-        razaoField.style.display = '';
-        razaoLabel.innerHTML =
-          (t === 'cooperativa' ? 'Nome da Cooperativa' : 'Razão Social') +
-          ' <span class="req">*</span>';
-      }
+      docLabel.innerHTML = 'CNPJ <span class="req">*</span>';
+      docInput.placeholder = '00.000.000/0001-00';
+      docInput.maxLength = 18;
+      razaoField.style.display = '';
+      razaoLabel.innerHTML =
+        (t === 'cooperativa' ? 'Nome da Cooperativa' : 'Razão Social') +
+        ' <span class="req">*</span>';
     });
   });
 
-  /* ─── Máscara CNPJ / CPF ────────────────────────────────────── */
+  /* ─── Máscara CNPJ ──────────────────────────────────────────── */
   docInput.addEventListener('input', e => {
     let v = e.target.value.replace(/\D/g, '');
-    const isPessoa = qs('.type-btn.active').dataset.type === 'pessoa';
-    if (isPessoa) {
-      v = v.slice(0, 11)
-           .replace(/(\d{3})(\d)/, '$1.$2')
-           .replace(/(\d{3})(\d)/, '$1.$2')
-           .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-    } else {
-      v = v.slice(0, 14)
-           .replace(/(\d{2})(\d)/, '$1.$2')
-           .replace(/(\d{3})(\d)/, '$1.$2')
-           .replace(/(\d{3})(\d)/, '$1/$2')
-           .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
 
-      const digits = v.replace(/\D/g, '');
-      if (digits.length === 14) buscarCNPJ(digits);
-    }
+    v = v.slice(0, 14)
+         .replace(/(\d{2})(\d)/, '$1.$2')
+         .replace(/(\d{3})(\d)/, '$1.$2')
+         .replace(/(\d{3})(\d)/, '$1/$2')
+         .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+
+    const digits = v.replace(/\D/g, '');
+    if (digits.length === 14) buscarCNPJ(digits);
+
     e.target.value = v;
     clearFieldError(docInput);
   });
@@ -153,9 +127,6 @@
   }
 
   async function buscarCNPJ(digits) {
-    const isPessoa = qs('.type-btn.active').dataset.type === 'pessoa';
-    if (isPessoa) return;
-
     setCnpjStatus('loading', '⏳ Consultando...');
 
     try {
@@ -275,7 +246,6 @@
     const senha     = $('senha').value;
     const senhaConf = $('senhaConf').value;
     const termos    = $('chkTermos').checked;
-    const isPessoa  = qs('.type-btn.active').dataset.type === 'pessoa';
 
     if (!nome)      erros.push({ field: 'nome',      msg: 'Nome é obrigatório.' });
     if (!sobrenome) erros.push({ field: 'sobrenome', msg: 'Sobrenome é obrigatório.' });
@@ -283,15 +253,11 @@
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       erros.push({ field: 'email', msg: 'Informe um e-mail válido.' });
 
-    if (isPessoa) {
-      if (cnpj.length !== 11)
-        erros.push({ field: 'cnpj', msg: 'CPF deve ter 11 dígitos.' });
-    } else {
-      if (cnpj.length !== 14)
-        erros.push({ field: 'cnpj', msg: 'CNPJ deve ter 14 dígitos.' });
-      if (!razao)
-        erros.push({ field: 'razao', msg: 'Razão social é obrigatória.' });
-    }
+    if (cnpj.length !== 14)
+      erros.push({ field: 'cnpj', msg: 'CNPJ deve ter 14 dígitos.' });
+
+    if (!razao)
+      erros.push({ field: 'razao', msg: 'Razão social é obrigatória.' });
 
     if (!telefone || telefone.length < 10)
       erros.push({ field: 'telefone', msg: 'Telefone inválido.' });
@@ -352,7 +318,6 @@
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
       });
 
-      // ✅ Verifica se a resposta é JSON antes de parsear
       const contentType = resp.headers.get('content-type') ?? '';
       if (!contentType.includes('application/json')) {
         const texto = await resp.text();
