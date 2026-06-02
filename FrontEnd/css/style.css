@@ -47,7 +47,6 @@ header {
   background: var(--bg);
 }
 
-/* ─── Flexbox: logo esquerda | hamburger direita | nav absolutamente centrada ─── */
 .header-top-inner {
   max-width: 1280px;
   margin: 0 auto;
@@ -55,20 +54,16 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;       /* âncora para a nav absoluta */
+  position: relative;
   background: var(--bg);
 }
 
-/* Logo maior */
+/* Logo */
 .logo img {
-  height: 86px; /* era 48px */
+  height: 86px;
 }
 
-/*
-  Nav centralizada de forma absoluta em relação ao .header-top
-  (que é full-width), garantindo alinhamento com a search bar
-  abaixo — ambas ficam centradas na largura da página.
-*/
+/* Nav centralizada — absoluta mas com limites para não sobrepor logo/hamburger */
 nav.desktop-nav {
   position: absolute;
   left: 50%;
@@ -76,8 +71,9 @@ nav.desktop-nav {
   display: flex;
   align-items: center;
   gap: 2rem;
-  /* Garante que não sobreponha logo/hamburger em telas menores */
   pointer-events: auto;
+  /* Evita sobreposição com logo e hamburger */
+  max-width: calc(100% - 320px);
 }
 
 nav.desktop-nav a {
@@ -92,12 +88,13 @@ nav.desktop-nav a {
 nav.desktop-nav a:hover { opacity: 0.6; }
 nav.desktop-nav a i { width: 16px; height: 16px; }
 
-/* ─── Actions: só hamburger agora ─── */
+/* Actions: só hamburger */
 .header-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  /* FIX: position relative para o dropdown ficar ancorado aqui */
   position: relative;
 }
 
@@ -143,12 +140,18 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   transform: rotate(0deg);
 }
 
-/* ─── Dropdown ─── */
+/* ─── Dropdown — FIX PRINCIPAL ─── */
+/*
+  PROBLEMA ORIGINAL: left: 1200px (valor fixo só funciona em 1920px)
+  SOLUÇÃO: ancorar no .header-actions (position: relative) e usar
+  right: 0 para alinhar pela direita — funciona em qualquer largura.
+*/
 .dropdown-menu {
   display: none;
   position: absolute;
   top: calc(100% + 8px);
-  left: 1200px;
+  right: 0;          /* FIX: era left: 1200px — agora alinha pela direita */
+  left: auto;        /* FIX: garante que left não interfira */
   width: 288px;
   background: var(--white);
   border-radius: 0.75rem;
@@ -178,10 +181,6 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   transition: background 0.3s;
 }
 
-/*
-  CORREÇÃO: o CSS original só selecionava "button.menu-btn",
-  mas os links são <a> — adicionado "a.menu-btn" aqui.
-*/
 .dropdown-menu button.menu-btn,
 .dropdown-menu a.menu-btn {
   display: block;
@@ -245,6 +244,7 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   padding: 0.5rem 1rem;
   border-right: 1px solid var(--bg);
   transition: border-color 0.3s;
+  min-width: 0; /* FIX: evita overflow em telas pequenas */
 }
 .search-field label {
   display: block;
@@ -271,6 +271,7 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   flex: 1;
   padding: 0.5rem 1rem;
   position: relative;
+  min-width: 0; /* FIX: evita overflow em telas pequenas */
 }
 .category-field label {
   display: block;
@@ -291,7 +292,7 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
   font-family: var(--font-body);
 }
 .category-trigger.selected { color: var(--dark); }
-.category-trigger i { width: 16px; height: 16px; color: var(--muted); }
+.category-trigger i { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
 
 .category-dropdown {
   display: none;
@@ -612,18 +613,8 @@ nav.desktop-nav a i { width: 16px; height: 16px; }
 }
 
 /* ═══════════════════════════════════════════════════
-   FOOTER — redesenhado para harmonia e legibilidade
+   FOOTER
 ═══════════════════════════════════════════════════ */
-
-/*
-  Paleta do rodapé: verde escuro que dialoga com a identidade
-  do site, em vez do cinza neutro anterior.
-  --footer-bg:        fundo principal (verde bem escuro)
-  --footer-surface:   stats bar, levemente mais claro
-  --footer-text:      texto principal — off-white legível
-  --footer-muted:     texto secundário — bege esverdeado
-  --footer-border:    separadores sutis
-*/
 footer {
   --footer-bg:      #0f2419;
   --footer-surface: #162e1e;
@@ -635,7 +626,6 @@ footer {
   color: var(--footer-text);
 }
 
-/* ─── Stats bar ─── */
 .stats-bar {
   background: var(--footer-surface);
   border-bottom: 1px solid var(--footer-border);
@@ -655,7 +645,7 @@ footer {
   font-family: var(--font-main);
   font-size: clamp(1.5rem, 3vw, 2.25rem);
   font-weight: 700;
-  color: #4fd68a; /* verde brilhante, legível no fundo escuro */
+  color: #4fd68a;
   margin-bottom: 0.4rem;
 }
 .stat-label {
@@ -666,7 +656,6 @@ footer {
   color: var(--footer-muted);
 }
 
-/* ─── Main footer ─── */
 .footer-main {
   max-width: 1280px;
   margin: 0 auto;
@@ -677,11 +666,10 @@ footer {
 }
 @media (min-width: 768px) { .footer-main { grid-template-columns: 1fr 1fr 1fr 1fr; } }
 
-/* ─── Logo no rodapé ─── */
 .footer-logo-wrap {
   display: inline-flex;
   align-items: center;
-  background: rgba(255,255,255,0.10); /* fundo suave para logo PNG transparente */
+  background: rgba(255,255,255,0.10);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 0.75rem;
   padding: 0.6rem 1rem;
@@ -690,8 +678,6 @@ footer {
 }
 .footer-logo-wrap img {
   height: 44px;
-  /* Inverte a logo para ficar branca no fundo escuro,
-     ideal para PNGs transparentes com texto/ícone escuro */
   filter: brightness(0) invert(1);
 }
 
@@ -701,7 +687,6 @@ footer {
   line-height: 1.6;
 }
 
-/* ─── Colunas de links ─── */
 .footer-col h4 {
   font-family: var(--font-main);
   font-size: 0.7rem;
@@ -709,7 +694,7 @@ footer {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 1rem;
-  color: var(--footer-text); /* era branco, mantido */
+  color: var(--footer-text);
 }
 
 .footer-col ul { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -720,7 +705,6 @@ footer {
 }
 .footer-col ul a:hover { color: #4fd68a; }
 
-/* ─── Contato ─── */
 .footer-contact {
   font-size: 0.875rem;
   color: var(--footer-muted);
@@ -733,12 +717,11 @@ footer {
 }
 .footer-contact a:hover { color: #7de8a6; }
 
-/* ─── Botão grande do WhatsApp ─── */
 .whatsapp-contact-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  background: #25D366; /* cor oficial do WhatsApp */
+  background: #25D366;
   color: #ffffff;
   font-family: var(--font-main);
   font-size: 0.9rem;
@@ -763,7 +746,6 @@ footer {
   flex-shrink: 0;
 }
 
-/* ─── Footer bottom ─── */
 .footer-bottom {
   max-width: 1280px;
   margin: 0 auto;
@@ -780,8 +762,66 @@ footer {
 .footer-bottom .project { font-weight: 600; color: #4fd68a; }
 
 /* ═══════════════════════════════════════════════════
-   RESPONSIVE — nav desktop oculta no mobile
+   RESPONSIVE — breakpoints
 ═══════════════════════════════════════════════════ */
+
+/* Desktop médio (1024px–1279px): logo menor para dar espaço à nav */
+@media (max-width: 1279px) {
+  .logo img { height: 64px; }
+}
+
+/* Tablet landscape / desktop pequeno (768px–1023px) */
+@media (max-width: 1023px) {
+  .logo img { height: 56px; }
+
+  nav.desktop-nav {
+    gap: 1.25rem;
+  }
+  nav.desktop-nav a {
+    font-size: 0.8rem;
+  }
+}
+
+/* Tablet portrait (768px) — nav vira hamburger-only */
 @media (max-width: 767px) {
   nav.desktop-nav { display: none; }
+
+  .logo img { height: 52px; }
+
+  /* FIX MOBILE: dropdown precisa de largura máxima para não sair da tela */
+  .dropdown-menu {
+    width: min(288px, calc(100vw - 2rem));
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 480px) {
+  .header-top-inner {
+    padding: 0.75rem 1rem;
+  }
+
+  .logo img { height: 44px; }
+
+  .search-bar-inner {
+    padding: 0.75rem 1rem;
+  }
+
+  /* Search pill: empilha em telas muito pequenas */
+  .search-pill {
+    border-radius: 1rem;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  .search-field {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--bg);
+    padding: 0.5rem 0.75rem;
+  }
+
+  .category-field {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+  }
 }
