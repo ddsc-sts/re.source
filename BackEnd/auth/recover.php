@@ -61,7 +61,7 @@ try {
     // ✅ CORRIGIDO: aponta para BackEnd/auth/reset.php (onde o arquivo realmente existe)
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $link = "{$scheme}://{$host}{$raiz}/FrontEnd/templates/reset.html?token={$token}";
+    $link   = "{$scheme}://{$host}{$raiz}/BackEnd/auth/reset.php?token={$token}";
 
     $enviado = enviarEmailRecuperacao($email, $user['name'], $link);
 

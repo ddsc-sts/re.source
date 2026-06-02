@@ -490,7 +490,7 @@ header {
 /* OAUTH */
 .oauth-row {
   display: grid;
-
+  grid-template-columns: repeat(3,1fr);
   gap: .8rem;
 }
 
@@ -676,10 +676,4 @@ footer {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-}
-
-.oauth-row {
-  grid-template-columns: 1fr;
-  max-width: 260px;
-  margin: 0 auto;
 }
