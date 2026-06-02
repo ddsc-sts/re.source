@@ -6,14 +6,14 @@ melhorias:
 
 
 
-Géder👺 - arrumar css dos checkbox do termos de uso e receber novidades do cadastro,
+Géder👺 (cadastro.css) - arrumar css dos checkbox do termos de uso e receber novidades do cadastro,
 
-Géder👺 - deixar o tamanho da logo do login igual aos demais
+Géder👺 (login.css) - deixar o tamanho da logo do login igual aos demais
 
 arrumar responsividade do css do base.php(exemplo menu dos 3 risquinhos esta sobrepondo o site 
 dependendo do tamanho do monitor, so ficando certo em 1920x1080, tendo que deixar o site e ele responsivo conforme o tamanho da tela)
 
-Géder👺 - deixar o css da index mais parecido com o do base(usando o mesmo css, tirando emojis, colocar logo no cabeçalho, 
+Géder👺 (index.css) - deixar o css da index mais parecido com o do base(usando o mesmo css, tirando emojis, colocar logo no cabeçalho, 
 deixar o footer igual ao da base, mudar as opções do cabeçalho e etc)
 
 
