@@ -19,11 +19,6 @@
         <a href="/" class="logo">
           <span><img src="/RE.SOURCE/FrontEnd/img/logo.png" alt="Re.Source" /></span>
         </a>
-        <div class="header-actions">
-          <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
-            <i data-lucide="sun" id="themeIcon"></i>
-          </button>
-        </div>
       </div>
     </div>
   </header>
@@ -72,7 +67,7 @@
             <p class="sent-desc" style="margin-bottom:1.5rem;">
               Este link de recuperação é inválido ou já expirou.<br>Solicite um novo.
             </p>
-            <a href="/RE.SOURCE/FrontEnd/login.php" class="btn-submit" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
+            <a href="/RE.SOURCE/login.php" class="btn-submit" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
               <i data-lucide="arrow-left"></i>
               <span>Voltar ao login</span>
             </a>
@@ -143,7 +138,7 @@
               <i data-lucide="clock"></i>
               <span>Redirecionando em <strong id="redirectCount">3</strong>s…</span>
             </div>
-            <a href="/RE.SOURCE/FrontEnd/login.php" class="btn-submit btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;">
+            <a href="/RE.SOURCE/login.php" class="btn-submit btn-outline" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;">
               <i data-lucide="log-in"></i>
               <span>Ir para o login</span>
             </a>
@@ -170,7 +165,6 @@
   </footer>
 
   <style>
-    /* Força da senha */
     .password-strength { display:flex; align-items:center; gap:.75rem; }
     .strength-bar { flex:1; height:4px; background:var(--border-color); border-radius:99px; overflow:hidden; }
     .strength-fill { height:100%; border-radius:99px; transition: width .3s, background .3s; }
@@ -179,15 +173,6 @@
 
   <script>
     lucide.createIcons();
-
-    // ── Tema ──
-    const html = document.documentElement;
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const dark = html.getAttribute('data-theme') === 'dark';
-      html.setAttribute('data-theme', dark ? 'light' : 'dark');
-      document.getElementById('themeIcon').setAttribute('data-lucide', dark ? 'sun' : 'moon');
-      lucide.createIcons();
-    });
 
     // ── Utils ──
     function showScreen(id) {
@@ -216,13 +201,15 @@
     // ── Pega token da URL ──
     const params = new URLSearchParams(window.location.search);
     const token  = params.get('token') || '';
-    const base   = window.location.pathname.replace(/reset\.php.*$|reset\.html.*$/, '');
+
+    // ── Monta base dinamicamente ──
+    const base = window.location.pathname.replace(/\/FrontEnd\/templates\/reset\.html.*$|\/BackEnd\/auth\/reset\.php.*$/, '/');
 
     // ── Valida token ao carregar ──
     async function validarToken() {
       if (!token) { showScreen('screenInvalid'); return; }
       try {
-        const res  = await fetch(`${base}BackEnd/auth/reset.php?token=${encodeURIComponent(token)}`);
+        const res  = await fetch(`${base}BackEnd/auth/reset.php?token=${encodeURIComponent(token)}&validate=1`);
         const data = await res.json();
         showScreen(data.success ? 'screenReset' : 'screenInvalid');
       } catch {
@@ -255,18 +242,18 @@
       wrap.style.display = 'flex';
 
       let score = 0;
-      if (val.length >= 8)              score++;
-      if (val.length >= 12)             score++;
-      if (/[A-Z]/.test(val))            score++;
-      if (/[0-9]/.test(val))            score++;
-      if (/[^A-Za-z0-9]/.test(val))     score++;
+      if (val.length >= 8)           score++;
+      if (val.length >= 12)          score++;
+      if (/[A-Z]/.test(val))         score++;
+      if (/[0-9]/.test(val))         score++;
+      if (/[^A-Za-z0-9]/.test(val))  score++;
 
       const levels = [
-        { pct: '20%', color: '#dc3545', text: 'Muito fraca' },
-        { pct: '40%', color: '#fd7e14', text: 'Fraca'       },
-        { pct: '60%', color: '#ffc107', text: 'Média'       },
-        { pct: '80%', color: '#20c997', text: 'Forte'       },
-        { pct: '100%',color: '#157347', text: 'Muito forte' },
+        { pct: '20%',  color: '#dc3545', text: 'Muito fraca'  },
+        { pct: '40%',  color: '#fd7e14', text: 'Fraca'        },
+        { pct: '60%',  color: '#ffc107', text: 'Média'        },
+        { pct: '80%',  color: '#20c997', text: 'Forte'        },
+        { pct: '100%', color: '#157347', text: 'Muito forte'  },
       ];
       const lv = levels[Math.min(score, 4)];
       fill.style.width      = lv.pct;
@@ -331,12 +318,12 @@
             document.getElementById('redirectCount').textContent = count;
             if (count <= 0) {
               clearInterval(iv);
-              location.href = `${base}login.html`;
+              location.href = `${base}login.php`;
             }
           }, 1000);
         } else {
           const alert = document.getElementById('resetAlert');
-          alert.textContent = data.message || 'Erro ao redefinir senha.';
+          alert.textContent  = data.message || 'Erro ao redefinir senha.';
           alert.style.display = 'block';
           btn.disabled = false;
           btn.innerHTML = '<i data-lucide="check-circle-2"></i><span>Salvar nova senha</span>';
@@ -345,7 +332,7 @@
 
       } catch {
         const alert = document.getElementById('resetAlert');
-        alert.textContent = 'Falha na comunicação com o servidor.';
+        alert.textContent  = 'Falha na comunicação com o servidor.';
         alert.style.display = 'block';
         btn.disabled = false;
         btn.innerHTML = '<i data-lucide="check-circle-2"></i><span>Salvar nova senha</span>';
@@ -353,8 +340,8 @@
       }
     });
 
-    // Enter dispara submit
-    ['novaSenha','confirmarSenha'].forEach(id => {
+    // ── Enter dispara submit ──
+    ['novaSenha', 'confirmarSenha'].forEach(id => {
       document.getElementById(id).addEventListener('keydown', e => {
         if (e.key === 'Enter') document.getElementById('btnReset').click();
       });
