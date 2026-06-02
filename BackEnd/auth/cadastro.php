@@ -7,7 +7,7 @@ session_start();
 require_once __DIR__ . "/../config/conexao.php";
 require_once __DIR__ . "/../config/mailer.php";
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+if ($_SERVER["REQUEST_METHOD"] !== "POST" || !isset($_GET['tipo']) || $_GET['tipo'] !== 'empresa') {
     header("Location: /cadastro.php");
     exit;
 }
