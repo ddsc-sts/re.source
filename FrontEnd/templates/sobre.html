@@ -1,795 +1,346 @@
-/* ── Reset & Base ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --green:   #157347;
-  --green-d: #0D4A2E;
-  --green-l: #e8f5ee;
-  --dark:    #343A40;
-  --muted:   #6C757D;
-  --bg:      #F8F9FA;
-  --white:   #ffffff;
-  --radius:  1rem;
-  --font-main: 'Sora', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --shadow-card: 0 12px 30px rgba(0,0,0,0.1);
-  --border-color: #eee;
-}
-
-[data-theme="dark"] {
-  --dark:   #E8E8E8;
-  --muted:  #9A9A9A;
-  --bg:     #1A1A2E;
-  --white:  #16213E;
-  --border-color: #2a2a4a;
-  --green-l: rgba(21,115,71,0.15);
-  --shadow-card: 0 12px 30px rgba(0,0,0,0.4);
-}
-
-html { font-size: 16px; scroll-behavior: smooth; }
-body {
-  font-family: var(--font-body);
-  background: var(--bg);
-  color: var(--dark);
-  min-height: 100vh;
-  transition: background 0.3s, color 0.3s;
-}
-
-a { text-decoration: none; color: inherit; }
-button { cursor: pointer; border: none; background: none; font-family: inherit; }
-img { display: block; }
-ul { list-style: none; }
-
-/* ══════════ HEADER ══════════ */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--white);
-  box-shadow: 0 1px 0 var(--bg);
-  transition: background 0.3s, box-shadow 0.3s;
-}
-
-.header-top { border-bottom: 1px solid var(--bg); transition: border-color 0.3s; }
-
-.header-top-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 1rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-}
-
-/* Logo */
-.logo-text {
-  font-family: var(--font-main);
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--dark);
-  transition: color 0.3s;
-}
-.logo-dot { color: var(--green); }
-
-.header-actions { display: flex; align-items: center; gap: 0.5rem; }
-
-.theme-toggle {
-  width: 40px; height: 40px;
-  border-radius: 0.5rem;
-  background: var(--bg);
-  color: var(--dark);
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s, color 0.2s;
-}
-.theme-toggle:hover { background: var(--green); color: #fff; }
-.theme-toggle i { width: 20px; height: 20px; display: block; }
-
-nav.desktop-nav { display: flex; align-items: center; gap: 2rem; }
-nav.desktop-nav a {
-  display: flex; align-items: center; gap: 0.4rem;
-  font-size: 0.875rem; color: var(--dark);
-  transition: opacity 0.2s, color 0.2s;
-}
-nav.desktop-nav a:hover { opacity: 0.6; }
-nav.desktop-nav a.active { color: var(--green); font-weight: 600; }
-nav.desktop-nav a i { width: 16px; height: 16px; }
-
-.hamburger {
-  padding: 0.6rem;
-  border-radius: 0.5rem;
-  background: var(--bg);
-  color: var(--dark);
-  transition: background 0.2s, color 0.2s;
-}
-.hamburger.open { background: var(--green); color: var(--white); }
-.hamburger i { width: 24px; height: 24px; display: block; }
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 1.5rem;
-  width: 288px;
-  background: var(--white);
-  border-radius: 0.75rem;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-  border: 1px solid var(--border-color);
-  overflow: hidden;
-  z-index: 200;
-  animation: slideDown 0.18s ease;
-  transition: background 0.3s;
-}
-.dropdown-menu.open { display: block; }
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.dropdown-label {
-  padding: 0.5rem 1rem;
-  font-size: 0.7rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--muted);
-  background: var(--bg);
-  margin-bottom: 0.25rem;
-  transition: background 0.3s;
-}
-
-.dropdown-menu .menu-btn {
-  display: block;
-  width: calc(100% - 1rem);
-  margin: 0 0.5rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  text-align: left;
-  font-size: 0.875rem;
-  color: var(--dark);
-  transition: background 0.15s;
-}
-.dropdown-menu .menu-btn:hover { background: var(--bg); }
-
-.dropdown-divider { border-top: 1px solid var(--border-color); margin: 0.75rem 0; }
-
-.btn-announce {
-  display: block;
-  width: calc(100% - 1rem);
-  margin: 0 0.5rem 0.75rem;
-  padding: 0.875rem 1rem;
-  border-radius: 0.5rem;
-  text-align: left;
-  font-size: 0.875rem; font-weight: 600;
-  color: var(--white);
-  background: var(--green);
-  transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
-}
-.btn-announce:hover {
-  background: var(--green-d);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(21,115,71,0.35);
-}
-
-@media (max-width: 767px) { nav.desktop-nav { display: none; } }
-
-/* ══════════ HERO ══════════ */
-.about-hero {
-  position: relative;
-  min-height: 600px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 5rem 1.5rem 4rem;
-  gap: 4rem;
-  overflow: hidden;
-}
-
-@media (max-width: 900px) {
-  .about-hero {
-    grid-template-columns: 1fr;
-    text-align: center;
-    padding: 3rem 1.5rem;
-    gap: 2.5rem;
-  }
-}
-
-.hero-bg-pattern {
-  position: absolute;
-  top: -80px; right: -100px;
-  width: 600px; height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(21,115,71,0.07) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--green);
-  margin-bottom: 1.25rem;
-}
-.eyebrow-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--green);
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.6; }
-}
-
-.hero-title {
-  font-family: var(--font-main);
-  font-size: clamp(2.4rem, 5vw, 3.75rem);
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--dark);
-  margin-bottom: 1.25rem;
-  transition: color 0.3s;
-}
-.hero-title em {
-  font-style: normal;
-  color: var(--green);
-  position: relative;
-}
-.hero-title em::after {
-  content: '';
-  position: absolute;
-  bottom: 2px; left: 0; right: 0;
-  height: 3px;
-  background: var(--green);
-  border-radius: 2px;
-  opacity: 0.3;
-}
-
-.hero-subtitle {
-  font-size: 1.1rem;
-  color: var(--muted);
-  line-height: 1.7;
-  max-width: 520px;
-  margin-bottom: 2.5rem;
-  transition: color 0.3s;
-}
-
-.hero-scroll-hint {
-  color: var(--green);
-  animation: bounce 2s infinite;
-}
-.hero-scroll-hint i { width: 24px; height: 24px; }
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
-}
-
-.hero-visual { position: relative; }
-
-.hero-img-wrap {
-  position: relative;
-  border-radius: 1.5rem;
-  overflow: hidden;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.15);
-}
-.hero-img-wrap img {
-  width: 100%;
-  height: 420px;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.6s ease;
-}
-.hero-img-wrap:hover img { transform: scale(1.04); }
-
-.hero-img-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(13,74,46,0.5) 0%, transparent 60%);
-}
-
-.hero-img-badge {
-  position: absolute;
-  bottom: 1.25rem; left: 1.25rem;
-  display: flex; align-items: center; gap: 0.6rem;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(8px);
-  border-radius: 9999px;
-  padding: 0.6rem 1rem;
-  font-size: 0.8rem; font-weight: 600;
-  color: var(--dark);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-.badge-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%; background: var(--green);
-}
-
-@media (max-width: 900px) {
-  .hero-scroll-hint { display: none; }
-  .hero-subtitle { margin: 0 auto 2rem; }
-  .hero-eyebrow { justify-content: center; }
-}
-
-/* ══════════ MVV ══════════ */
-.mvv-section {
-  background: var(--green);
-  padding: 5rem 1.5rem;
-}
-.mvv-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-@media (max-width: 768px) { .mvv-inner { grid-template-columns: 1fr; } }
-
-.mvv-card {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: var(--radius);
-  padding: 2.5rem 2rem;
-  color: #ffffff;
-  transition: transform 0.25s, background 0.25s;
-}
-.mvv-card:hover {
-  transform: translateY(-4px);
-  background: rgba(255,255,255,0.15);
-}
-.mvv-card.featured {
-  background: rgba(255,255,255,0.2);
-  border-color: rgba(255,255,255,0.3);
-  transform: translateY(-8px);
-}
-.mvv-card.featured:hover { transform: translateY(-12px); }
-
-.mvv-icon {
-  width: 52px; height: 52px;
-  border-radius: 0.75rem;
-  background: rgba(255,255,255,0.15);
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 1.5rem;
-}
-.mvv-icon i { width: 24px; height: 24px; color: #ffffff; }
-.mvv-card h3 {
-  font-family: var(--font-main);
-  font-size: 1.25rem; font-weight: 700;
-  margin-bottom: 0.875rem;
-}
-.mvv-card p { font-size: 0.9rem; line-height: 1.7; opacity: 0.85; }
-
-/* ══════════ STORY ══════════ */
-.story-section {
-  padding: 6rem 1.5rem;
-  background: var(--bg);
-  transition: background 0.3s;
-}
-.story-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5rem;
-  align-items: center;
-}
-@media (max-width: 900px) {
-  .story-inner { grid-template-columns: 1fr; gap: 3rem; }
-  .story-visual { order: -1; }
-}
-
-.section-tag {
-  display: inline-block;
-  font-size: 0.7rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.12em;
-  color: var(--green);
-  background: var(--green-l);
-  padding: 0.35rem 0.875rem;
-  border-radius: 9999px;
-  margin-bottom: 1.25rem;
-  transition: background 0.3s;
-}
-.section-tag.center { display: block; text-align: center; }
-
-.section-heading {
-  font-family: var(--font-main);
-  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
-  font-weight: 800;
-  color: var(--dark);
-  line-height: 1.2;
-  margin-bottom: 1.5rem;
-  transition: color 0.3s;
-}
-.section-heading.center { text-align: center; }
-
-.story-text p {
-  font-size: 1rem;
-  color: var(--muted);
-  line-height: 1.8;
-  margin-bottom: 1rem;
-  transition: color 0.3s;
-}
-
-.story-highlight {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: var(--white);
-  border-left: 4px solid var(--green);
-  border-radius: 0 0.75rem 0.75rem 0;
-  box-shadow: var(--shadow-card);
-  transition: background 0.3s;
-}
-.story-highlight i { width: 24px; height: 24px; color: var(--green); flex-shrink: 0; margin-top: 2px; }
-.story-highlight blockquote {
-  font-family: var(--font-main);
-  font-size: 0.95rem;
-  font-weight: 500;
-  font-style: italic;
-  color: var(--dark);
-  line-height: 1.6;
-  transition: color 0.3s;
-}
-
-.story-img-stack {
-  position: relative;
-  height: 480px;
-}
-.img-back {
-  width: 85%;
-  height: 380px;
-  object-fit: cover;
-  border-radius: 1.25rem;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-  position: absolute;
-  top: 0; right: 0;
-}
-.img-front {
-  width: 55%;
-  height: 240px;
-  object-fit: cover;
-  border-radius: 1rem;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.2);
-  position: absolute;
-  bottom: 0; left: 0;
-  border: 4px solid var(--white);
-  transition: border-color 0.3s;
-}
-.img-stat-chip {
-  position: absolute;
-  top: 1rem; left: 0;
-  background: var(--green);
-  color: #fff;
-  border-radius: 0.75rem;
-  padding: 0.75rem 1.25rem;
-  text-align: center;
-  box-shadow: 0 8px 20px rgba(21,115,71,0.35);
-}
-.chip-value {
-  display: block;
-  font-family: var(--font-main);
-  font-size: 1.5rem; font-weight: 800;
-}
-.chip-label {
-  display: block;
-  font-size: 0.7rem; opacity: 0.85;
-  text-transform: uppercase; letter-spacing: 0.08em;
-}
-
-/* ══════════ HOW ══════════ */
-.how-section {
-  background: var(--white);
-  padding: 6rem 1.5rem;
-  transition: background 0.3s;
-}
-.how-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-.how-inner .section-heading { margin-bottom: 3.5rem; }
-
-.how-steps {
-  display: flex;
-  align-items: flex-start;
-  gap: 0;
-}
-@media (max-width: 768px) {
-  .how-steps { flex-direction: column; align-items: center; }
-  .how-connector { transform: rotate(90deg); }
-}
-
-.how-step {
-  flex: 1;
-  text-align: center;
-  padding: 2rem 1.5rem;
-  background: var(--bg);
-  border-radius: var(--radius);
-  border: 1px solid var(--border-color);
-  transition: transform 0.25s, box-shadow 0.25s, background 0.3s, border-color 0.3s;
-  position: relative;
-}
-.how-step:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-card);
-}
-
-.step-number {
-  font-family: var(--font-main);
-  font-size: 3rem; font-weight: 800;
-  color: var(--green);
-  opacity: 0.15;
-  line-height: 1;
-  margin-bottom: 0.5rem;
-}
-.step-icon {
-  width: 56px; height: 56px;
-  border-radius: 50%;
-  background: var(--green-l);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 1rem;
-  transition: background 0.3s;
-}
-.step-icon i { width: 24px; height: 24px; color: var(--green); }
-.how-step h4 {
-  font-family: var(--font-main);
-  font-size: 1rem; font-weight: 700;
-  color: var(--dark);
-  margin-bottom: 0.75rem;
-  transition: color 0.3s;
-}
-.how-step p { font-size: 0.875rem; color: var(--muted); line-height: 1.6; transition: color 0.3s; }
-
-.how-connector {
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  width: 40px; height: 40px;
-  color: var(--green);
-  opacity: 0.4;
-  align-self: center;
-}
-.how-connector i { width: 20px; height: 20px; }
-
-/* ══════════ TEAM ══════════ */
-.team-section {
-  padding: 6rem 1.5rem;
-  background: var(--bg);
-  transition: background 0.3s;
-}
-.team-inner { max-width: 1280px; margin: 0 auto; }
-
-.team-desc {
-  font-size: 1rem;
-  color: var(--muted);
-  max-width: 540px;
-  line-height: 1.7;
-  margin-bottom: 3rem;
-  transition: color 0.3s;
-}
-
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-}
-@media (min-width: 768px) { .team-grid { grid-template-columns: repeat(4, 1fr); } }
-
-.team-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  border: 1px solid var(--border-color);
-  padding: 2rem 1.5rem;
-  text-align: center;
-  transition: transform 0.25s, box-shadow 0.25s, background 0.3s, border-color 0.3s;
-}
-.team-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-card);
-}
-
-.team-avatar {
-  width: 72px; height: 72px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 1.25rem;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-.team-avatar i { width: 28px; height: 28px; color: #fff; }
-
-.team-info h4 {
-  font-family: var(--font-main);
-  font-size: 0.95rem; font-weight: 700;
-  color: var(--dark);
-  margin-bottom: 0.35rem;
-  transition: color 0.3s;
-}
-.team-info span { font-size: 0.8rem; color: var(--muted); transition: color 0.3s; }
-
-/* ══════════ CTA ══════════ */
-.cta-section {
-  padding: 5rem 1.5rem;
-  background: var(--white);
-  transition: background 0.3s;
-}
-.cta-inner {
-  max-width: 900px;
-  margin: 0 auto;
-  position: relative;
-  background: var(--green);
-  border-radius: 2rem;
-  overflow: hidden;
-  text-align: center;
-  padding: 5rem 2rem;
-}
-
-.cta-glow {
-  position: absolute;
-  top: -60px; right: -60px;
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  pointer-events: none;
-}
-.cta-content { position: relative; z-index: 1; }
-.cta-content h2 {
-  font-family: var(--font-main);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 1rem;
-}
-.cta-content p {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.8);
-  margin-bottom: 2.5rem;
-}
-
-.cta-buttons { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-.cta-btn-primary {
-  display: inline-block;
-  padding: 0.875rem 2rem;
-  background: #fff;
-  color: var(--green);
-  border-radius: 9999px;
-  font-family: var(--font-main);
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.cta-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-}
-.cta-btn-secondary {
-  display: inline-block;
-  padding: 0.875rem 2rem;
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  border: 2px solid rgba(255,255,255,0.4);
-  border-radius: 9999px;
-  font-family: var(--font-main);
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: background 0.2s, border-color 0.2s;
-}
-.cta-btn-secondary:hover {
-  background: rgba(255,255,255,0.25);
-  border-color: rgba(255,255,255,0.7);
-}
-
-/* ══════════ FOOTER ══════════ */
-footer {
-  background: var(--dark);
-  color: #ffffff;
-  transition: background 0.3s;
-}
-[data-theme="dark"] footer { background: #0d0d1a; }
-
-.stats-bar { border-bottom: 1px solid rgba(255,255,255,0.1); }
-.stats-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 3rem 1.5rem;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  text-align: center;
-}
-@media (min-width: 768px) { .stats-inner { grid-template-columns: repeat(4, 1fr); } }
-
-.stat-value {
-  font-family: var(--font-main);
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  font-weight: 700;
-  color: var(--green);
-  margin-bottom: 0.4rem;
-}
-.stat-label {
-  font-size: 0.7rem; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  color: #6C757D;
-}
-
-.footer-main {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 3rem 1.5rem;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-}
-@media (min-width: 768px) { .footer-main { grid-template-columns: 1fr 1fr 1fr 1fr; } }
-
-.footer-logo-text {
-  font-family: var(--font-main);
-  font-size: 1.75rem; font-weight: 800;
-  color: #fff;
-  display: block;
-  margin-bottom: 1rem;
-}
-.footer-desc { font-size: 0.875rem; color: #6C757D; line-height: 1.6; }
-
-.footer-col h4 {
-  font-family: var(--font-main);
-  font-size: 0.7rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  margin-bottom: 1rem; color: #fff;
-}
-.footer-col ul { display: flex; flex-direction: column; gap: 0.5rem; }
-.footer-col ul a { font-size: 0.875rem; color: #6C757D; transition: color 0.2s; }
-.footer-col ul a:hover { color: var(--green); }
-
-.footer-contact { font-size: 0.875rem; color: #6C757D; line-height: 1.8; margin-bottom: 1.25rem; }
-.footer-contact a { color: var(--green); transition: color 0.2s; }
-.footer-contact a:hover { color: #2ECC71; }
-
-.social-icons { display: flex; gap: 0.75rem; }
-.social-btn {
-  width: 40px; height: 40px;
-  border-radius: 0.5rem;
-  background: rgba(21,115,71,0.12);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--green);
-  transition: background 0.2s, transform 0.2s;
-}
-.social-btn:hover { background: var(--green); color: #fff; transform: translateY(-2px); }
-.social-btn i { width: 18px; height: 18px; }
-
-.footer-bottom {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.825rem;
-  color: #6C757D;
-}
-@media (min-width: 768px) { .footer-bottom { flex-direction: row; justify-content: space-between; } }
-.footer-bottom .project { font-weight: 600; color: var(--green); }
-
-/* ══════════ SCROLL REVEAL ══════════ */
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.reveal.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-.mvv-card:nth-child(2).reveal { transition-delay: 0.1s; }
-.mvv-card:nth-child(3).reveal { transition-delay: 0.2s; }
-.how-step:nth-child(3).reveal { transition-delay: 0.1s; }
-.how-step:nth-child(5).reveal { transition-delay: 0.2s; }
-.how-step:nth-child(7).reveal { transition-delay: 0.3s; }
-.team-card:nth-child(2).reveal { transition-delay: 0.1s; }
-.team-card:nth-child(3).reveal { transition-delay: 0.2s; }
-.team-card:nth-child(4).reveal { transition-delay: 0.3s; }
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre Nós — Re.Source</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="/re.source/frontend/css/sobre.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+<header>
+  <div class="header-top">
+    <div class="header-top-inner">
+      <div class="logo">
+        <span class="logo-text">Re<span class="logo-dot">.</span>Source</span>
+      </div>
+
+      <nav class="desktop-nav">
+        <a href="/re.source/base.php"><i data-lucide="home"></i> Página Inicial</a>
+        <a href="#" class="active"><i data-lucide="info"></i> Sobre Nós</a>
+        <a href="#"><i data-lucide="phone"></i> Contato</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="Alternar tema">
+          <i data-lucide="moon" id="themeIcon"></i>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+          <i data-lucide="menu" id="hamburgerIcon"></i>
+        </button>
+      </div>
+
+      <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-label">Minha Conta</div>
+        <a href="cadastro.html" class="menu-btn">Cadastre-se</a>
+        <a href="login.html" class="menu-btn">Entrar</a>
+        <div class="dropdown-divider"></div>
+        <button class="btn-announce">✨ Anunciar Resíduo</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section class="about-hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span>Economia Circular · Joinville · ESG</span>
+    </div>
+    <h1 class="hero-title">
+      Acreditamos que<br />
+      <em>resíduo é recurso.</em>
+    </h1>
+    <p class="hero-subtitle">
+      A Re.Source nasceu para transformar a forma como a indústria catarinense 
+      enxerga seus rejeitos — conectando quem descarta com quem pode aproveitar.
+    </p>
+    <div class="hero-scroll-hint">
+      <i data-lucide="chevrons-down"></i>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-img-wrap">
+      <img src="https://images.unsplash.com/photo-1766246719951-0d21674dd9b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=900" alt="Fábrica sustentável" />
+      <div class="hero-img-overlay"></div>
+      <div class="hero-img-badge">
+        <div class="badge-dot"></div>
+        <span>Plataforma B2B Sustentável</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ MISSÃO / VISÃO / VALORES ═══════════════════════════ -->
+<section class="mvv-section">
+  <div class="mvv-inner">
+    <div class="mvv-card">
+      <div class="mvv-icon"><i data-lucide="target"></i></div>
+      <h3>Missão</h3>
+      <p>Facilitar a circulação de resíduos industriais criando uma ponte eficiente entre empresas geradoras e empresas consumidoras, reduzindo o impacto ambiental e gerando valor econômico.</p>
+    </div>
+    <div class="mvv-card featured">
+      <div class="mvv-icon"><i data-lucide="eye"></i></div>
+      <h3>Visão</h3>
+      <p>Ser a principal plataforma de economia circular do Sul do Brasil até 2030, tornando Joinville referência nacional em gestão sustentável de resíduos industriais.</p>
+    </div>
+    <div class="mvv-card">
+      <div class="mvv-icon"><i data-lucide="heart"></i></div>
+      <h3>Valores</h3>
+      <p>Sustentabilidade, transparência, inovação e responsabilidade socioambiental guiam cada decisão que tomamos — do código à conexão entre empresas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ HISTÓRIA ═══════════════════════════ -->
+<section class="story-section">
+  <div class="story-inner">
+    <div class="story-text">
+      <div class="section-tag">Nossa História</div>
+      <h2 class="section-heading">De um problema real<br />para uma solução real.</h2>
+      <p>Tudo começou quando um grupo de estudantes do Senai Joinville percebeu que as indústrias da região descartavam toneladas de materiais reaproveitáveis todos os meses — enquanto outras empresas pagavam caro pelos mesmos insumos.</p>
+      <p>O problema não era falta de recurso. Era falta de conexão.</p>
+      <p>Em 2024, a Re.Source nasceu como projeto acadêmico com um objetivo claro: criar a ponte que faltava. Uma plataforma simples, eficiente e acessível para que qualquer indústria de Joinville possa anunciar seus resíduos ou encontrar os materiais que precisa.</p>
+      <div class="story-highlight">
+        <i data-lucide="quote"></i>
+        <blockquote>
+          "O resíduo de uma empresa é a matéria-prima de outra. Nosso papel é tornar essa troca óbvia e fácil."
+        </blockquote>
+      </div>
+    </div>
+    <div class="story-visual">
+      <div class="story-img-stack">
+        <img class="img-back" src="https://images.unsplash.com/photo-1748944079305-8d2a86e7ad32?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Equipe Re.Source" />
+        <img class="img-front" src="https://images.unsplash.com/photo-1646803101279-d1a2461a5eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" alt="Economia circular" />
+        <div class="img-stat-chip">
+          <span class="chip-value">2026</span>
+          <span class="chip-label">Fundação</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ COMO FUNCIONA ═══════════════════════════ -->
+<section class="how-section">
+  <div class="how-inner">
+    <div class="section-tag center">Como Funciona</div>
+    <h2 class="section-heading center">Simples assim.</h2>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-number">01</div>
+        <div class="step-icon"><i data-lucide="building-2"></i></div>
+        <h4>Cadastre sua Empresa</h4>
+        <p>Crie seu perfil gratuitamente e homologue sua empresa na plataforma em poucos minutos.</p>
+      </div>
+      <div class="how-connector"><i data-lucide="arrow-right"></i></div>
+      <div class="how-step">
+        <div class="step-number">02</div>
+        <div class="step-icon"><i data-lucide="megaphone"></i></div>
+        <h4>Anuncie ou Busque</h4>
+        <p>Publique seus resíduos disponíveis ou pesquise por materiais que sua operação precisa.</p>
+      </div>
+      <div class="how-connector"><i data-lucide="arrow-right"></i></div>
+      <div class="how-step">
+        <div class="step-number">03</div>
+        <div class="step-icon"><i data-lucide="handshake"></i></div>
+        <h4>Conecte e Negocie</h4>
+        <p>Entre em contato diretamente com a empresa, feche o acordo e gere valor para ambos os lados.</p>
+      </div>
+      <div class="how-connector"><i data-lucide="arrow-right"></i></div>
+      <div class="how-step">
+        <div class="step-number">04</div>
+        <div class="step-icon"><i data-lucide="leaf"></i></div>
+        <h4>Impacto Real</h4>
+        <p>Menos resíduo no aterro, menos custo operacional, mais ESG para o seu relatório.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ EQUIPE ═══════════════════════════ -->
+<section class="team-section">
+  <div class="team-inner">
+    <div class="section-tag">Quem Faz</div>
+    <h2 class="section-heading">A equipe por trás<br />da Re.Source.</h2>
+    <p class="team-desc">Estudantes do Senai Joinville unidos por um propósito: provar que tecnologia e sustentabilidade andam juntas.</p>
+
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar" style="background: linear-gradient(135deg, #157347 0%, #0D4A2E 100%);">
+          <i data-lucide="user"></i>
+        </div>
+        <div class="team-info">
+          <h4>Desenvolvimento</h4>
+          <span>Front-end & Back-end</span>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background: linear-gradient(135deg, #0D6EFD 0%, #0043a8 100%);">
+          <i data-lucide="palette"></i>
+        </div>
+        <div class="team-info">
+          <h4>Design UX/UI</h4>
+          <span>Interface & Experiência</span>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background: linear-gradient(135deg, #DC3545 0%, #8B0000 100%);">
+          <i data-lucide="bar-chart-2"></i>
+        </div>
+        <div class="team-info">
+          <h4>Negócios</h4>
+          <span>Estratégia & Mercado</span>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background: linear-gradient(135deg, #fd7e14 0%, #c44d00 100%);">
+          <i data-lucide="shield-check"></i>
+        </div>
+        <div class="team-info">
+          <h4>Sustentabilidade</h4>
+          <span>ESG & Impacto</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CTA ═══════════════════════════ -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-glow"></div>
+    <div class="cta-content">
+      <h2>Faça parte da mudança.</h2>
+      <p>Cadastre sua empresa e comece a transformar resíduos em receita hoje mesmo.</p>
+      <div class="cta-buttons">
+        <a href="cadastro.html" class="cta-btn-primary">Cadastrar Empresa</a>
+        <a href="#" class="cta-btn-secondary">Ver Anúncios</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+<footer>
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div>
+        <div class="stat-value">+1,4 Bilhão</div>
+        <div class="stat-label">KG de Resíduos</div>
+      </div>
+      <div>
+        <div class="stat-value">+1,3 Bilhão</div>
+        <div class="stat-label">Reais Valorizados</div>
+      </div>
+      <div>
+        <div class="stat-value">+790 mil</div>
+        <div class="stat-label">Usuários B2B</div>
+      </div>
+      <div>
+        <div class="stat-value">+25 mil</div>
+        <div class="stat-label">Empresas Homologadas</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-main">
+    <div class="footer-logo">
+      <span class="logo-text footer-logo-text">Re<span class="logo-dot">.</span>Source</span>
+      <p class="footer-desc">Conectando empresas para uma economia circular sustentável em Joinville.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>O que você procura?</h4>
+      <ul>
+        <li><a href="#">Plástico</a></li>
+        <li><a href="#">Metal</a></li>
+        <li><a href="#">Madeira</a></li>
+        <li><a href="#">Têxtil</a></li>
+        <li><a href="#">Eletrônicos</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Na Re.Source</h4>
+      <ul>
+        <li><a href="#">A Re.Source</a></li>
+        <li><a href="#">Sobre Nós</a></li>
+        <li><a href="#">Serviços</a></li>
+        <li><a href="#">Anúncios</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Precisa de ajuda?</h4>
+      <div class="footer-contact">
+        <p>Entre em contato com a nossa equipe:</p>
+        <a href="mailto:contato@resource.com.br">contato@resource.com.br</a>
+        <p style="margin-top:0.4rem">Atendimento apenas via WhatsApp</p>
+      </div>
+      <div class="social-icons">
+        <a href="#" class="social-btn" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+        <a href="#" class="social-btn" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+        <a href="#" class="social-btn" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+        <a href="#" class="social-btn" aria-label="WhatsApp"><i data-lucide="message-circle"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2024 Re.Source. Todos os direitos reservados.</p>
+    <p class="project">Projeto Acadêmico — Senai 2024</p>
+  </div>
+</footer>
+
+<script>
+  lucide.createIcons();
+
+  // Theme toggle
+  const btn = document.getElementById('themeToggleBtn');
+  const icon = document.getElementById('themeIcon');
+  const html = document.documentElement;
+  btn.addEventListener('click', () => {
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+    lucide.createIcons();
+  });
+
+  // Hamburger
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const hamburgerIcon = document.getElementById('hamburgerIcon');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+  hamburgerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropdownMenu.classList.toggle('open');
+    hamburgerBtn.classList.toggle('open', isOpen);
+    hamburgerIcon.setAttribute('data-lucide', isOpen ? 'x' : 'menu');
+    lucide.createIcons();
+  });
+  document.addEventListener('click', () => {
+    dropdownMenu.classList.remove('open');
+    hamburgerBtn.classList.remove('open');
+    hamburgerIcon.setAttribute('data-lucide', 'menu');
+    lucide.createIcons();
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('revealed'); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.mvv-card, .how-step, .team-card, .story-text, .story-visual').forEach(el => {
+    el.classList.add('reveal');
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
