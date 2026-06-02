@@ -1,5 +1,5 @@
 /**
- * FrontEnd/js/cadastro.js
+ * BackEnd/js/cadastro.js
  * Gerencia o formulário de cadastro: máscaras, validações,
  * busca automática de CNPJ via BrasilAPI,
  * submit via fetch → exibe erros inline sem recarregar a página.
@@ -11,7 +11,8 @@
   /* ─── Injeta CSS de erros inline ───────────────────────────── */
   const _style = document.createElement('link');
   _style.rel   = 'stylesheet';
-  _style.href  = 'FrontEnd/css/cadastro-errors.css';
+  // ✅ caminho absoluto
+  _style.href  = '/RE.SOURCE/FrontEnd/css/cadastro-errors.css';
   document.head.appendChild(_style);
 
   /* ─── Helpers ──────────────────────────────────────────────── */
@@ -74,17 +75,27 @@
   });
 
   /* ─── Tipo de conta ─────────────────────────────────────────── */
+  const form       = $('formCadastro');
   const typeBtns   = document.querySelectorAll('.type-btn');
   const docLabel   = qs('#docField label');
   const docInput   = $('cnpj');
   const razaoField = $('razaoField');
   const razaoLabel = razaoField.querySelector('label');
 
+  // ✅ Atualiza o ?tipo= na action conforme o botão selecionado
+  function updateFormAction(tipo) {
+    form.action = `/RE.SOURCE/BackEnd/auth/cadastro.php?tipo=${tipo}`;
+  }
+
   typeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       typeBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const t = btn.dataset.type;
+
+      // ✅ Atualiza action ao trocar tipo
+      updateFormAction(t);
+
       if (t === 'pessoa') {
         docLabel.innerHTML = 'CPF <span class="req">*</span>';
         docInput.placeholder = '000.000.000-00';
@@ -118,7 +129,6 @@
            .replace(/(\d{3})(\d)/, '$1/$2')
            .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
 
-      // Dispara busca quando CNPJ estiver completo (14 dígitos)
       const digits = v.replace(/\D/g, '');
       if (digits.length === 14) buscarCNPJ(digits);
     }
@@ -127,8 +137,6 @@
   });
 
   /* ─── Busca CNPJ via BrasilAPI ──────────────────────────────── */
-  // Mapa UF → sigla (a API retorna nome da UF em algumas versões,
-  // mas normalmente já retorna a sigla — mantemos o mapa como fallback)
   const UF_MAP = {
     'AC':'AC','AL':'AL','AP':'AP','AM':'AM','BA':'BA','CE':'CE',
     'DF':'DF','ES':'ES','GO':'GO','MA':'MA','MT':'MT','MS':'MS',
@@ -141,7 +149,7 @@
     const tag = $('cnpjStatus');
     if (!tag) return;
     tag.textContent = msg;
-    tag.className   = 'input-tag cnpj-tag-' + type; // ok | erro | loading
+    tag.className   = 'input-tag cnpj-tag-' + type;
   }
 
   async function buscarCNPJ(digits) {
@@ -160,18 +168,15 @@
         return;
       }
 
-      // ── Preenche Razão Social ────────────────────────────────
       const razaoInput = $('razao');
       if (razaoInput && data.razao_social) {
         razaoInput.value = data.razao_social;
         clearFieldError(razaoInput);
       }
 
-      // ── Preenche Estado ──────────────────────────────────────
       const estadoSelect = $('estado');
       const uf = data.uf ? (UF_MAP[data.uf] ?? data.uf) : null;
       if (estadoSelect && uf) {
-        // Procura o option correspondente e seleciona
         const opt = Array.from(estadoSelect.options).find(o => o.value === uf || o.text === uf);
         if (opt) {
           estadoSelect.value = opt.value;
@@ -179,10 +184,8 @@
         }
       }
 
-      // ── Preenche Telefone (se vier e estiver vazio) ──────────
       const telInput = $('telefone');
       if (telInput && !telInput.value && data.ddd_telefone_1) {
-        // Formata: ex "1133334444" → "(11) 33334-444" / "(11) 3333-4444"
         let tel = data.ddd_telefone_1.replace(/\D/g, '').slice(0, 11);
         tel = tel.replace(/(\d{2})(\d)/, '($1) $2')
                  .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
@@ -242,7 +245,7 @@
     clearFieldError(senhaInput);
   });
 
-  /* ─── Limpar erro ao digitar (campos simples) ───────────────── */
+  /* ─── Limpar erro ao digitar ────────────────────────────────── */
   ['nome', 'sobrenome', 'email', 'senhaConf', 'razao', 'estado'].forEach(id => {
     const el = $(id);
     if (!el) return;
@@ -309,7 +312,6 @@
   }
 
   /* ─── Submit via Fetch ──────────────────────────────────────── */
-  const form   = $('formCadastro');
   const btnSub = $('btnSubmit');
 
   function setBtnLoading(on) {
@@ -350,10 +352,20 @@
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
       });
 
+      // ✅ Verifica se a resposta é JSON antes de parsear
+      const contentType = resp.headers.get('content-type') ?? '';
+      if (!contentType.includes('application/json')) {
+        const texto = await resp.text();
+        console.error('Resposta inesperada do servidor:', texto);
+        showAlert('O servidor retornou uma resposta inesperada. Verifique o console.');
+        shakBtn();
+        return;
+      }
+
       const data = await resp.json();
 
       if (data.ok) {
-        window.location.href = data.redirect ?? '/pendente.php';
+        window.location.href = data.redirect ?? '/RE.SOURCE/pendente.php';
       } else {
         if (Array.isArray(data.campos)) {
           data.campos.forEach(({ field, msg }) => {
@@ -364,7 +376,8 @@
         showAlert(data.erro ?? 'Ocorreu um erro. Tente novamente.');
         shakBtn();
       }
-    } catch {
+    } catch (err) {
+      console.error('Erro no fetch:', err);
       showAlert('Falha na comunicação com o servidor. Verifique sua conexão.');
       shakBtn();
     } finally {

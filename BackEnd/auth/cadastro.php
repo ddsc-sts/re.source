@@ -130,5 +130,4 @@ if (!$enviou) {
 
 // ── 10. Redireciona para /pendente.php sem nada na URL ───────
 $script = $_SERVER['SCRIPT_NAME'];
-$raiz   = rtrim(str_replace('BackEnd/auth/cadastro.php', '', $script), '/');
-voltarComSucesso($raiz . "/pendente.php");
+voltarComSucesso("/re.source/pendente.php");

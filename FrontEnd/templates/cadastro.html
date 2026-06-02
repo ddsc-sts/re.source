@@ -10,11 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-
-  <!-- Caminhos relativos à RAIZ (onde fica o cadastro.php que inclui este HTML) -->
   <link rel="stylesheet" href="/RE.SOURCE/FrontEnd/css/style.css" />
   <link rel="stylesheet" href="/RE.SOURCE/FrontEnd/css/cadastro.css" />
-
 </head>
 <body>
 
@@ -95,7 +92,10 @@
           </button>
         </div>
 
-        <form class="form-body" id="formCadastro" action="BackEnd/auth/cadastro.php" method="POST">
+        <!-- ✅ action corrigido: caminho absoluto + ?tipo=empresa -->
+        <form class="form-body" id="formCadastro"
+              action="/RE.SOURCE/BackEnd/auth/cadastro.php?tipo=empresa"
+              method="POST">
 
           <div class="form-row">
             <div class="form-field">
@@ -239,7 +239,6 @@
           <p class="login-link">Já tem uma conta? <a href="/RE.SOURCE/login.php">Entrar agora</a></p>
 
         </form>
-
       </div>
     </section>
 
@@ -250,9 +249,9 @@
     <a href="#" style="color:var(--green);">Política de Privacidade</a>
   </footer>
 
-  <!-- Inicializa ícones e carrega o JS do formulário -->
   <script>lucide.createIcons();</script>
-  <script src="BackEnd/js/cadastro.js"></script>
+  <!-- ✅ caminho absoluto para o JS -->
+  <script src="/RE.SOURCE/BackEnd/js/cadastro.js"></script>
 
 </body>
 </html>

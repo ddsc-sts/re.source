@@ -19,3 +19,15 @@ deixar o footer igual ao da base, mudar as opções do cabeçalho e etc)
 
 mudar no sobre a logo do cabeçalho, remover o botão de dark mode e deixar os 3 risquinhos 
 igual ao base(ACHAR UMA FORMA DE USAR UM INCLUDE DO MESMO CABEÇALHO E FOOTER EM TODOS OS HTMLS QUE PRECISAM IGUAL O PYTHON,)
+
+APOS TODAS AS MELHORIAS:
+
+Começar a fazer os demais HTMLS:
+
+catalogos, html de busca, detalhes da conta, estatisticas, configuraçoes, anunciar residuos, pagina de contato, funcionalidade de compra(JA IMPLEMENTANDO CHAT IGUAL OLX)
+(**JA APLICANDO COM CRUD BANCO DE DADOS E ETC**)
+
+A logica de compra e o seguinte: Cliente entra em um anuncio e para comprar clica em chat com vendedor/doador 
+e eles combinam no chat frete e etc, apos isso eles teram um botao para confirmar que fecharam a venda e apos isso e 
+liberado a opçao para o comprador pagar, e apos o comprador ter recebido ele ira confirmar a 
+entrega e o dinheiro sera disponibilizado para retirada do vendedor nas estatisticas da conta
