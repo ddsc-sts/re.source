@@ -3,6 +3,9 @@
    Depende das variáveis definidas em style.css
    ══════════════════════════════════════════ */
 
+.logo img {
+  height: 86px;
+}
 /* ── Logo texto (fallback sem imagem) ── */
 .logo-text {
     font-family: var(--font-main);
