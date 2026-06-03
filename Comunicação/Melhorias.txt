@@ -1,24 +1,15 @@
 melhorias:
 
-
-
-
-
-
-
-Géder👺 (cadastro.css) - arrumar css dos checkbox do termos de uso e receber novidades do cadastro,
+Géder👺 (cadastro.css) - arrumar css dos checkbox do termos de uso e receber novidades do cadastro, botao de empresa e cooperativa estao desalinhados
 
 Géder👺 (login.css) - deixar o tamanho da logo do login igual aos demais
 
-arrumar responsividade do css do base.php(exemplo menu dos 3 risquinhos esta sobrepondo o site 
-dependendo do tamanho do monitor, so ficando certo em 1920x1080, tendo que deixar o site e ele responsivo conforme o tamanho da tela)
 
 Géder👺 (index.css) - deixar o css da index mais parecido com o do base(usando o mesmo css, tirando emojis, colocar logo no cabeçalho, 
 deixar o footer igual ao da base, mudar as opções do cabeçalho e etc)
 
+criar botao de logout no dropdown do base.php
 
-mudar no sobre a logo do cabeçalho, remover o botão de dark mode e deixar os 3 risquinhos 
-igual ao base(ACHAR UMA FORMA DE USAR UM INCLUDE DO MESMO CABEÇALHO E FOOTER EM TODOS OS HTMLS QUE PRECISAM IGUAL O PYTHON,)
 
 APOS TODAS AS MELHORIAS:
 

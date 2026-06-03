@@ -4,7 +4,7 @@ $host   = "localhost";
 $usuario = "root";
 $senha  = "";
 $banco  = "resource";
-$port   = "3406";
+$port   = "3306";
 
 try {
 

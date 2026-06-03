@@ -202,15 +202,6 @@
   <script>
     lucide.createIcons();
 
-    // ── Tema ──
-    const html = document.documentElement;
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const dark = html.getAttribute('data-theme') === 'dark';
-      html.setAttribute('data-theme', dark ? 'light' : 'dark');
-      document.getElementById('themeIcon').setAttribute('data-lucide', dark ? 'sun' : 'moon');
-      lucide.createIcons();
-    });
-
     // ── Telas ──
     function showScreen(id) {
       document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
