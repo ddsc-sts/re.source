@@ -50,7 +50,7 @@ header {
 .header-top-inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 1rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -60,7 +60,7 @@ header {
 
 /* Logo */
 .logo img {
-  height: 86px;
+  height: 68px;
 }
 
 /* Nav centralizada — absoluta mas com limites para não sobrepor logo/hamburger */
