@@ -22,3 +22,59 @@ A logica de compra e o seguinte: Cliente entra em um anuncio e para comprar clic
 e eles combinam no chat frete e etc, apos isso eles teram um botao para confirmar que fecharam a venda e apos isso e 
 liberado a opçao para o comprador pagar, e apos o comprador ter recebido ele ira confirmar a 
 entrega e o dinheiro sera disponibilizado para retirada do vendedor nas estatisticas da conta
+
+
+Proxima estrutura de MVC:
+
+ProjetoMVC/
+│
+├── app/
+│   ├── Controllers/
+│   │   ├── AuthController.php
+│   │   ├── HomeController.php
+│   │   └── CompanyController.php
+│   │
+│   ├── Models/
+│   │   ├── User.php
+│   │   └── Company.php
+│   │
+│   ├── Views/
+│   │   ├── auth/
+│   │   │   ├── login.php
+│   │   │   ├── cadastro.php
+│   │   │   ├── recover.php
+│   │   │   ├── reset.php
+│   │   │   ├── verificar.php
+│   │   │   └── pendente.php
+│   │   │
+│   │   ├── home/
+│   │   │   ├── index.php
+│   │   │   └── sobre.php
+│   │   │
+│   │   └── layouts/
+│   │       ├── header.php
+│   │       ├── footer.php
+│   │       └── base.php
+│   │
+│   ├── Services/
+│   └── Core/
+│
+├── config/
+│   ├── database.php
+│   └── mail.php
+│
+├── public/
+│   ├── css/
+│   ├── js/
+│   ├── img/
+│   └── index.php
+│
+├── routes/
+│   └── web.php
+│
+├── database/
+│   └── schema.sql
+│
+└── storage/
+    ├── logs/
+    └── uploads/
