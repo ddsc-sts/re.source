@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?php echo isset($titulo_pagina) ? $titulo_pagina : 'Re.Source — Economia Circular'; ?></title>
+  
   <link rel="stylesheet" href="/RE.SOURCE/FrontEnd/css/style.css" />
-   <?php if (isset($css_especifico)): ?>
-   <link rel="stylesheet" href="<?php echo $css_especifico; ?>" />
-   <?php endif; ?>
+  <?php if (isset($css_especifico)): ?>
+    <link rel="stylesheet" href="<?php echo $css_especifico; ?>" />
+  <?php endif; ?>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <link rel="stylesheet" href="/RE.SOURCE/FrontEnd/css/style.css" />
-  
 </head>
 <body>
 
@@ -21,7 +21,9 @@
     <div class="header-top-inner">
 
       <div class="logo">
-        <img src="/RE.SOURCE/FrontEnd/img/logo.png" alt="Re.Source" />
+        <a href="/RE.SOURCE/base.php">
+          <img src="/RE.SOURCE/FrontEnd/img/logo.png" alt="Re.Source" />
+        </a>
       </div>
 
       <nav class="desktop-nav">
@@ -40,11 +42,14 @@
       <div class="dropdown-menu" id="dropdownMenu">
         <div class="dropdown-label">Minha Conta</div>
         <a href="/RE.SOURCE/conta.php" class="menu-btn">Detalhes da conta</a>
+        <a href="/RE.SOURCE/meusAnuncios.php" class="menu-btn">Meus Anuncios</a>
         <a href="/RE.SOURCE/.php" class="menu-btn">Estatísticas</a>
         <a href="/RE.SOURCE/.php" class="menu-btn">Configurações</a>
 
         <div class="dropdown-divider"></div>
-        <button class="btn-announce">Anunciar Resíduo</button>
+        <a href="/RE.SOURCE/anunciarResiduos.php">
+          <button class="btn-announce">Anunciar Resíduo</button>
+        </a>
       </div>
 
     </div>
@@ -52,32 +57,49 @@
 
   <div class="search-bar-wrap">
     <div class="search-bar-inner">
-      <div class="search-pill">
+      
+      <form action="/RE.SOURCE/busca.php" method="GET" class="search-pill">
+        
         <div class="search-field">
           <label>O que busca?</label>
-          <input type="text" placeholder="Ex: Serragem" />
+          <input type="text" name="q" placeholder="Ex: Serragem" />
         </div>
 
         <div class="category-field">
           <label>Categoria</label>
-          <button class="category-trigger" id="categoryTrigger">
+          <button type="button" class="category-trigger" id="categoryTrigger">
             <span id="categoryLabel">Todas as categorias</span>
             <i data-lucide="chevron-down"></i>
           </button>
+          
           <div class="category-dropdown" id="categoryDropdown">
-            <button onclick="selectCategory('Todas as categorias')">Todas as categorias</button>
-            <button onclick="selectCategory('Madeira')">Madeira</button>
-            <button onclick="selectCategory('Plástico')">Plástico</button>
-            <button onclick="selectCategory('Têxtil')">Têxtil</button>
-            <button onclick="selectCategory('Metal')">Metal</button>
-            <button onclick="selectCategory('Papelão')">Papelão</button>
-            <button onclick="selectCategory('Borracha')">Borracha</button>
-            <button onclick="selectCategory('Eletrônicos')">Eletrônicos</button>
+            <button type="button" onclick="selectCategory('Todas as categorias')">Todas as categorias</button>
+            <button type="button" onclick="selectCategory('Madeira')">Madeira</button>
+            <button type="button" onclick="selectCategory('Plástico')">Plástico</button>
+            <button type="button" onclick="selectCategory('Têxtil')">Têxtil</button>
+            <button type="button" onclick="selectCategory('Metal')">Metal</button>
+            <button type="button" onclick="selectCategory('Papelão')">Papelão</button>
+            <button type="button" onclick="selectCategory('Borracha')">Borracha</button>
+            <button type="button" onclick="selectCategory('Eletrônicos')">Eletrônicos</button>
           </div>
+          
+          <input type="hidden" name="cat_nome" id="hiddenCategory" value="">
         </div>
 
-        <button class="search-btn"><i data-lucide="search"></i></button>
-      </div>
+        <button type="submit" class="search-btn"><i data-lucide="search"></i></button>
+        
+      </form>
+
     </div>
   </div>
 </header>
+
+<script>
+// Garante que o texto selecionado na categoria atualize a interface e o campo escondido
+function selectCategory(categoryName) {
+    document.getElementById('categoryLabel').innerText = categoryName;
+    document.getElementById('hiddenCategory').value = categoryName === 'Todas as categorias' ? '' : categoryName;
+    // Opcional: fechar o dropdown após clicar (caso seu script.js já não faça isso)
+    document.getElementById('categoryDropdown').classList.remove('active'); 
+}
+</script>

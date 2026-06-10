@@ -1,11 +1,217 @@
-<?php 
-// 1. Configurações dinâmicas para a Página Inicial
-$titulo_pagina = "Re.Source — Economia Circular em Joinville";
+<?php
+// 1. Evita o erro de sessão duplicada verificando se já não está ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 2. Corrige o caminho voltando duas pastas (../..) para achar o BackEnd
+require_once __DIR__ . "/../../BackEnd/config/conexao.php";
+
+// Configurações da página
+$titulo_pagina  = "Re.Source — Economia Circular em Joinville";
 $css_especifico = "/RE.SOURCE/FrontEnd/css/style.css";
 
-// 2. Puxa o cabeçalho global
-include 'header.php'; 
+// ── Busca os 8 anúncios mais recentes (ativos) ──────────────────────────────
+$stmt = $pdo->prepare("
+    SELECT
+        l.id,
+        l.type,
+        l.title,
+        l.quantity,
+        l.unit,
+        l.price,
+        l.is_negotiable,
+        l.location_city,
+        l.location_state,
+        c.nome_fantasia   AS company_name,
+        cat.name          AS category_name,
+        COALESCE(
+            (SELECT li.url FROM listing_images li
+             WHERE li.listing_id = l.id ORDER BY li.`order` ASC LIMIT 1),
+            'https://images.unsplash.com/photo-1718473476174-21e7a853f5f6?w=600'
+        ) AS thumb
+    FROM listings l
+    INNER JOIN companies  c   ON c.id  = l.company_id
+    INNER JOIN categories cat ON cat.id = l.category_id
+    WHERE l.status = 'active'
+      AND l.deleted_at IS NULL
+    ORDER BY l.created_at DESC
+    LIMIT 8
+");
+$stmt->execute();
+$recentListings = $stmt->fetchAll();
+
+// ── Unidades para exibição ──────────────────────────────────────────────────
+$unitLabel = ['kg'=>'Kg','ton'=>'Ton','m2'=>'m²','m3'=>'m³','unidade'=>'un.','litro'=>'L','outro'=>''];
+
+include 'header.php';
 ?>
+
+<style>
+.listings-section {
+    max-width: 1400px;
+    margin: 4rem auto;
+    padding: 0 2rem;
+}
+
+/* --- NOVO HEADER DA LISTAGEM --- */
+.listings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.listings-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    font-family: 'Sora', sans-serif;
+}
+
+/* --- NOVO BOTÃO VER TODOS ESTILIZADO --- */
+.btn-ver-todos {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background-color: #ffffff;
+    color: #157347; /* Verde do tema */
+    border: 1px solid #157347;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-ver-todos:hover {
+    background-color: #157347;
+    color: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(21, 115, 71, 0.15);
+}
+
+.btn-ver-todos i {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+
+.btn-ver-todos:hover i {
+    transform: translateX(4px); /* Sutil efeito da setinha indo para a direita */
+}
+
+/* --- GRADE E CARDS REAPROVEITADOS DO BUSCA.PHP --- */
+.listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.ad-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.ad-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.ad-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: #f3f4f6;
+}
+
+.ad-content {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    width: fit-content;
+    margin-bottom: 0.5rem;
+}
+.badge-offer { background: #e0f2fe; color: #0284c7; }
+.badge-demand { background: #fef3c7; color: #d97706; }
+
+.ad-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 3.1rem; /* Mantém o alinhamento mesmo com títulos de tamanhos diferentes */
+}
+
+.ad-meta {
+    font-size: 0.85rem;
+    color: #6b7280;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.ad-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ad-price {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #157347;
+}
+
+.btn-view {
+    padding: 0.5rem 1rem;
+    background: #f3f4f6;
+    color: #111827;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-view:hover {
+    background: #e5e7eb;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #ffffff;
+    border: 1px dashed #d1d5db;
+    border-radius: 1rem;
+    color: #6b7280;
+}
+</style>
 
 <section class="hero" aria-label="Banner principal">
   <div class="slides-container" id="slider">
@@ -88,137 +294,138 @@ include 'header.php';
   <h2 class="section-title">Explore por Categoria</h2>
   <div class="category-grid">
 
-    <button class="category-card">
+    <a href="/RE.SOURCE/busca.php?q=madeira" class="category-card">
       <img src="https://images.unsplash.com/photo-1759300635757-19ab99f4cfed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Madeira" />
       <div class="category-overlay"></div>
       <div class="category-hover-tint"></div>
       <div class="category-name">MADEIRA</div>
-    </button>
+    </a>
 
-    <button class="category-card">
+    <a href="/RE.SOURCE/busca.php?q=plastico" class="category-card">
       <img src="https://images.unsplash.com/photo-1606037150583-fb842a55bae7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Plástico" />
       <div class="category-overlay"></div>
       <div class="category-hover-tint"></div>
       <div class="category-name">PLÁSTICO</div>
-    </button>
+    </a>
 
-    <button class="category-card">
+    <a href="/RE.SOURCE/busca.php?q=textil" class="category-card">
       <img src="https://images.unsplash.com/photo-1758264629814-44559c99e506?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Têxtil" />
       <div class="category-overlay"></div>
       <div class="category-hover-tint"></div>
       <div class="category-name">TÊXTIL</div>
-    </button>
+    </a>
 
-    <button class="category-card">
+    <a href="/RE.SOURCE/busca.php?q=metal" class="category-card">
       <img src="https://images.unsplash.com/photo-1722695510527-cc033e43be1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Metal" />
       <div class="category-overlay"></div>
       <div class="category-hover-tint"></div>
       <div class="category-name">METAL</div>
-    </button>
+    </a>
 
-    <button class="category-card">
+    <a href="/RE.SOURCE/busca.php?q=papel" class="category-card">
       <img src="https://images.unsplash.com/photo-1719600804011-3bff3909b183?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Papelão" />
       <div class="category-overlay"></div>
       <div class="category-hover-tint"></div>
       <div class="category-name">PAPELÃO</div>
-    </button>
+    </a>
 
-    <button class="category-card">
+    <a href="/RE.SOURCE/busca.php?q=borracha" class="category-card">
       <img src="https://images.unsplash.com/photo-1761765030682-26f51cfbc034?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Borracha" />
       <div class="category-overlay"></div>
       <div class="category-hover-tint"></div>
       <div class="category-name">BORRACHA</div>
-    </button>
+    </a>
 
-    <button class="category-card">
+    <a href="/RE.SOURCE/busca.php?q=eletronico" class="category-card">
       <img src="https://images.unsplash.com/photo-1759500657339-6e11b99a8882?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Eletrônicos" />
       <div class="category-overlay"></div>
       <div class="category-hover-tint"></div>
       <div class="category-name">ELETRÔNICOS</div>
-    </button>
+    </a>
 
-    <button class="category-card">
-      <img src="https://images.unsplash.com/photo-1646803101279-d1a2461a5eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Vidro" />
+    <a href="/RE.SOURCE/busca.php?q=vidro" class="category-card">
+      <img src="https://images.unsplash.com/photo-1646803101279-d1a2461a5eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg& computationally-w=600" alt="Vidro" />
       <div class="category-overlay"></div>
       <div class="category-hover-tint"></div>
       <div class="category-name">VIDRO</div>
-    </button>
+    </a>
 
   </div>
 </section>
 
 <section class="listings-section">
   <div class="listings-inner">
-    <h2 class="listings-title">Anúncios Recentes</h2>
-    <div class="listings-grid">
-
-      <div class="listing-card">
-        <div class="listing-img-wrap">
-          <img src="https://images.unsplash.com/photo-1764114440880-9bdbfe570a4d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Limalha de Ferro" />
-          <span class="listing-badge">Venda</span>
-        </div>
-        <div class="listing-body">
-          <div class="listing-title">Limalha de Ferro Limpa</div>
-          <div class="listing-location">
-            <i data-lucide="map-pin"></i>
-            <span>Zona Industrial Norte, Joinville</span>
-          </div>
-          <div class="listing-qty">Quantidade: 500 Kg</div>
-        </div>
-      </div>
-
-      <div class="listing-card">
-        <div class="listing-img-wrap">
-          <img src="https://images.unsplash.com/photo-1760939858984-5dc76f0ea34a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Serragem de Pinus" />
-          <span class="listing-badge">Venda</span>
-        </div>
-        <div class="listing-body">
-          <div class="listing-title">Serragem de Pinus</div>
-          <div class="listing-location">
-            <i data-lucide="map-pin"></i>
-            <span>Distrito Industrial, Joinville</span>
-          </div>
-          <div class="listing-qty">Quantidade: 1.200 Kg</div>
-        </div>
-      </div>
-
-      <div class="listing-card">
-        <div class="listing-img-wrap">
-          <img src="https://images.unsplash.com/photo-1682668373702-10e0eb560e44?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Aparas de Plástico PET" />
-          <span class="listing-badge doacao">Doação</span>
-        </div>
-        <div class="listing-body">
-          <div class="listing-title">Aparas de Plástico PET</div>
-          <div class="listing-location">
-            <i data-lucide="map-pin"></i>
-            <span>Centro Industrial, Joinville</span>
-          </div>
-          <div class="listing-qty">Quantidade: 800 Kg</div>
-        </div>
-      </div>
-
-      <div class="listing-card">
-        <div class="listing-img-wrap">
-          <img src="https://images.unsplash.com/photo-1759300635757-19ab99f4cfed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Pallets de Madeira" />
-          <span class="listing-badge">Venda</span>
-        </div>
-        <div class="listing-body">
-          <div class="listing-title">Pallets de Madeira</div>
-          <div class="listing-location">
-            <i data-lucide="map-pin"></i>
-            <span>Zona Sul, Joinville</span>
-          </div>
-          <div class="listing-qty">Quantidade: 50 unidades</div>
-        </div>
-      </div>
-
+    
+    <div class="listings-header">
+      <h2 class="listings-title">Anúncios Recentes</h2>
+      <a href="/RE.SOURCE/busca.php" class="btn-ver-todos">
+        Ver todos <i data-lucide="arrow-right"></i>
+      </a>
     </div>
+
+    <?php if (empty($recentListings)): ?>
+      <div class="empty-state">
+        <i data-lucide="package-open" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
+        <p>Nenhum anúncio disponível no momento.</p>
+        <?php if (isset($_SESSION['company_id'])): ?>
+          <a href="/RE.SOURCE/anunciarResiduos.php" class="btn-view" style="background: #157347; color: white; margin-top: 1rem; display: inline-block;">Seja o primeiro a anunciar</a>
+        <?php endif; ?>
+      </div>
+    <?php else: ?>
+      <div class="listings-grid">
+        <?php foreach ($recentListings as $item): ?>
+          <div class="ad-card">
+            
+            <img
+              src="<?= htmlspecialchars($item['thumb']) ?>"
+              alt="<?= htmlspecialchars($item['title']) ?>"
+              class="ad-image"
+              loading="lazy"
+            />
+            
+            <div class="ad-content">
+              <?php if ($item['type'] === 'offer'): ?>
+                <span class="badge badge-offer">Venda</span>
+              <?php else: ?>
+                <span class="badge badge-demand">Procura</span>
+              <?php endif; ?>
+              
+              <h3 class="ad-title"><?= htmlspecialchars($item['title']) ?></h3>
+              
+              <div class="ad-meta">
+                <span><i data-lucide="tag" style="width:14px; height:14px; vertical-align:middle;"></i> <?= htmlspecialchars($item['category_name']) ?></span>
+                <span><i data-lucide="box" style="width:14px; height:14px; vertical-align:middle;"></i> 
+                  <?php
+                    $qty = $item['quantity'] == floor($item['quantity'])
+                         ? number_format($item['quantity'], 0, ',', '.')
+                         : number_format($item['quantity'], 3, ',', '.');
+                    echo 'Qtd: ' . $qty . ' ' . ($unitLabel[$item['unit']] ?? $item['unit']);
+                  ?>
+                </span>
+                <span><i data-lucide="map-pin" style="width:14px; height:14px; vertical-align:middle;"></i> <?= htmlspecialchars($item['location_city'] . ' - ' . $item['location_state']) ?></span>
+              </div>
+
+              <div class="ad-footer">
+                <?php if ($item['type'] === 'offer' && $item['price'] !== null): ?>
+                  <span class="ad-price">
+                    <?= ($item['price'] > 0) ? 'R$ ' . number_format($item['price'], 2, ',', '.') : 'Doação'; ?>
+                  </span>
+                <?php else: ?>
+                  <span class="ad-price" style="color: #d97706;">Busca</span>
+                <?php endif; ?>
+
+                <a href="/RE.SOURCE/anuncio.php?id=<?= $item['id'] ?>" class="btn-view">Ver Detalhes</a>
+              </div>
+            </div>
+
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+
   </div>
 </section>
 
-<script src="/RE.SOURCE/frontend/js/script.js"></script>
+<script src="/RE.SOURCE/FrontEnd/js/script.js"></script>
 
-<?php 
-// 3. Puxa o rodapé global
-include 'footer.php'; 
-?>
+<?php include 'footer.php'; ?>
