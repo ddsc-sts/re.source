@@ -43,8 +43,8 @@
         <div class="dropdown-label">Minha Conta</div>
         <a href="/RE.SOURCE/conta.php" class="menu-btn">Detalhes da conta</a>
         <a href="/RE.SOURCE/meusAnuncios.php" class="menu-btn">Meus Anuncios</a>
-        <a href="/RE.SOURCE/.php" class="menu-btn">Estatísticas</a>
-        <a href="/RE.SOURCE/.php" class="menu-btn">Configurações</a>
+        <a href="/RE.SOURCE/estatisticas.php" class="menu-btn">Estatísticas</a>
+        <a href="/RE.SOURCE/configuracoes.php" class="menu-btn">Configurações</a>
 
         <div class="dropdown-divider"></div>
         <a href="/RE.SOURCE/anunciarResiduos.php">

@@ -568,6 +568,15 @@ CREATE TABLE IF NOT EXISTS search_alerts (
     CONSTRAINT fk_sa_company FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `views_history` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `listing_id` INT UNSIGNED NOT NULL,
+    `company_id` INT DEFAULT NULL,
+    `session_id` VARCHAR(128) NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`listing_id`) REFERENCES `listings`(`id`) ON DELETE CASCADE
+);
+
 
 SET FOREIGN_KEY_CHECKS = 1;
 

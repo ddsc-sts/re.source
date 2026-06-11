@@ -1,28 +1,17 @@
-melhorias:
+oque se deve mudar:
 
-Géder👺 (cadastro.css) - arrumar css dos checkbox do termos de uso e receber novidades do cadastro, botao de empresa e cooperativa estao desalinhados
+**FAZER COM QUE APAREÇA O NOME E FOTO CERTA EM TODAS AS OPÇOES DAS CONFIGURAÇOES**
 
-Géder👺 (login.css) - deixar o tamanho da logo do login igual aos demais
+estatisticas da conta: ver como adcionar saldo ficticio, fazer a parte de retirada de dinheiro, testar se todas as partes de calculo de metricas estao certos
 
+Detalhes da conta: fazer com que o campo de email so seja mudado com confirmaçao de codigo no email atual, e integrar o codigo no email para vereficaçao duas etapas e mudança de senha
 
-Géder👺 (index.css) - deixar o css da index mais parecido com o do base(usando o mesmo css, tirando emojis, colocar logo no cabeçalho, 
-deixar o footer igual ao da base, mudar as opções do cabeçalho e etc)
+anuncios: fazer que apareça a foto da empresa nos anuncios
 
-criar botao de logout no dropdown do base.php
+conta: Fazer que realmente funcione, parte de modo dark, retirar preferencia de linguagem do sistema(ou fazer se for facil), retirar botao de boletins esg, fazer funcionar as 
+notificaçoes para o email, fazer que mostre mesmo os dispositivos conectados naquela conta nao ficticio, e criar pagina de logout e de excluir conta
 
-
-APOS TODAS AS MELHORIAS:
-
-Começar a fazer os demais HTMLS:
-
-catalogos, html de busca, detalhes da conta, estatisticas, configuraçoes, anunciar residuos, pagina de contato, funcionalidade de compra(JA IMPLEMENTANDO CHAT IGUAL OLX)
-(**JA APLICANDO COM CRUD BANCO DE DADOS E ETC**)
-
-A logica de compra e o seguinte: Cliente entra em um anuncio e para comprar clica em chat com vendedor/doador 
-e eles combinam no chat frete e etc, apos isso eles teram um botao para confirmar que fecharam a venda e apos isso e 
-liberado a opçao para o comprador pagar, e apos o comprador ter recebido ele ira confirmar a 
-entrega e o dinheiro sera disponibilizado para retirada do vendedor nas estatisticas da conta
-
+salvar_preferencia: fazer funcionar salvando mesmo a preferencia
 
 Proxima estrutura de MVC:
 

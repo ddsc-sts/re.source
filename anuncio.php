@@ -12,7 +12,35 @@ if (!$id) {
 }
 
 try {
+    // =================================================================
+    // 0. LÓGICA DE VISUALIZAÇÕES (Única por usuário/sessão por dia)
+    // =================================================================
+    $viewer_company_id = $_SESSION['company_id'] ?? null;
+    $viewer_session_id = session_id();
+
+    // Checa se esse usuário/sessão já viu este anúncio HOJE
+    $stmtCheckView = $pdo->prepare("
+        SELECT id FROM views_history 
+        WHERE listing_id = ? 
+        AND DATE(created_at) = CURDATE()
+        AND (session_id = ? OR (company_id IS NOT NULL AND company_id = ?))
+    ");
+    $stmtCheckView->execute([$id, $viewer_session_id, $viewer_company_id]);
+    
+    // Se não encontrou registro hoje, conta como uma nova visualização
+    if (!$stmtCheckView->fetch()) {
+        // Registra no histórico
+        $stmtInsertView = $pdo->prepare("INSERT INTO views_history (listing_id, company_id, session_id) VALUES (?, ?, ?)");
+        $stmtInsertView->execute([$id, $viewer_company_id, $viewer_session_id]);
+        
+        // Atualiza o contador total na tabela listings (para consultas rápidas do dashboard)
+        $stmtUpdateTotal = $pdo->prepare("UPDATE listings SET views_count = views_count + 1 WHERE id = ?");
+        $stmtUpdateTotal->execute([$id]);
+    }
+
+    // =================================================================
     // 1. DADOS DO ANÚNCIO PRINCIPAL
+    // =================================================================
     $stmt = $pdo->prepare("
         SELECT 
             l.*, 
@@ -461,17 +489,12 @@ body {
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
-    // Inicializar ícones apenas quando tudo carregar
     document.addEventListener("DOMContentLoaded", function() {
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
     });
 
-    // =========================================
-    // LÓGICA DO LIGHTBOX (Isolada de erros)
-    // =========================================
-    // O json_encode aqui é super seguro para não quebrar o script
     const loadedImagesArray = <?php echo json_encode($imagens, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
     let indiceAtual = 0;
 
@@ -485,7 +508,6 @@ body {
         btnNext.style.display = 'none';
     }
 
-    // Função global acessível pelo onclick do HTML
     window.abrirLightbox = function(index) {
         indiceAtual = index;
         lightboxImg.src = loadedImagesArray[indiceAtual];
@@ -508,14 +530,12 @@ body {
         lightboxImg.src = loadedImagesArray[indiceAtual];
     };
 
-    // Fechar ao clicar fora da foto
     lightbox.addEventListener('click', function(e) {
         if (e.target === lightbox || e.target.classList.contains('lightbox-content')) {
             fecharLightbox();
         }
     });
 
-    // Controle pelo teclado
     document.addEventListener('keydown', function(e) {
         if (!lightbox.classList.contains('active')) return;
         if (e.key === 'Escape') fecharLightbox();
