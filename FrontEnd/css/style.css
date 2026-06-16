@@ -825,3 +825,19 @@ footer {
     padding: 0.5rem 0.75rem;
   }
 }
+
+/* ── Dark Mode Variables ── */
+[data-theme="dark"] {
+  --bg: #121212;
+  --white: #1e1e1e;
+  --dark: #f3f4f6;
+  --muted: #a0aec0;
+  --border-color: #333;
+  --shadow-card: 0 12px 30px rgba(0,0,0,0.4);
+}
+
+/* Ajustes finos para Dark Mode */
+[data-theme="dark"] .dropdown-menu { border: 1px solid var(--border-color); }
+[data-theme="dark"] .search-pill { border: 1px solid var(--border-color); }
+[data-theme="dark"] .listing-card { border: 1px solid var(--border-color); }
+[data-theme="dark"] .category-card { border: 1px solid var(--border-color); }

@@ -577,6 +577,11 @@ CREATE TABLE `views_history` (
     FOREIGN KEY (`listing_id`) REFERENCES `listings`(`id`) ON DELETE CASCADE
 );
 
+ALTER TABLE companies 
+ADD COLUMN theme VARCHAR(20) DEFAULT 'system',
+ADD COLUMN notify_proposals TINYINT(1) DEFAULT 1,
+ADD COLUMN notify_chat TINYINT(1) DEFAULT 1;
+
 
 SET FOREIGN_KEY_CHECKS = 1;
 

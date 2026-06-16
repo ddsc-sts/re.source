@@ -209,23 +209,24 @@ include 'header.php';
 <main class="dashboard-layout">
     
     <aside class="dashboard-sidebar">
-        <div class="sidebar-user">
-            <div class="sidebar-avatar">
-                <?php if($empresa['logo_url']): ?>
-                    <img src="<?= $empresa['logo_url'] ?>" alt="Logo">
-                <?php else: ?>
-                    <i data-lucide="building-2"></i>
-                <?php endif; ?>
-            </div>
-            <h3><?= htmlspecialchars($empresa['nome_fantasia'] ?: $empresa['razao_social']); ?></h3>
-            <p>Conta B2B Verificada</p>
-        </div>
+    <div class="sidebar-user">
+    <div class="sidebar-avatar" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <?php if (!empty($empresa['logo_url'])): ?>
+            <img src="<?= htmlspecialchars($empresa['logo_url']) ?>" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+        <?php else: ?>
+            <i data-lucide="building-2"></i>
+        <?php endif; ?>
+    </div>
+    <h3><?= htmlspecialchars(!empty($empresa['nome_fantasia']) ? $empresa['nome_fantasia'] : $empresa['razao_social']); ?></h3>
+    <p>Conta B2B Verificada</p>
+</div>
 
         <nav class="sidebar-nav">
-            <a href="estatisticas.php" class="sidebar-link"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
+            <a href="estatisticas.php" class="sidebar-link "><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
             <a href="meusAnuncios.php" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
             <a href="conta.php" class="sidebar-link active"><i data-lucide="user"></i> Detalhes da Conta</a>
             <a href="configuracoes.php" class="sidebar-link"><i data-lucide="settings"></i> Configurações</a>
+            <a href="logout.php" class="sidebar-link"><i data-lucide="log-out"></i> Sair</a>
         </nav>
     </aside>
 

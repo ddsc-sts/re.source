@@ -1,5 +1,17 @@
+<?php
+// Busca o tema do banco antes de renderizar o header
+$theme = 'light'; // padrão
+if (isset($_SESSION['company_id'])) {
+    $stmt = $pdo->prepare("SELECT theme FROM companies WHERE id = ?");
+    $stmt->execute([$_SESSION['company_id']]);
+    $result = $stmt->fetch();
+    if ($result && $result['theme']) {
+        $theme = $result['theme'];
+    }
+}
+?>
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR" data-theme="<?php echo $theme; ?>">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -40,7 +52,15 @@
       </div>
 
       <div class="dropdown-menu" id="dropdownMenu">
-        <div class="dropdown-label">Minha Conta</div>
+      <div class="dropdown-label">
+            <?php 
+            // Buscamos o nome da empresa para exibir aqui
+            $stmt = $pdo->prepare("SELECT nome_fantasia FROM companies WHERE id = ?");
+            $stmt->execute([$_SESSION['company_id'] ?? 1]);
+            $empresa = $stmt->fetch();
+            echo htmlspecialchars($empresa['nome_fantasia'] ?? 'Minha Conta');
+            ?>
+        </div>
         <a href="/RE.SOURCE/conta.php" class="menu-btn">Detalhes da conta</a>
         <a href="/RE.SOURCE/meusAnuncios.php" class="menu-btn">Meus Anuncios</a>
         <a href="/RE.SOURCE/estatisticas.php" class="menu-btn">Estatísticas</a>
@@ -102,4 +122,6 @@ function selectCategory(categoryName) {
     // Opcional: fechar o dropdown após clicar (caso seu script.js já não faça isso)
     document.getElementById('categoryDropdown').classList.remove('active'); 
 }
+
+
 </script>

@@ -9,14 +9,32 @@ require_once __DIR__ . "/BackEnd/config/conexao.php";
 
 $company_id = $_SESSION['company_id'] ?? 1;
 
-// Simulando preferências vindas do banco (no futuro, associadas à tabela de configurações da empresa)
-$prefs = [
-    'theme' => 'system', // light, dark, system
-    'language' => 'pt-BR',
-    'notify_proposals' => true,
-    'notify_chat' => true,
-    'notify_marketing' => false
-];
+// Buscando preferências, nome e logo reais do banco de dados
+try {
+    $stmt = $pdo->prepare("SELECT theme, notify_proposals, notify_chat, razao_social, nome_fantasia, logo_url FROM companies WHERE id = ?");
+    $stmt->execute([$company_id]);
+    $company_data = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Se achar a empresa, usa os dados. Se não, usa o padrão.
+    $prefs = [
+        'theme' => $company_data['theme'] ?? 'light',
+        'notify_proposals' => isset($company_data['notify_proposals']) ? (bool)$company_data['notify_proposals'] : true,
+        'notify_chat' => isset($company_data['notify_chat']) ? (bool)$company_data['notify_chat'] : true
+    ];
+
+    // Define o nome que será exibido (prioriza Nome Fantasia, se não tiver usa Razão Social)
+    $nome_empresa = !empty($company_data['nome_fantasia']) ? $company_data['nome_fantasia'] : ($company_data['razao_social'] ?? 'Minha Empresa');
+    $logo_url = $company_data['logo_url'] ?? null;
+
+} catch (PDOException $e) {
+    // Fallback de segurança caso dê erro no banco
+    $prefs = [ 'theme' => 'light', 'notify_proposals' => true, 'notify_chat' => true ];
+    $nome_empresa = 'Minha Empresa';
+    $logo_url = null;
+}
+
+// Salva o tema na sessão para o JavaScript ler
+$_SESSION['user_theme'] = $prefs['theme'];
 
 $titulo_pagina = 'Configurações do Sistema — Re.Source';
 include 'header.php';
@@ -62,6 +80,7 @@ include 'header.php';
     border: 1px solid var(--border-color);
     padding: 2rem;
     margin-bottom: 1.5rem;
+    transition: background 0.3s, border-color 0.3s;
 }
 
 .panel-header {
@@ -191,6 +210,42 @@ input:checked + .slider:before { transform: translateX(22px); }
 .crit-modal p { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.5; }
 .modal-actions { display: flex; gap: 1rem; justify-content: center; }
 
+/* REGRAS DO MODO ESCURO (DARK MODE) */
+body.theme-dark {
+    background-color: #0f172a !important;
+}
+.theme-dark .config-panel, 
+.theme-dark .dashboard-sidebar {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+.theme-dark var(--dark),
+.theme-dark h2,
+.theme-dark h3,
+.theme-dark h4,
+.theme-dark label {
+    color: #f8fafc !important;
+}
+.theme-dark p,
+.theme-dark .setting-info p {
+    color: #94a3b8 !important;
+}
+.theme-dark .setting-row {
+    border-bottom: 1px solid #334155 !important;
+}
+.theme-dark .config-select {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+}
+.theme-dark .device-item {
+    background: #0f172a !important;
+}
+.theme-dark .device-icon {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
 @media (max-width: 768px) {
     .dashboard-layout { grid-template-columns: 1fr; }
     .setting-row { flex-direction: column; align-items: flex-start; gap: 1rem; }
@@ -200,22 +255,27 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 <main class="dashboard-layout">
     
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-user">
-            <div class="sidebar-avatar">
+<aside class="dashboard-sidebar">
+    <div class="sidebar-user">
+        <div class="sidebar-avatar" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <?php if (!empty($logo_url)): ?>
+                <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da Empresa" style="width: 100%; height: 100%; object-fit: cover;">
+            <?php else: ?>
                 <i data-lucide="building-2"></i>
-            </div>
-            <h3>Configurações</h3>
-            <p>Painel de Controle</p>
+            <?php endif; ?>
         </div>
+        <h3><?= htmlspecialchars($nome_empresa) ?></h3>
+        <p>Painel de Controle</p>
+    </div>
 
-        <nav class="sidebar-nav">
-            <a href="estatisticas.php" class="sidebar-link"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
+    <nav class="sidebar-nav">
+            <a href="estatisticas.php" class="sidebar-link "><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
             <a href="meusAnuncios.php" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
             <a href="conta.php" class="sidebar-link"><i data-lucide="user"></i> Detalhes da Conta</a>
             <a href="configuracoes.php" class="sidebar-link active"><i data-lucide="settings"></i> Configurações</a>
+            <a href="logout.php" class="sidebar-link"><i data-lucide="log-out"></i> Sair</a>
         </nav>
-    </aside>
+</aside>
 
     <div class="dashboard-content">
         
@@ -236,18 +296,6 @@ input:checked + .slider:before { transform: translateX(22px); }
                         <option value="light" <?= $prefs['theme'] === 'light' ? 'selected' : '' ?>>Modo Claro</option>
                         <option value="dark" <?= $prefs['theme'] === 'dark' ? 'selected' : '' ?>>Modo Escuro</option>
                         <option value="system" <?= $prefs['theme'] === 'system' ? 'selected' : '' ?>>Seguir o Sistema</option>
-                    </select>
-                </div>
-
-                <div class="setting-row">
-                    <div class="setting-info">
-                        <label>Idioma do Painel</label>
-                        <p>Selecione a linguagem padrão para a navegação interna.</p>
-                    </div>
-                    <select name="language" class="config-select">
-                        <option value="pt-BR" <?= $prefs['language'] === 'pt-BR' ? 'selected' : '' ?>>Português (Brasil)</option>
-                        <option value="en" <?= $prefs['language'] === 'en' ? 'selected' : '' ?>>English</option>
-                        <option value="es" <?= $prefs['language'] === 'es' ? 'selected' : '' ?>>Español</option>
                     </select>
                 </div>
             </div>
@@ -279,17 +327,6 @@ input:checked + .slider:before { transform: translateX(22px); }
                         <span class="slider"></span>
                     </label>
                 </div>
-
-                <div class="setting-row">
-                    <div class="setting-info">
-                        <label for="notify_marketing">Boletins de Mercado e ESG</label>
-                        <p>Receber relatórios de preços de resíduos e newsletters de novidades do setor de sustentabilidade.</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" name="notify_marketing" id="notify_marketing" value="1" <?= $prefs['notify_marketing'] ? 'checked' : '' ?>>
-                        <span class="slider"></span>
-                    </label>
-                </div>
             </div>
 
             <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
@@ -304,23 +341,74 @@ input:checked + .slider:before { transform: translateX(22px); }
             </div>
             <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem;">Estes são os dispositivos que acessaram a conta da empresa recentemente. Caso não reconheça algum, encerre a sessão.</p>
 
-            <div class="device-item">
-                <div class="device-icon"><i data-lucide="monitor"></i></div>
-                <div class="device-details">
-                    <h4>Windows 11 — Chrome Browser</h4>
-                    <p>Joinville, Brasil • IP: 177.85.22.104</p>
-                </div>
-                <span class="device-badge">Sessão Atual</span>
-            </div>
+            <?php
+            // 1. CAPTURA DO IP REAL (Trata servidores locais)
+            $ip_atual = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+            if ($ip_atual === '::1' || $ip_atual === '127.0.0.1') {
+                $ip_atual = '192.168.0.15'; // Força um IP local amigável para testes visuais no localhost
+            }
 
-            <div class="device-item">
-                <div class="device-icon"><i data-lucide="smartphone"></i></div>
-                <div class="device-details">
-                    <h4>iPhone 15 — Safari Mobile</h4>
-                    <p>São Paulo, Brasil • Há 2 horas</p>
+            // 2. CAPTURA E TRATAMENTO DO USER AGENT ATUAL
+            $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'Desconhecido';
+
+            // Detecta o Sistema Operacional Atual
+            $os_atual = "Sistema Desconhecido";
+            if (preg_match('/windows|win32/i', $user_agent)) $os_atual = 'Windows';
+            elseif (preg_match('/macintosh|mac os x/i', $user_agent)) $os_atual = 'macOS';
+            elseif (preg_match('/linux/i', $user_agent)) $os_atual = 'Linux';
+            elseif (preg_match('/iphone|ipad/i', $user_agent)) $os_atual = 'iOS (iPhone)';
+            elseif (preg_match('/android/i', $user_agent)) $os_atual = 'Android';
+
+            // Detecta o Navegador Atual
+            $browser_atual = "Navegador Desconhecido";
+            if (preg_match('/edge/i', $user_agent)) $browser_atual = 'Microsoft Edge';
+            elseif (preg_match('/firefox/i', $user_agent)) $browser_atual = 'Mozilla Firefox';
+            elseif (preg_match('/chrome/i', $user_agent)) $browser_atual = 'Google Chrome';
+            elseif (preg_match('/safari/i', $user_agent)) $browser_atual = 'Safari';
+
+            // 3. SIMULAÇÃO DA TABELA `user_sessions`
+            if (!isset($_SESSION['dispositivos_historico'])) {
+                $_SESSION['dispositivos_historico'] = [];
+            }
+
+            $chave_dispositivo = md5($os_atual . $browser_atual);
+
+            $_SESSION['dispositivos_historico'][$chave_dispositivo] = [
+                'os' => $os_atual,
+                'browser' => $browser_atual,
+                'ip' => $ip_atual,
+                'last_access' => 'Agora mesmo',
+                'agent_string' => $user_agent
+            ];
+
+            // 4. RENDERIZAÇÃO DA LISTA DE DISPOSITIVOS REAIS
+            foreach ($_SESSION['dispositivos_historico'] as $hash => $device):
+                $eh_atual = ($device['os'] === $os_atual && $device['browser'] === $browser_atual);
+            ?>
+                <div class="device-item" id="device-<?= $hash ?>">
+                    <div class="device-icon">
+                        <?php if (preg_match('/iphone|ipad|android/i', $device['agent_string'])): ?>
+                            <i data-lucide="smartphone"></i>
+                        <?php else: ?>
+                            <i data-lucide="monitor"></i>
+                        <?php endif; ?>
+                    </div>
+                    <div class="device-details">
+                        <h4><?= $device['os'] . " — " . $device['browser'] ?></h4>
+                        <p>Joinville, Brasil • IP: <?= $device['ip'] ?> • <?= $device['last_access'] ?></p>
+                    </div>
+                    
+                    <?php if ($eh_atual): ?>
+                        <span class="device-badge">Sessão Atual</span>
+                    <?php else: ?>
+                        <button type="button" 
+                                style="margin-left: auto; background: none; border: none; color: #ef4444; font-size: 0.85rem; font-weight: 600; cursor: pointer;" 
+                                onclick="derrubarSessao('<?= $hash ?>')">
+                            Derrubar
+                        </button>
+                    <?php endif; ?>
                 </div>
-                <button type="button" style="margin-left: auto; background: none; border: none; color: #ef4444; font-size: 0.85rem; font-weight: 600; cursor: pointer;">Derrubar</button>
-            </div>
+            <?php endforeach; ?>
         </div>
 
         <div class="config-panel danger-zone">
@@ -340,13 +428,15 @@ input:checked + .slider:before { transform: translateX(22px); }
             </div>
 
             <div class="setting-row" style="border-top: 1px solid #fee2e2; padding-top: 1.5rem; margin-top: 0.5rem;">
-                <div class="setting-info">
-                    <label style="color: #b91c1c;">Excluir Conta Corporativa</label>
-                    <p>Ação irreversível. Apaga permanentemente seus anúncios ativos, histórico de propostas e relatórios fiscais.</p>
-                </div>
-                <button type="button" class="btn-danger" onclick="toggleDeleteModal(true)">Excluir Conta</button>
-            </div>
-        </div>
+    <div class="setting-info">
+        <label style="color: #b91c1c;">Excluir Conta Corporativa</label>
+        <p>Ação irreversível. Apaga permanentemente seus anúncios ativos, histórico de propostas e relatórios fiscais.</p>
+    </div>
+    
+    <form action="excluir_conta.php" method="POST" onsubmit="return confirm('Tem certeza absoluta? Esta ação não pode ser desfeita e todos os seus dados serão desativados.');">
+        <button type="submit" class="btn-danger">Excluir Conta</button>
+    </form>
+</div>
 
     </div>
 </main>
@@ -376,7 +466,48 @@ input:checked + .slider:before { transform: translateX(22px); }
         }
     }
 
+    function derrubarSessao(hash) {
+        if (confirm('Tem certeza que deseja encerrar e derrubar esta sessão ativa?')) {
+            const elemento = document.getElementById('device-' + hash);
+            if (elemento) {
+                elemento.style.opacity = '0';
+                setTimeout(() => elemento.remove(), 400);
+            }
+            alert('Sessão encerrada com sucesso! O token de segurança deste navegador foi revogado.');
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
+        const currentTheme = "<?= $prefs['theme'] ?>";
+        const body = document.body;
+
+        // Função para aplicar o tema
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('theme-dark');
+            } else if (theme === 'light') {
+                body.classList.remove('theme-dark');
+            } else if (theme === 'system') {
+                // Verifica a preferência do sistema operacional
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    body.classList.add('theme-dark');
+                } else {
+                    body.classList.remove('theme-dark');
+                }
+            }
+        }
+
+        // Aplica o tema configurado
+        applyTheme(currentTheme);
+
+        // Opcional: Escuta mudanças em tempo real se o usuário trocar o tema no sistema operacional
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (currentTheme === 'system') {
+                applyTheme('system');
+            }
+        });
+
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }

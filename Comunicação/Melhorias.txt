@@ -1,17 +1,21 @@
-oque se deve mudar:
+oque se deve mudar(FEITO EM 16/06):
 
 **FAZER COM QUE APAREÇA O NOME E FOTO CERTA EM TODAS AS OPÇOES DAS CONFIGURAÇOES**
-
 estatisticas da conta: ver como adcionar saldo ficticio, fazer a parte de retirada de dinheiro, testar se todas as partes de calculo de metricas estao certos
-
 Detalhes da conta: fazer com que o campo de email so seja mudado com confirmaçao de codigo no email atual, e integrar o codigo no email para vereficaçao duas etapas e mudança de senha
-
 anuncios: fazer que apareça a foto da empresa nos anuncios
-
 conta: Fazer que realmente funcione, parte de modo dark, retirar preferencia de linguagem do sistema(ou fazer se for facil), retirar botao de boletins esg, fazer funcionar as 
 notificaçoes para o email, fazer que mostre mesmo os dispositivos conectados naquela conta nao ficticio, e criar pagina de logout e de excluir conta
-
 salvar_preferencia: fazer funcionar salvando mesmo a preferencia
+
+PARA FAZER:
+
+arrumar os detalhes da conta
+adcionar a dashboard-sidebar aos meus anúncios
+implementar o modo dark a todo style do site
+saber o porque mesmo quando crio minha conta toda vez que eu logo ao invés de mostrar minhas informações ele mostra as informações
+da metaljoin que esta como id 1 no insert dos anúncios(O erro foi mudado somente na pagina de estatiscas pois o gemini indicou que ao invés de puxar o id do usuário atual estava puxando do id 1 então mudar isto nas demais paginas)
+razão social não esta sendo informada na estatiscas.php
 
 Proxima estrutura de MVC:
 

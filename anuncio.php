@@ -305,7 +305,8 @@ body {
 .texto-descricao { font-size: 1rem; line-height: 1.7; color: #374151; white-space: pre-line; }
 
 .localizacao-box { display: flex; align-items: center; gap: 1rem; }
-.icone-cidade { width: 48px; height: 48px; background: #ffffff; color: #157347; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #e5e7eb; }
+.icone-cidade { width: 48px; height: 48px; background: #ffffff; color: #157347; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #e5e7eb; overflow: hidden; }
+.icone-cidade img { width: 100%; height: 100%; object-fit: cover; }
 
 /* Carrossel de mais anúncios */
 .carrosel-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; margin-top: 3rem; }
@@ -445,8 +446,8 @@ body {
             <div style="font-weight: 600; color: #111827; font-size: 1.1rem;"><?= htmlspecialchars($anuncio['company_name'] ?? 'Empresa Sem Nome') ?></div>
             
             <div style="color: #6b7280; font-size: 0.9rem;">
-                <?= htmlspecialchars($anuncio['location_city'] ?? $anuncio['company_city'] ?? 'Cidade não informada') ?>, 
-                <?= htmlspecialchars($anuncio['location_state'] ?? $anuncio['company_state'] ?? 'SC') ?>
+                <?= htmlspecialchars($anuncio['location_city'] ?? 'Cidade não informada') ?>, 
+                <?= htmlspecialchars($anuncio['location_state'] ?? 'SC') ?>
             </div>
         </div>
     </div>
