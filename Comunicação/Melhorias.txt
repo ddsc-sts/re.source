@@ -10,12 +10,20 @@ salvar_preferencia: fazer funcionar salvando mesmo a preferencia
 
 PARA FAZER:
 
-arrumar os detalhes da conta
-adcionar a dashboard-sidebar aos meus anúncios
+
+
+alterar nas demais paginas que precisam: erro que o cluaude aponta: O problema é o mesmo de sempre — mock $SESSION['companyid'] = 1 e $SESSION['userid'] = 1.O problema é o mesmo de sempre — mock $_SESSION['company_id'] = 1 e $_SESSION['user_id'] = 1. Com isso a query WHERE id = :id AND company_id = :company_id não acha o anúncio do usuário real e 
+redireciona para meusAnuncios.php imediatamente.
+
+arrumar para mostrar o nome da empresa do estatiscas.php e mostrar foto e nome dos meus anuncios
+
 implementar o modo dark a todo style do site
-saber o porque mesmo quando crio minha conta toda vez que eu logo ao invés de mostrar minhas informações ele mostra as informações
-da metaljoin que esta como id 1 no insert dos anúncios(O erro foi mudado somente na pagina de estatiscas pois o gemini indicou que ao invés de puxar o id do usuário atual estava puxando do id 1 então mudar isto nas demais paginas)
-razão social não esta sendo informada na estatiscas.php
+
+Apos testar tudo começar a importação para a main principal e mvc e dar continuidade
+
+
+
+
 
 Proxima estrutura de MVC:
 

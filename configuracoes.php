@@ -1,39 +1,34 @@
 <?php
 // configuracoes.php
+// CORREÇÃO: Removido $_SESSION['company_id'], agora usa auth_check.php
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . "/BackEnd/config/conexao.php"; 
+require_once __DIR__ . "/BackEnd/config/conexao.php";
+require_once __DIR__ . "/BackEnd/config/auth_check.php"; // define $company_id e $user_id, redireciona se não logado
 
-$company_id = $_SESSION['company_id'] ?? 1;
-
-// Buscando preferências, nome e logo reais do banco de dados
 try {
     $stmt = $pdo->prepare("SELECT theme, notify_proposals, notify_chat, razao_social, nome_fantasia, logo_url FROM companies WHERE id = ?");
     $stmt->execute([$company_id]);
     $company_data = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Se achar a empresa, usa os dados. Se não, usa o padrão.
     $prefs = [
-        'theme' => $company_data['theme'] ?? 'light',
-        'notify_proposals' => isset($company_data['notify_proposals']) ? (bool)$company_data['notify_proposals'] : true,
-        'notify_chat' => isset($company_data['notify_chat']) ? (bool)$company_data['notify_chat'] : true
+        'theme'              => $company_data['theme'] ?? 'light',
+        'notify_proposals'   => isset($company_data['notify_proposals']) ? (bool)$company_data['notify_proposals'] : true,
+        'notify_chat'        => isset($company_data['notify_chat'])      ? (bool)$company_data['notify_chat']      : true,
     ];
 
-    // Define o nome que será exibido (prioriza Nome Fantasia, se não tiver usa Razão Social)
     $nome_empresa = !empty($company_data['nome_fantasia']) ? $company_data['nome_fantasia'] : ($company_data['razao_social'] ?? 'Minha Empresa');
-    $logo_url = $company_data['logo_url'] ?? null;
+    $logo_url     = $company_data['logo_url'] ?? null;
 
 } catch (PDOException $e) {
-    // Fallback de segurança caso dê erro no banco
-    $prefs = [ 'theme' => 'light', 'notify_proposals' => true, 'notify_chat' => true ];
+    $prefs        = ['theme' => 'light', 'notify_proposals' => true, 'notify_chat' => true];
     $nome_empresa = 'Minha Empresa';
-    $logo_url = null;
+    $logo_url     = null;
 }
 
-// Salva o tema na sessão para o JavaScript ler
 $_SESSION['user_theme'] = $prefs['theme'];
 
 $titulo_pagina = 'Configurações do Sistema — Re.Source';
@@ -41,7 +36,6 @@ include 'header.php';
 ?>
 
 <style>
-/* Layout Base Unificado */
 .dashboard-layout {
     max-width: 1280px;
     margin: 2rem auto;
@@ -94,7 +88,6 @@ include 'header.php';
 .panel-header i { color: var(--green); }
 .panel-header h2 { font-family: var(--font-main); font-size: 1.25rem; color: var(--dark); }
 
-/* Custom Switch/Toggle (Estilo iOS) */
 .setting-row {
     display: flex;
     justify-content: space-between;
@@ -108,143 +101,44 @@ include 'header.php';
 .setting-info label { font-weight: 600; color: var(--dark); font-size: 0.95rem; cursor: pointer; }
 .setting-info p { font-size: 0.85rem; color: var(--muted); }
 
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 46px;
-    height: 24px;
-}
+.switch { position: relative; display: inline-block; width: 46px; height: 24px; }
 .switch input { opacity: 0; width: 0; height: 0; }
-.slider {
-    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc; transition: .3s; border-radius: 24px;
-}
-.slider:before {
-    position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
-    background-color: white; transition: .3s; border-radius: 50%;
-}
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 24px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
 input:checked + .slider { background-color: var(--green); }
 input:checked + .slider:before { transform: translateX(22px); }
 
-/* Selectores Customizados */
-.config-select {
-    padding: 0.6rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--dark);
-    background-color: white;
-    min-width: 180px;
-}
+.config-select { padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.9rem; color: var(--dark); background-color: white; min-width: 180px; }
 
-/* Dispositivos Conectados */
-.device-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--bg);
-    border-radius: 0.5rem;
-    margin-bottom: 0.75rem;
-}
-.device-icon {
-    width: 40px;
-    height: 40px;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-}
+.device-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--bg); border-radius: 0.5rem; margin-bottom: 0.75rem; }
+.device-icon { width: 40px; height: 40px; background: white; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--muted); }
 .device-details h4 { font-size: 0.9rem; color: var(--dark); }
 .device-details p { font-size: 0.8rem; color: var(--muted); }
-.device-badge {
-    margin-left: auto;
-    background: rgba(21, 115, 71, 0.1);
-    color: var(--green);
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-}
+.device-badge { margin-left: auto; background: rgba(21, 115, 71, 0.1); color: var(--green); font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
 
-/* Zona de Perigo */
 .danger-zone { border-color: #fca5a5; background: #fff5f5; }
 .danger-zone .panel-header i { color: #ef4444; }
-.btn-danger {
-    background: #ef4444; color: white; border: none; padding: 0.6rem 1.5rem;
-    border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
-}
+.btn-danger { background: #ef4444; color: white; border: none; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
 .btn-danger:hover { background: #dc2626; }
 
-.btn-logout {
-    background: transparent; border: 1px solid #d1d5db; color: #4b5563;
-    padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer;
-    display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;
-}
+.btn-logout { background: transparent; border: 1px solid #d1d5db; color: #4b5563; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
 .btn-logout:hover { background: #f3f4f6; color: var(--dark); }
 
-/* Sidebar user info components */
 .sidebar-user { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-.sidebar-avatar { width: 64px; height: 64px; background: var(--bg); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; color: var(--green); }
+.sidebar-avatar { width: 64px; height: 64px; background: var(--bg); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; color: var(--green); overflow: hidden; }
+.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
 .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.9rem; font-weight: 500; color: var(--muted); transition: all 0.2s; }
 .sidebar-link:hover { background: var(--bg); color: var(--dark); }
 .sidebar-link.active { background: rgba(21, 115, 71, 0.1); color: var(--green); font-weight: 600; }
 
-/* Modal Crítico */
-.modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6); z-index: 1000;
-    display: none; align-items: center; justify-content: center;
-}
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
-.crit-modal {
-    background: white; padding: 2.5rem; border-radius: var(--radius);
-    width: 100%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-}
+.crit-modal { background: white; padding: 2.5rem; border-radius: var(--radius); width: 100%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
 .crit-modal i { color: #ef4444; margin-bottom: 1rem; }
 .crit-modal h3 { font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--dark); }
 .crit-modal p { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.5; }
 .modal-actions { display: flex; gap: 1rem; justify-content: center; }
-
-/* REGRAS DO MODO ESCURO (DARK MODE) */
-body.theme-dark {
-    background-color: #0f172a !important;
-}
-.theme-dark .config-panel, 
-.theme-dark .dashboard-sidebar {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
-.theme-dark var(--dark),
-.theme-dark h2,
-.theme-dark h3,
-.theme-dark h4,
-.theme-dark label {
-    color: #f8fafc !important;
-}
-.theme-dark p,
-.theme-dark .setting-info p {
-    color: #94a3b8 !important;
-}
-.theme-dark .setting-row {
-    border-bottom: 1px solid #334155 !important;
-}
-.theme-dark .config-select {
-    background-color: #1e293b !important;
-    color: #f8fafc !important;
-    border-color: #475569 !important;
-}
-.theme-dark .device-item {
-    background: #0f172a !important;
-}
-.theme-dark .device-icon {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
 
 @media (max-width: 768px) {
     .dashboard-layout { grid-template-columns: 1fr; }
@@ -255,27 +149,27 @@ body.theme-dark {
 
 <main class="dashboard-layout">
     
-<aside class="dashboard-sidebar">
-    <div class="sidebar-user">
-        <div class="sidebar-avatar" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
-            <?php if (!empty($logo_url)): ?>
-                <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da Empresa" style="width: 100%; height: 100%; object-fit: cover;">
-            <?php else: ?>
-                <i data-lucide="building-2"></i>
-            <?php endif; ?>
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <?php if (!empty($logo_url)): ?>
+                    <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da Empresa" style="width: 100%; height: 100%; object-fit: cover;">
+                <?php else: ?>
+                    <i data-lucide="building-2"></i>
+                <?php endif; ?>
+            </div>
+            <h3><?= htmlspecialchars($nome_empresa) ?></h3>
+            <p>Painel de Controle</p>
         </div>
-        <h3><?= htmlspecialchars($nome_empresa) ?></h3>
-        <p>Painel de Controle</p>
-    </div>
 
-    <nav class="sidebar-nav">
-            <a href="estatisticas.php" class="sidebar-link "><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
+        <nav class="sidebar-nav">
+            <a href="estatisticas.php" class="sidebar-link"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
             <a href="meusAnuncios.php" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
             <a href="conta.php" class="sidebar-link"><i data-lucide="user"></i> Detalhes da Conta</a>
             <a href="configuracoes.php" class="sidebar-link active"><i data-lucide="settings"></i> Configurações</a>
             <a href="logout.php" class="sidebar-link"><i data-lucide="log-out"></i> Sair</a>
         </nav>
-</aside>
+    </aside>
 
     <div class="dashboard-content">
         
@@ -293,8 +187,8 @@ body.theme-dark {
                         <p>Personalize a aparência do seu painel corporativo.</p>
                     </div>
                     <select name="theme" class="config-select">
-                        <option value="light" <?= $prefs['theme'] === 'light' ? 'selected' : '' ?>>Modo Claro</option>
-                        <option value="dark" <?= $prefs['theme'] === 'dark' ? 'selected' : '' ?>>Modo Escuro</option>
+                        <option value="light"  <?= $prefs['theme'] === 'light'  ? 'selected' : '' ?>>Modo Claro</option>
+                        <option value="dark"   <?= $prefs['theme'] === 'dark'   ? 'selected' : '' ?>>Modo Escuro</option>
                         <option value="system" <?= $prefs['theme'] === 'system' ? 'selected' : '' ?>>Seguir o Sistema</option>
                     </select>
                 </div>
@@ -330,7 +224,7 @@ body.theme-dark {
             </div>
 
             <div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
-                <button type="submit" class="btn-save" style="background: var(--green); color: white; padding: 0.75rem 2rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">Salvar Preferências</button>
+                <button type="submit" style="background: var(--green); color: white; padding: 0.75rem 2rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">Salvar Preferências</button>
             </div>
         </form>
 
@@ -342,46 +236,39 @@ body.theme-dark {
             <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem;">Estes são os dispositivos que acessaram a conta da empresa recentemente. Caso não reconheça algum, encerre a sessão.</p>
 
             <?php
-            // 1. CAPTURA DO IP REAL (Trata servidores locais)
             $ip_atual = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
             if ($ip_atual === '::1' || $ip_atual === '127.0.0.1') {
-                $ip_atual = '192.168.0.15'; // Força um IP local amigável para testes visuais no localhost
+                $ip_atual = '192.168.0.15';
             }
 
-            // 2. CAPTURA E TRATAMENTO DO USER AGENT ATUAL
             $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'Desconhecido';
 
-            // Detecta o Sistema Operacional Atual
             $os_atual = "Sistema Desconhecido";
-            if (preg_match('/windows|win32/i', $user_agent)) $os_atual = 'Windows';
+            if (preg_match('/windows|win32/i', $user_agent))       $os_atual = 'Windows';
             elseif (preg_match('/macintosh|mac os x/i', $user_agent)) $os_atual = 'macOS';
-            elseif (preg_match('/linux/i', $user_agent)) $os_atual = 'Linux';
-            elseif (preg_match('/iphone|ipad/i', $user_agent)) $os_atual = 'iOS (iPhone)';
-            elseif (preg_match('/android/i', $user_agent)) $os_atual = 'Android';
+            elseif (preg_match('/linux/i', $user_agent))            $os_atual = 'Linux';
+            elseif (preg_match('/iphone|ipad/i', $user_agent))     $os_atual = 'iOS (iPhone)';
+            elseif (preg_match('/android/i', $user_agent))         $os_atual = 'Android';
 
-            // Detecta o Navegador Atual
             $browser_atual = "Navegador Desconhecido";
-            if (preg_match('/edge/i', $user_agent)) $browser_atual = 'Microsoft Edge';
-            elseif (preg_match('/firefox/i', $user_agent)) $browser_atual = 'Mozilla Firefox';
-            elseif (preg_match('/chrome/i', $user_agent)) $browser_atual = 'Google Chrome';
-            elseif (preg_match('/safari/i', $user_agent)) $browser_atual = 'Safari';
+            if (preg_match('/edge/i', $user_agent))                 $browser_atual = 'Microsoft Edge';
+            elseif (preg_match('/firefox/i', $user_agent))          $browser_atual = 'Mozilla Firefox';
+            elseif (preg_match('/chrome/i', $user_agent))           $browser_atual = 'Google Chrome';
+            elseif (preg_match('/safari/i', $user_agent))           $browser_atual = 'Safari';
 
-            // 3. SIMULAÇÃO DA TABELA `user_sessions`
             if (!isset($_SESSION['dispositivos_historico'])) {
                 $_SESSION['dispositivos_historico'] = [];
             }
 
             $chave_dispositivo = md5($os_atual . $browser_atual);
-
             $_SESSION['dispositivos_historico'][$chave_dispositivo] = [
-                'os' => $os_atual,
-                'browser' => $browser_atual,
-                'ip' => $ip_atual,
-                'last_access' => 'Agora mesmo',
-                'agent_string' => $user_agent
+                'os'           => $os_atual,
+                'browser'      => $browser_atual,
+                'ip'           => $ip_atual,
+                'last_access'  => 'Agora mesmo',
+                'agent_string' => $user_agent,
             ];
 
-            // 4. RENDERIZAÇÃO DA LISTA DE DISPOSITIVOS REAIS
             foreach ($_SESSION['dispositivos_historico'] as $hash => $device):
                 $eh_atual = ($device['os'] === $os_atual && $device['browser'] === $browser_atual);
             ?>
@@ -397,7 +284,6 @@ body.theme-dark {
                         <h4><?= $device['os'] . " — " . $device['browser'] ?></h4>
                         <p>Joinville, Brasil • IP: <?= $device['ip'] ?> • <?= $device['last_access'] ?></p>
                     </div>
-                    
                     <?php if ($eh_atual): ?>
                         <span class="device-badge">Sessão Atual</span>
                     <?php else: ?>
@@ -414,7 +300,7 @@ body.theme-dark {
         <div class="config-panel danger-zone">
             <div class="panel-header">
                 <i data-lucide="octagon-alert"></i>
-                <h2>Zona de Perigo Fiscal e Contratual</h2>
+                <h2>Zona de Perigo</h2>
             </div>
             
             <div class="setting-row" style="border: none;">
@@ -428,15 +314,15 @@ body.theme-dark {
             </div>
 
             <div class="setting-row" style="border-top: 1px solid #fee2e2; padding-top: 1.5rem; margin-top: 0.5rem;">
-    <div class="setting-info">
-        <label style="color: #b91c1c;">Excluir Conta Corporativa</label>
-        <p>Ação irreversível. Apaga permanentemente seus anúncios ativos, histórico de propostas e relatórios fiscais.</p>
-    </div>
-    
-    <form action="excluir_conta.php" method="POST" onsubmit="return confirm('Tem certeza absoluta? Esta ação não pode ser desfeita e todos os seus dados serão desativados.');">
-        <button type="submit" class="btn-danger">Excluir Conta</button>
-    </form>
-</div>
+                <div class="setting-info">
+                    <label style="color: #b91c1c;">Excluir Conta Corporativa</label>
+                    <p>Ação irreversível. Apaga permanentemente seus anúncios ativos, histórico de propostas e relatórios fiscais.</p>
+                </div>
+                <form action="excluir_conta.php" method="POST" onsubmit="return confirm('Tem certeza absoluta? Esta ação não pode ser desfeita.');">
+                    <button type="submit" class="btn-danger">Excluir Conta</button>
+                </form>
+            </div>
+        </div>
 
     </div>
 </main>
@@ -445,8 +331,7 @@ body.theme-dark {
     <div class="crit-modal">
         <i data-lucide="alert-triangle" style="width: 48px; height: 48px;"></i>
         <h3>Tem certeza absoluta?</h3>
-        <p>Esta ação **não pode ser desfeita**. Você perderá o acesso instantâneo a todas as transações, dados de CO₂ evitado e fundos não retirados no sistema RE.SOURCE.</p>
-        
+        <p>Esta ação não pode ser desfeita. Você perderá o acesso a todas as transações, dados e fundos não retirados no Re.Source.</p>
         <div class="modal-actions">
             <button type="button" class="btn-logout" onclick="toggleDeleteModal(false)">Cancelar</button>
             <form action="excluir_conta.php" method="POST" style="display: inline;">
@@ -458,59 +343,41 @@ body.theme-dark {
 
 <script>
     function toggleDeleteModal(show) {
-        const modal = document.getElementById('deleteModal');
-        if (show) {
-            modal.classList.add('active');
-        } else {
-            modal.classList.remove('active');
-        }
+        document.getElementById('deleteModal').classList.toggle('active', show);
     }
 
     function derrubarSessao(hash) {
-        if (confirm('Tem certeza que deseja encerrar e derrubar esta sessão ativa?')) {
+        if (confirm('Tem certeza que deseja encerrar esta sessão ativa?')) {
             const elemento = document.getElementById('device-' + hash);
             if (elemento) {
                 elemento.style.opacity = '0';
                 setTimeout(() => elemento.remove(), 400);
             }
-            alert('Sessão encerrada com sucesso! O token de segurança deste navegador foi revogado.');
+            alert('Sessão encerrada com sucesso!');
         }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
         const currentTheme = "<?= $prefs['theme'] ?>";
-        const body = document.body;
 
-        // Função para aplicar o tema
         function applyTheme(theme) {
             if (theme === 'dark') {
-                body.classList.add('theme-dark');
+                document.body.classList.add('theme-dark');
             } else if (theme === 'light') {
-                body.classList.remove('theme-dark');
+                document.body.classList.remove('theme-dark');
             } else if (theme === 'system') {
-                // Verifica a preferência do sistema operacional
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (prefersDark) {
-                    body.classList.add('theme-dark');
-                } else {
-                    body.classList.remove('theme-dark');
-                }
+                document.body.classList.toggle('theme-dark', prefersDark);
             }
         }
 
-        // Aplica o tema configurado
         applyTheme(currentTheme);
 
-        // Opcional: Escuta mudanças em tempo real se o usuário trocar o tema no sistema operacional
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (currentTheme === 'system') {
-                applyTheme('system');
-            }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (currentTheme === 'system') applyTheme('system');
         });
 
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        if (typeof lucide !== 'undefined') { lucide.createIcons(); }
     });
 </script>
 

@@ -7,11 +7,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . "/BackEnd/config/conexao.php"; 
 
-// Proteção para garantir que o usuário está logado
-$company_id = $_SESSION['company_id'] ?? 1; // Fallback para desenvolvimento
+// Pega o ID correto da sessão e bloqueia se não estiver logado
+$company_id = $_SESSION['user']['company_id'] ?? null; 
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: conta.php");
+if (!$company_id) {
+    header("Location: login.php");
     exit();
 }
 

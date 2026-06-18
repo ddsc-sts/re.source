@@ -21,7 +21,6 @@
         <a href="/" class="logo">
           <span><img src="/RE.SOURCE/FrontEnd/img/logo.png" alt="Re.Source"></span>
         </a>
-      
       </div>
     </div>
   </header>
@@ -41,7 +40,7 @@
         <ul class="aside-benefits">
           <li>
             <span class="benefit-icon"><i data-lucide="leaf"></i></span>
-            <div><strong>Zero burocracia</strong><span>Anuncie ou encontre resíduos em minutos</span></div>
+            <div><strong>Zero burocracia</strong><span>Anuncie ou encontre resíduos in minutos</span></div>
           </li>
           <li>
             <span class="benefit-icon"><i data-lucide="shield-check"></i></span>
@@ -83,27 +82,23 @@
           <button class="type-btn" data-type="cooperativa" type="button">
             <i data-lucide="users"></i><span>Cooperativa</span>
           </button>
-          
         </div>
 
-        <!-- ✅ action corrigido: caminho absoluto + ?tipo=empresa -->
-        <form class="form-body" id="formCadastro"
-              action="/RE.SOURCE/BackEnd/auth/cadastro.php?tipo=empresa"
-              method="POST">
+        <form class="form-body" id="formCadastro" action="/RE.SOURCE/BackEnd/auth/cadastro.php?tipo=empresa" method="POST">
 
           <div class="form-row">
             <div class="form-field">
-              <label for="nome">Nome <span class="req">*</span></label>
+              <label for="nome">Nome do Responsável <span class="req">*</span></label>
               <div class="input-wrap">
                 <i data-lucide="user" class="input-icon"></i>
-                <input type="text" id="nome" name="nome" placeholder="Ex.: Maria" autocomplete="given-name" />
+                <input type="text" id="nome" name="nome" placeholder="Ex.: Maria" autocomplete="given-name" required />
               </div>
             </div>
             <div class="form-field">
               <label for="sobrenome">Sobrenome <span class="req">*</span></label>
               <div class="input-wrap">
                 <i data-lucide="user" class="input-icon"></i>
-                <input type="text" id="sobrenome" name="sobrenome" placeholder="Ex.: Silva" autocomplete="family-name" />
+                <input type="text" id="sobrenome" name="sobrenome" placeholder="Ex.: Silva" autocomplete="family-name" required />
               </div>
             </div>
           </div>
@@ -112,7 +107,7 @@
             <label for="cnpj">CNPJ <span class="req">*</span></label>
             <div class="input-wrap">
               <i data-lucide="hash" class="input-icon"></i>
-              <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0001-00" maxlength="18" />
+              <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0001-00" maxlength="18" required />
               <span class="input-tag" id="cnpjStatus"></span>
             </div>
           </div>
@@ -121,15 +116,23 @@
             <label for="razao">Razão Social <span class="req">*</span></label>
             <div class="input-wrap">
               <i data-lucide="briefcase" class="input-icon"></i>
-              <input type="text" id="razao" name="razao_social" placeholder="Nome da empresa ou cooperativa" />
+              <input type="text" id="razao" name="razao_social" placeholder="Nome jurídico da empresa ou cooperativa" required />
+            </div>
+          </div>
+
+          <div class="form-field" id="fantasiaField">
+            <label for="nome_fantasia">Nome Fantasia <span class="req">*</span></label>
+            <div class="input-wrap">
+              <i data-lucide="store" class="input-icon"></i>
+              <input type="text" id="nome_fantasia" name="nome_fantasia" placeholder="Nome comercial da sua marca" required />
             </div>
           </div>
 
           <div class="form-field">
-            <label for="email">E-mail <span class="req">*</span></label>
+            <label for="email">E-mail Corporativo <span class="req">*</span></label>
             <div class="input-wrap">
               <i data-lucide="mail" class="input-icon"></i>
-              <input type="email" id="email" name="email" placeholder="contato@empresa.com.br" autocomplete="email" />
+              <input type="email" id="email" name="email" placeholder="contato@empresa.com.br" autocomplete="email" required />
             </div>
           </div>
 
@@ -138,14 +141,14 @@
               <label for="telefone">Telefone <span class="req">*</span></label>
               <div class="input-wrap">
                 <i data-lucide="phone" class="input-icon"></i>
-                <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" maxlength="15" />
+                <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" maxlength="15" required />
               </div>
             </div>
             <div class="form-field">
               <label for="estado">Estado <span class="req">*</span></label>
               <div class="input-wrap input-wrap-select">
                 <i data-lucide="map-pin" class="input-icon"></i>
-                <select id="estado" name="estado">
+                <select id="estado" name="estado" required>
                   <option value="" disabled selected>Selecione</option>
                   <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
                   <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
@@ -164,7 +167,7 @@
             <label for="senha">Senha <span class="req">*</span></label>
             <div class="input-wrap">
               <i data-lucide="lock" class="input-icon"></i>
-              <input type="password" id="senha" name="senha" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+              <input type="password" id="senha" name="senha" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required />
               <button class="toggle-pw" type="button" id="toggleSenha" aria-label="Mostrar senha">
                 <i data-lucide="eye"></i>
               </button>
@@ -179,7 +182,7 @@
             <label for="senhaConf">Confirmar Senha <span class="req">*</span></label>
             <div class="input-wrap">
               <i data-lucide="lock" class="input-icon"></i>
-              <input type="password" id="senhaConf" name="senha_conf" placeholder="Repita a senha" autocomplete="new-password" />
+              <input type="password" id="senhaConf" name="senha_conf" placeholder="Repita a senha" autocomplete="new-password" required />
               <button class="toggle-pw" type="button" id="toggleConf" aria-label="Mostrar confirmação">
                 <i data-lucide="eye"></i>
               </button>
@@ -188,7 +191,7 @@
 
           <div class="check-group">
             <label class="check-label">
-              <input type="checkbox" id="chkTermos" name="termos" />
+              <input type="checkbox" id="chkTermos" name="termos" required />
               <span class="check-box"><i data-lucide="check"></i></span>
               <span>Li e aceito os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a></span>
             </label>
@@ -216,8 +219,19 @@
     <a href="#" style="color:var(--green);">Política de Privacidade</a>
   </footer>
 
-  <script>lucide.createIcons();</script>
-  <!-- ✅ caminho absoluto para o JS -->
+  <script>
+    lucide.createIcons();
+    
+    // Gerenciador básico alternador de tipo de conta para ajustar dinamicamente o action do formulário
+    document.querySelectorAll('.type-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        const tipo = this.getAttribute('data-type');
+        document.getElementById('formCadastro').setAttribute('action', `/RE.SOURCE/BackEnd/auth/cadastro.php?tipo=${tipo}`);
+      });
+    });
+  </script>
   <script src="/RE.SOURCE/BackEnd/js/cadastro.js"></script>
 
 </body>

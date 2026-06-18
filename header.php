@@ -1,9 +1,11 @@
 <?php
-// Busca o tema do banco antes de renderizar o header
-$theme = 'light'; // padrão
-if (isset($_SESSION['company_id'])) {
+// header.php
+// CORREÇÃO: Trocado $_SESSION['company_id'] por $_SESSION['user']['company_id'] em todos os lugares.
+
+$theme = 'light';
+if (!empty($_SESSION['user']['company_id'])) {
     $stmt = $pdo->prepare("SELECT theme FROM companies WHERE id = ?");
-    $stmt->execute([$_SESSION['company_id']]);
+    $stmt->execute([$_SESSION['user']['company_id']]);
     $result = $stmt->fetch();
     if ($result && $result['theme']) {
         $theme = $result['theme'];
@@ -52,17 +54,21 @@ if (isset($_SESSION['company_id'])) {
       </div>
 
       <div class="dropdown-menu" id="dropdownMenu">
-      <div class="dropdown-label">
-            <?php 
-            // Buscamos o nome da empresa para exibir aqui
-            $stmt = $pdo->prepare("SELECT nome_fantasia FROM companies WHERE id = ?");
-            $stmt->execute([$_SESSION['company_id'] ?? 1]);
-            $empresa = $stmt->fetch();
-            echo htmlspecialchars($empresa['nome_fantasia'] ?? 'Minha Conta');
-            ?>
+        <div class="dropdown-label">
+          <?php
+          // CORREÇÃO: usa $_SESSION['user']['company_id'] ao invés de $_SESSION['company_id']
+          if (!empty($_SESSION['user']['company_id'])) {
+              $stmt = $pdo->prepare("SELECT nome_fantasia FROM companies WHERE id = ?");
+              $stmt->execute([$_SESSION['user']['company_id']]);
+              $empresa = $stmt->fetch();
+              echo htmlspecialchars($empresa['nome_fantasia'] ?? 'Minha Conta');
+          } else {
+              echo 'Minha Conta';
+          }
+          ?>
         </div>
         <a href="/RE.SOURCE/conta.php" class="menu-btn">Detalhes da conta</a>
-        <a href="/RE.SOURCE/meusAnuncios.php" class="menu-btn">Meus Anuncios</a>
+        <a href="/RE.SOURCE/meusAnuncios.php" class="menu-btn">Meus Anúncios</a>
         <a href="/RE.SOURCE/estatisticas.php" class="menu-btn">Estatísticas</a>
         <a href="/RE.SOURCE/configuracoes.php" class="menu-btn">Configurações</a>
 
@@ -77,7 +83,6 @@ if (isset($_SESSION['company_id'])) {
 
   <div class="search-bar-wrap">
     <div class="search-bar-inner">
-      
       <form action="/RE.SOURCE/busca.php" method="GET" class="search-pill">
         
         <div class="search-field">
@@ -109,19 +114,14 @@ if (isset($_SESSION['company_id'])) {
         <button type="submit" class="search-btn"><i data-lucide="search"></i></button>
         
       </form>
-
     </div>
   </div>
 </header>
 
 <script>
-// Garante que o texto selecionado na categoria atualize a interface e o campo escondido
 function selectCategory(categoryName) {
     document.getElementById('categoryLabel').innerText = categoryName;
     document.getElementById('hiddenCategory').value = categoryName === 'Todas as categorias' ? '' : categoryName;
-    // Opcional: fechar o dropdown após clicar (caso seu script.js já não faça isso)
     document.getElementById('categoryDropdown').classList.remove('active'); 
 }
-
-
 </script>

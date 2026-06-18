@@ -1,13 +1,16 @@
 <?php
 // conta.php
+// CORREÇÕES:
+// 1. auth_check.php para pegar company_id correto da sessão
+// 2. Todas as saídas com htmlspecialchars() agora usam ?? '' para nunca passar null
+// 3. Logo tratada corretamente tanto na sidebar quanto no preview
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . "/BackEnd/config/conexao.php"; 
-
-$company_id = $_SESSION['company_id'] ?? 1; 
+require_once __DIR__ . "/BackEnd/config/conexao.php";
+require_once __DIR__ . "/BackEnd/config/auth_check.php"; // define $company_id e $user_id
 
 try {
     $stmt = $pdo->prepare("
@@ -17,15 +20,39 @@ try {
         WHERE c.id = ?
     ");
     $stmt->execute([$company_id]);
-    $empresa = $stmt->fetch();
+    $empresa = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$empresa) {
+        session_destroy();
+        header("Location: /RE.SOURCE/login.php");
+        exit();
+    }
 
     $stmtUser = $pdo->prepare("SELECT name, email FROM users WHERE company_id = ? AND role = 'admin_company' LIMIT 1");
     $stmtUser->execute([$company_id]);
-    $admin = $stmtUser->fetch();
+    $admin = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     die("Erro ao carregar dados: " . $e->getMessage());
 }
+
+// Variáveis seguras — nunca null — para usar no HTML sem warnings
+$logo_url        = $empresa['logo_url']        ?? '';
+$nome_fantasia   = $empresa['nome_fantasia']   ?? '';
+$razao_social    = $empresa['razao_social']    ?? '';
+$nome_exibicao   = !empty($nome_fantasia) ? $nome_fantasia : $razao_social;
+$cnpj            = $empresa['cnpj']            ?? '';
+$segment         = $empresa['segment']         ?? '';
+$phone           = $empresa['phone']           ?? '';
+$email           = $empresa['email']           ?? '';
+$responsible     = $empresa['responsible_name'] ?? '';
+$zip_code        = $empresa['zip_code']        ?? '';
+$street          = $empresa['street']          ?? '';
+$number          = $empresa['number']          ?? '';
+$complement      = $empresa['complement']      ?? '';
+$city            = $empresa['city']            ?? '';
+$state           = $empresa['state']           ?? '';
+$admin_email     = $admin['email']             ?? 'seu e-mail';
 
 $titulo_pagina = 'Configurações da Conta — Re.Source';
 include 'header.php';
@@ -41,18 +68,16 @@ include 'header.php';
     gap: 2rem;
     align-items: start;
 }
-
 .dashboard-sidebar {
     background: var(--white);
     border-radius: var(--radius);
     border: 1px solid var(--border-color);
     padding: 1.5rem 1rem;
     position: sticky;
-    top: 100px; 
-    height: calc(100vh - 120px); 
-    overflow-y: auto; 
+    top: 100px;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
 }
-
 .dashboard-content {
     display: flex;
     flex-direction: column;
@@ -63,7 +88,6 @@ include 'header.php';
     overflow-y: auto;
     padding-right: 10px;
 }
-
 .account-panel {
     background: var(--white);
     border-radius: var(--radius);
@@ -71,7 +95,6 @@ include 'header.php';
     padding: 2rem;
     margin-bottom: 1.5rem;
 }
-
 .panel-header {
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 1rem;
@@ -80,25 +103,12 @@ include 'header.php';
     align-items: center;
     gap: 1rem;
 }
-
 .panel-header i { color: var(--green); }
 .panel-header h2 { font-family: var(--font-main); font-size: 1.25rem; color: var(--dark); }
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-}
-
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
 .form-group.full { grid-column: span 2; }
-
-.form-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--muted);
-}
-
+.form-group label { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
 .form-group input, .form-group select, .form-group textarea {
     padding: 0.75rem 1rem;
     border: 1px solid #d1d5db;
@@ -107,13 +117,11 @@ include 'header.php';
     font-size: 0.95rem;
     transition: border-color 0.2s;
 }
-
 .form-group input:focus {
     border-color: var(--green);
     outline: none;
     box-shadow: 0 0 0 3px rgba(21, 115, 71, 0.1);
 }
-
 .logo-upload-container {
     display: flex;
     align-items: center;
@@ -123,16 +131,15 @@ include 'header.php';
     background: var(--bg);
     border-radius: 0.5rem;
 }
-
 .current-logo {
     width: 100px;
     height: 100px;
     border-radius: 0.5rem;
-    object-fit: contain;
+    object-fit: cover;
     background: white;
     border: 1px solid var(--border-color);
+    flex-shrink: 0;
 }
-
 .btn-save {
     background: var(--green);
     color: white;
@@ -145,60 +152,37 @@ include 'header.php';
     cursor: pointer;
 }
 .btn-save:hover { background: #0f5132; }
-
 .sidebar-user { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-.sidebar-avatar { width: 64px; height: 64px; background: var(--bg); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; color: var(--green); overflow: hidden; }
+.sidebar-avatar {
+    width: 64px; height: 64px;
+    background: var(--bg);
+    border-radius: 50%;
+    margin: 0 auto 0.75rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--green);
+    overflow: hidden;
+    border: 2px solid var(--border-color);
+}
 .sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
 .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.9rem; font-weight: 500; color: var(--muted); transition: all 0.2s; }
 .sidebar-link:hover { background: var(--bg); color: var(--dark); }
 .sidebar-link.active { background: rgba(21, 115, 71, 0.1); color: var(--green); font-weight: 600; }
-
-/* --- NOVOS ESTILOS DE SEGURANÇA --- */
-.security-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-}
+.security-row { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem; margin-bottom: 1rem; }
 .security-info h3 { font-size: 1rem; color: var(--dark); margin-bottom: 0.25rem; }
 .security-info p { font-size: 0.85rem; color: var(--muted); }
-
-.btn-outline {
-    background: transparent;
-    border: 1px solid var(--green);
-    color: var(--green);
-    padding: 0.5rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
+.btn-outline { background: transparent; border: 1px solid var(--green); color: var(--green); padding: 0.5rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .btn-outline:hover { background: var(--green); color: white; }
-
-/* Modal de Segurança */
-.modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); z-index: 1000;
-    display: none; align-items: center; justify-content: center;
-}
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
-.security-modal {
-    background: white; padding: 2rem; border-radius: 0.5rem;
-    width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
+.security-modal { background: white; padding: 2rem; border-radius: 0.5rem; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .modal-header h3 { font-size: 1.2rem; }
 .btn-close { background: none; border: none; cursor: pointer; color: var(--muted); }
 .code-inputs { display: flex; gap: 0.5rem; justify-content: space-between; margin-bottom: 1.5rem; }
 .code-inputs input { width: 45px; height: 50px; text-align: center; font-size: 1.5rem; font-weight: bold; border: 1px solid #d1d5db; border-radius: 0.5rem; }
 .code-inputs input:focus { border-color: var(--green); outline: none; }
-
 #dynamic-modal-content { display: none; margin-top: 1.5rem; }
-
 @media (max-width: 768px) {
     .form-grid { grid-template-columns: 1fr; }
     .dashboard-layout { grid-template-columns: 1fr; }
@@ -207,22 +191,22 @@ include 'header.php';
 </style>
 
 <main class="dashboard-layout">
-    
+
     <aside class="dashboard-sidebar">
-    <div class="sidebar-user">
-    <div class="sidebar-avatar" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
-        <?php if (!empty($empresa['logo_url'])): ?>
-            <img src="<?= htmlspecialchars($empresa['logo_url']) ?>" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
-        <?php else: ?>
-            <i data-lucide="building-2"></i>
-        <?php endif; ?>
-    </div>
-    <h3><?= htmlspecialchars(!empty($empresa['nome_fantasia']) ? $empresa['nome_fantasia'] : $empresa['razao_social']); ?></h3>
-    <p>Conta B2B Verificada</p>
-</div>
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">
+                <?php if (!empty($logo_url)): ?>
+                    <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da empresa">
+                <?php else: ?>
+                    <i data-lucide="building-2" style="width:32px;height:32px;"></i>
+                <?php endif; ?>
+            </div>
+            <h3><?= htmlspecialchars($nome_exibicao) ?></h3>
+            <p>Conta B2B Verificada</p>
+        </div>
 
         <nav class="sidebar-nav">
-            <a href="estatisticas.php" class="sidebar-link "><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
+            <a href="estatisticas.php" class="sidebar-link"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
             <a href="meusAnuncios.php" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
             <a href="conta.php" class="sidebar-link active"><i data-lucide="user"></i> Detalhes da Conta</a>
             <a href="configuracoes.php" class="sidebar-link"><i data-lucide="settings"></i> Configurações</a>
@@ -231,17 +215,22 @@ include 'header.php';
     </aside>
 
     <div class="dashboard-content">
-        
+
         <form action="atualizar_conta.php" method="POST" enctype="multipart/form-data">
-            
+
             <div class="account-panel">
                 <div class="panel-header">
                     <i data-lucide="camera"></i>
                     <h2>Identidade Visual</h2>
                 </div>
-                
+
                 <div class="logo-upload-container">
-                    <img src="<?= $empresa['logo_url'] ?: 'FrontEnd/img/default-logo.png' ?>" class="current-logo" id="logoPreview">
+                    <?php if (!empty($logo_url)): ?>
+                        <img src="<?= htmlspecialchars($logo_url) ?>" class="current-logo" id="logoPreview" alt="Logo atual">
+                    <?php else: ?>
+                        <img src="FrontEnd/img/default-logo.png" class="current-logo" id="logoPreview" alt="Logo padrão">
+                    <?php endif; ?>
+
                     <div class="form-group">
                         <label>Logotipo da Empresa</label>
                         <input type="file" name="logo_empresa" accept="image/*" onchange="previewImage(event)">
@@ -251,7 +240,7 @@ include 'header.php';
 
                 <div class="form-group full">
                     <label>Biografia / Descrição da Empresa</label>
-                    <textarea name="segment" rows="3" placeholder="Conte um pouco sobre o que sua empresa faz e quais materiais costuma operar..."><?= htmlspecialchars($empresa['segment'] ?? '') ?></textarea>
+                    <textarea name="segment" rows="3" placeholder="Conte um pouco sobre o que sua empresa faz..."><?= htmlspecialchars($segment) ?></textarea>
                 </div>
             </div>
 
@@ -260,21 +249,21 @@ include 'header.php';
                     <i data-lucide="briefcase"></i>
                     <h2>Informações Jurídicas</h2>
                 </div>
-                
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Nome Fantasia</label>
-                        <input type="text" name="nome_fantasia" value="<?= htmlspecialchars($empresa['nome_fantasia'] ?? '') ?>" required>
+                        <input type="text" name="nome_fantasia" value="<?= htmlspecialchars($nome_fantasia) ?>" required>
                     </div>
                     <div class="form-group">
                         <label>Razão Social</label>
-                        <input type="text" name="razao_social" value="<?= htmlspecialchars($empresa['razao_social']) ?>" required>
+                        <input type="text" name="razao_social" value="<?= htmlspecialchars($razao_social) ?>" required>
                     </div>
                     <div class="form-group full">
                         <label>CNPJ</label>
-                        <input type="text" name="cnpj" value="<?= $empresa['cnpj'] ?>" readonly style="background: #f3f4f6; cursor: not-allowed; width: 50%;">
+                        <input type="text" name="cnpj" value="<?= htmlspecialchars($cnpj) ?>" readonly style="background:#f3f4f6;cursor:not-allowed;width:50%;">
                     </div>
-                    </div>
+                </div>
             </div>
 
             <div class="account-panel">
@@ -282,31 +271,31 @@ include 'header.php';
                     <i data-lucide="map-pin"></i>
                     <h2>Endereço Comercial</h2>
                 </div>
-                
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label>CEP</label>
-                        <input type="text" name="zip_code" id="cep" value="<?= $empresa['zip_code'] ?? '' ?>" maxlength="9">
+                        <input type="text" name="zip_code" id="cep" value="<?= htmlspecialchars($zip_code) ?>" maxlength="9">
                     </div>
                     <div class="form-group">
                         <label>Logradouro (Rua/Av)</label>
-                        <input type="text" name="street" value="<?= htmlspecialchars($empresa['street'] ?? '') ?>">
+                        <input type="text" name="street" value="<?= htmlspecialchars($street) ?>">
                     </div>
                     <div class="form-group">
                         <label>Número</label>
-                        <input type="text" name="number" value="<?= $empresa['number'] ?? '' ?>">
+                        <input type="text" name="number" value="<?= htmlspecialchars($number) ?>">
                     </div>
                     <div class="form-group">
                         <label>Complemento</label>
-                        <input type="text" name="complement" value="<?= htmlspecialchars($empresa['complement'] ?? '') ?>">
+                        <input type="text" name="complement" value="<?= htmlspecialchars($complement) ?>">
                     </div>
                     <div class="form-group">
                         <label>Cidade</label>
-                        <input type="text" name="city" value="<?= htmlspecialchars($empresa['city'] ?? '') ?>">
+                        <input type="text" name="city" value="<?= htmlspecialchars($city) ?>">
                     </div>
                     <div class="form-group">
                         <label>Estado (UF)</label>
-                        <input type="text" name="state" maxlength="2" value="<?= $empresa['state'] ?? '' ?>">
+                        <input type="text" name="state" maxlength="2" value="<?= htmlspecialchars($state) ?>">
                     </div>
                 </div>
             </div>
@@ -316,34 +305,34 @@ include 'header.php';
                     <i data-lucide="phone"></i>
                     <h2>Contato e Negociações</h2>
                 </div>
-                
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label>WhatsApp para Negócios</label>
-                        <input type="text" name="phone" placeholder="(47) 99999-9999" value="<?= $empresa['phone'] ?>">
+                        <input type="text" name="phone" placeholder="(47) 99999-9999" value="<?= htmlspecialchars($phone) ?>">
                     </div>
                     <div class="form-group">
                         <label>E-mail Financeiro/Admin</label>
-                        <input type="email" name="email" value="<?= $empresa['email'] ?>" required>
+                        <input type="email" name="email" value="<?= htmlspecialchars($email) ?>" required>
                     </div>
                     <div class="form-group">
                         <label>Nome do Responsável</label>
-                        <input type="text" name="responsible_name" value="<?= htmlspecialchars($empresa['responsible_name']) ?>" required>
+                        <input type="text" name="responsible_name" value="<?= htmlspecialchars($responsible) ?>" required>
                     </div>
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:2rem;">
                 <button type="submit" class="btn-save">Salvar Dados Cadastrais</button>
             </div>
         </form>
 
-        <div class="account-panel" style="border-color: #fca5a5;">
+        <div class="account-panel" style="border-color:#fca5a5;">
             <div class="panel-header">
-                <i data-lucide="shield" style="color: #ef4444;"></i>
+                <i data-lucide="shield" style="color:#ef4444;"></i>
                 <h2>Central de Segurança</h2>
             </div>
-            
+
             <div class="security-row">
                 <div class="security-info">
                     <h3>Senha de Acesso</h3>
@@ -352,12 +341,12 @@ include 'header.php';
                 <button type="button" class="btn-outline" onclick="openSecurityModal('password')">Alterar Senha</button>
             </div>
 
-            <div class="security-row" style="background: #fffbeb; border-color: #fde68a;">
+            <div class="security-row" style="background:#fffbeb;border-color:#fde68a;">
                 <div class="security-info">
-                    <h3 style="color: #92400e;">Autenticação em Duas Etapas (2FA)</h3>
-                    <p style="color: #b45309;">Proteja sua conta exigindo um código do e-mail ao fazer login.</p>
+                    <h3 style="color:#92400e;">Autenticação em Duas Etapas (2FA)</h3>
+                    <p style="color:#b45309;">Proteja sua conta exigindo um código do e-mail ao fazer login.</p>
                 </div>
-                <button type="button" class="btn-outline" style="border-color: #d97706; color: #d97706;" onclick="openSecurityModal('2fa')">Ativar 2FA</button>
+                <button type="button" class="btn-outline" style="border-color:#d97706;color:#d97706;" onclick="openSecurityModal('2fa')">Ativar 2FA</button>
             </div>
         </div>
 
@@ -370,9 +359,9 @@ include 'header.php';
             <h3 id="modalTitle">Verificação de Segurança</h3>
             <button class="btn-close" onclick="closeModal()"><i data-lucide="x"></i></button>
         </div>
-        
-        <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem;">
-            Enviamos um código de 6 dígitos para o e-mail: <strong style="color:var(--dark);"><?= htmlspecialchars($admin['email'] ?? 'seu e-mail') ?></strong>
+
+        <p style="font-size:0.9rem;color:var(--muted);margin-bottom:1.5rem;">
+            Enviamos um código de 6 dígitos para: <strong style="color:var(--dark);"><?= htmlspecialchars($admin_email) ?></strong>
         </p>
 
         <form id="securityForm">
@@ -386,17 +375,17 @@ include 'header.php';
             </div>
 
             <div id="dynamic-modal-content">
-                <div class="form-group" style="margin-bottom: 1rem;">
+                <div class="form-group" style="margin-bottom:1rem;">
                     <label>Nova Senha</label>
-                    <input type="password" name="new_password" id="modal_new_password">
+                    <input type="password" name="new_password">
                 </div>
                 <div class="form-group">
                     <label>Confirmar Nova Senha</label>
-                    <input type="password" name="confirm_password" id="modal_confirm_password">
+                    <input type="password" name="confirm_password">
                 </div>
             </div>
 
-            <button type="button" class="btn-save" style="width: 100%; margin-top: 1.5rem;" onclick="processSecurityAction()">Confirmar e Salvar</button>
+            <button type="button" class="btn-save" style="width:100%;margin-top:1.5rem;" onclick="processSecurityAction()">Confirmar e Salvar</button>
         </form>
     </div>
 </div>
@@ -404,9 +393,8 @@ include 'header.php';
 <script>
     function previewImage(event) {
         var reader = new FileReader();
-        reader.onload = function(){
-            var output = document.getElementById('logoPreview');
-            output.src = reader.result;
+        reader.onload = function() {
+            document.getElementById('logoPreview').src = reader.result;
         };
         reader.readAsDataURL(event.target.files[0]);
     }
@@ -415,22 +403,10 @@ include 'header.php';
 
     function openSecurityModal(action) {
         currentSecurityAction = action;
-        const modal = document.getElementById('securityModal');
-        const title = document.getElementById('modalTitle');
         const dynamicContent = document.getElementById('dynamic-modal-content');
-        
-        // Aqui, no futuro, faremos um fetch() enviando um e-mail com o código
-        // alert('Código de verificação enviado para o e-mail!');
-
-        if (action === 'password') {
-            title.innerText = 'Alterar Senha';
-            dynamicContent.style.display = 'block';
-        } else if (action === '2fa') {
-            title.innerText = 'Ativar 2FA';
-            dynamicContent.style.display = 'none';
-        }
-
-        modal.classList.add('active');
+        document.getElementById('modalTitle').innerText = action === 'password' ? 'Alterar Senha' : 'Ativar 2FA';
+        dynamicContent.style.display = action === 'password' ? 'block' : 'none';
+        document.getElementById('securityModal').classList.add('active');
     }
 
     function closeModal() {
@@ -439,26 +415,17 @@ include 'header.php';
     }
 
     function moveToNext(current, event) {
-        if (current.value.length === 1) {
-            let next = current.nextElementSibling;
-            if (next) next.focus();
-        }
-        if (event.key === "Backspace") {
-            let prev = current.previousElementSibling;
-            if (prev) prev.focus();
-        }
+        if (current.value.length === 1 && current.nextElementSibling) current.nextElementSibling.focus();
+        if (event.key === "Backspace" && current.previousElementSibling) current.previousElementSibling.focus();
     }
 
     function processSecurityAction() {
-        // Função futura para validar o código via AJAX e atualizar no banco
-        alert('Aqui o sistema fará a validação do código via AJAX para a ação: ' + currentSecurityAction);
+        alert('Validação via AJAX — ação: ' + currentSecurityAction);
         closeModal();
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
 

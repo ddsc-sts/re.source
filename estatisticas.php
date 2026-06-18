@@ -10,6 +10,8 @@ require_once __DIR__ . "/BackEnd/config/conexao.php";
 // Pega o ID correto da sessão e bloqueia se não estiver logado
 $company_id = $_SESSION['user']['company_id'] ?? null; 
 
+
+
 if (!$company_id) {
     header("Location: login.php");
     exit();
@@ -147,28 +149,50 @@ try {
     die("Erro ao carregar o painel: " . $e->getMessage());
 }
 
+
+
 $titulo_pagina = 'Estatísticas do Painel — Re.Source';
 include 'header.php';
 ?>
 
 <style>
 /* Layout Base Unificado */
-.dashboard-layout { max-width: 1280px; margin: 2rem auto; padding: 0 1.5rem; display: grid; grid-template-columns: 260px 1fr; gap: 2rem; align-items: start; }
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.dashboard-layout {
+    max-width: 1280px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+.dashboard-sidebar {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem 1rem;
+    position: sticky;
+    top: 100px;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+}
 
-.dashboard-sidebar { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 1.5rem 1rem; position: sticky; top: 100px; height: calc(100vh - 120px); overflow-y: auto; }
 .sidebar-user { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-.sidebar-avatar { width: 64px; height: 64px; background: var(--bg); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; color: var(--green); }
-.sidebar-user h3 { font-family: var(--font-main); font-size: 1rem; color: var(--dark); }
-.sidebar-user p { font-size: 0.75rem; color: var(--muted); }
+.sidebar-avatar {
+    width: 64px; height: 64px;
+    background: var(--bg);
+    border-radius: 50%;
+    margin: 0 auto 0.75rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--green);
+    overflow: hidden;
+    border: 2px solid var(--border-color);
+}
+.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
 .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.9rem; font-weight: 500; color: var(--muted); transition: all 0.2s; }
 .sidebar-link:hover { background: var(--bg); color: var(--dark); }
 .sidebar-link.active { background: rgba(21, 115, 71, 0.1); color: var(--green); font-weight: 600; }
-.sidebar-link i { width: 18px; height: 18px; }
 
 .dashboard-content { display: flex; flex-direction: column; gap: 1.5rem; position: sticky; top: 100px; height: calc(100vh - 120px); overflow-y: auto; padding-right: 10px; }
 .dash-header { display: flex; justify-content: space-between; align-items: center; }
@@ -218,22 +242,23 @@ include 'header.php';
 </style>
 
 <main class="dashboard-layout">
-    <aside class="dashboard-sidebar">
-    <div class="sidebar-user">
-            <div class="sidebar-avatar" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
+<aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">
                 <?php if (!empty($logo_url)): ?>
-                    <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da Empresa" style="width: 100%; height:
+                    <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da empresa">
                 <?php else: ?>
-                    <i data-lucide="building-2" style="width: 32px; height: 32px;"></i>
+                    <i data-lucide="building-2" style="width:32px;height:32px;"></i>
                 <?php endif; ?>
             </div>
-            <h3><?= htmlspecialchars($nome_empresa); ?></h3>
-            <p>Razão Social: <?= htmlspecialchars($empresa['razao_social'] ?? 'Não informada'); ?></p>
+            <h3><?= htmlspecialchars($nome_exibicao) ?></h3>
+            <p>Conta B2B Verificada</p>
         </div>
+
         <nav class="sidebar-nav">
             <a href="estatisticas.php" class="sidebar-link active"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
             <a href="meusAnuncios.php" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
-            <a href="conta.php" class="sidebar-link"><i data-lucide="user"></i> Detalhes da Conta</a>
+            <a href="conta.php" class="sidebar-link "><i data-lucide="user"></i> Detalhes da Conta</a>
             <a href="configuracoes.php" class="sidebar-link"><i data-lucide="settings"></i> Configurações</a>
             <a href="logout.php" class="sidebar-link"><i data-lucide="log-out"></i> Sair</a>
         </nav>
