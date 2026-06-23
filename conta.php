@@ -341,12 +341,12 @@ include 'header.php';
                 <button type="button" class="btn-outline" onclick="openSecurityModal('password')">Alterar Senha</button>
             </div>
 
-            <div class="security-row" style="background:#fffbeb;border-color:#fde68a;">
+            <div class="security-row">
                 <div class="security-info">
-                    <h3 style="color:#92400e;">Autenticação em Duas Etapas (2FA)</h3>
-                    <p style="color:#b45309;">Proteja sua conta exigindo um código do e-mail ao fazer login.</p>
+                    <h3>Autenticação em Duas Etapas (2FA)</h3>
+                    <p>Proteja sua conta exigindo um código do e-mail ao fazer login.</p>
                 </div>
-                <button type="button" class="btn-outline" style="border-color:#d97706;color:#d97706;" onclick="openSecurityModal('2fa')">Ativar 2FA</button>
+                <button type="button" class="btn-outline" onclick="openSecurityModal('2fa')">Ativar 2FA</button>
             </div>
         </div>
 

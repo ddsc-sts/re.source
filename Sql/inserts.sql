@@ -97,3 +97,31 @@ INSERT IGNORE INTO listing_images (listing_id, url, `order`) VALUES
 (6, 'https://images.unsplash.com/photo-1722695510527-cc033e43be1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', 0),
 (7, 'https://images.unsplash.com/photo-1606037150583-fb842a55bae7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', 0),
 (8, 'https://images.unsplash.com/photo-1761765030682-26f51cfbc034?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', 0);
+
+INSERT INTO negotiations (
+    listing_id, buyer_company_id, seller_company_id, proposed_total, status, created_at, updated_at
+) VALUES (
+    2, -- Mude para outro ID de anúncio que exista
+    2, 
+    5, 
+    500.00, 
+    'concluded', 
+    NOW(), 
+    NOW()
+);
+
+
+describe companies;
+
+select * from companies;
+
+UPDATE users 
+SET is_active = 1, deleted_at = NULL 
+WHERE company_id = 5;
+
+UPDATE companies 
+SET 
+    status = 'active', 
+    deactivated_at = NULL,
+    suspended_at = NULL
+WHERE id = 5;

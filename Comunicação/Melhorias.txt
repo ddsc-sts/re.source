@@ -1,81 +1,15 @@
-oque se deve mudar(FEITO EM 16/06):
+Alteraçoes para fazer pos integração a main:
 
-**FAZER COM QUE APAREÇA O NOME E FOTO CERTA EM TODAS AS OPÇOES DAS CONFIGURAÇOES**
-estatisticas da conta: ver como adcionar saldo ficticio, fazer a parte de retirada de dinheiro, testar se todas as partes de calculo de metricas estao certos
-Detalhes da conta: fazer com que o campo de email so seja mudado com confirmaçao de codigo no email atual, e integrar o codigo no email para vereficaçao duas etapas e mudança de senha
-anuncios: fazer que apareça a foto da empresa nos anuncios
-conta: Fazer que realmente funcione, parte de modo dark, retirar preferencia de linguagem do sistema(ou fazer se for facil), retirar botao de boletins esg, fazer funcionar as 
-notificaçoes para o email, fazer que mostre mesmo os dispositivos conectados naquela conta nao ficticio, e criar pagina de logout e de excluir conta
-salvar_preferencia: fazer funcionar salvando mesmo a preferencia
+1. Elaborar melhor o saque das empresas(Por exemplo somente dando para colcoar chaves pix validas e um painel mais bonito e etc), e integrar ao painel do adm verificação 
+se foi ja realizado o saque ou nao e historico de saques das empresas
 
-PARA FAZER:
+2. fazer a parte do 2FA e alteração de senha com codigo no email nos detalhes da conta
 
+3. melhorar estilização do anunciar residuos e editar residuos
 
+4. mudar a cor do que esta cinza para branco no modo dark do buscar
 
-alterar nas demais paginas que precisam: erro que o cluaude aponta: O problema é o mesmo de sempre — mock $SESSION['companyid'] = 1 e $SESSION['userid'] = 1.O problema é o mesmo de sempre — mock $_SESSION['company_id'] = 1 e $_SESSION['user_id'] = 1. Com isso a query WHERE id = :id AND company_id = :company_id não acha o anúncio do usuário real e 
-redireciona para meusAnuncios.php imediatamente.
-
-arrumar para mostrar o nome da empresa do estatiscas.php e mostrar foto e nome dos meus anuncios
-
-implementar o modo dark a todo style do site
-
-Apos testar tudo começar a importação para a main principal e mvc e dar continuidade
+5. talvez reanalisar a paleta de cores do modo dark, pois talvez esta muito escuro e sem um contraste de cores com mais partes verdes tavlez    
 
 
 
-
-
-Proxima estrutura de MVC:
-
-ProjetoMVC/
-│
-├── app/
-│   ├── Controllers/
-│   │   ├── AuthController.php
-│   │   ├── HomeController.php
-│   │   └── CompanyController.php
-│   │
-│   ├── Models/
-│   │   ├── User.php
-│   │   └── Company.php
-│   │
-│   ├── Views/
-│   │   ├── auth/
-│   │   │   ├── login.php
-│   │   │   ├── cadastro.php
-│   │   │   ├── recover.php
-│   │   │   ├── reset.php
-│   │   │   ├── verificar.php
-│   │   │   └── pendente.php
-│   │   │
-│   │   ├── home/
-│   │   │   ├── index.php
-│   │   │   └── sobre.php
-│   │   │
-│   │   └── layouts/
-│   │       ├── header.php
-│   │       ├── footer.php
-│   │       └── base.php
-│   │
-│   ├── Services/
-│   └── Core/
-│
-├── config/
-│   ├── database.php
-│   └── mail.php
-│
-├── public/
-│   ├── css/
-│   ├── js/
-│   ├── img/
-│   └── index.php
-│
-├── routes/
-│   └── web.php
-│
-├── database/
-│   └── schema.sql
-│
-└── storage/
-    ├── logs/
-    └── uploads/

@@ -10,6 +10,7 @@ require_once __DIR__ . "/BackEnd/config/conexao.php";
 // 3. CAPTURA DOS PARÂMETROS DE BUSCA (GET)
 $q           = filter_input(INPUT_GET, 'q', FILTER_DEFAULT);
 $category_id = filter_input(INPUT_GET, 'category_id', FILTER_VALIDATE_INT);
+$cat_nome    = filter_input(INPUT_GET, 'cat_nome', FILTER_DEFAULT);
 $type        = filter_input(INPUT_GET, 'type', FILTER_DEFAULT);
 $state       = filter_input(INPUT_GET, 'location_state', FILTER_DEFAULT);
 $city        = filter_input(INPUT_GET, 'location_city', FILTER_DEFAULT);
@@ -20,6 +21,16 @@ try {
     $categorias = $stmtCat->fetchAll();
 } catch (PDOException $e) {
     $categorias = [];
+}
+
+// 4.1. Resolve cat_nome vindo do Header para category_id
+if (empty($category_id) && !empty($cat_nome)) {
+    foreach ($categorias as $cat) {
+        if (strcasecmp(trim($cat['name']), trim($cat_nome)) === 0) {
+            $category_id = $cat['id'];
+            break;
+        }
+    }
 }
 
 // 5. MONTAGEM DINÂMICA DA CONSULTA SQL

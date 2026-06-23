@@ -10,8 +10,6 @@ require_once __DIR__ . "/BackEnd/config/conexao.php";
 // Pega o ID correto da sessão e bloqueia se não estiver logado
 $company_id = $_SESSION['user']['company_id'] ?? null; 
 
-
-
 if (!$company_id) {
     header("Location: login.php");
     exit();
@@ -31,8 +29,6 @@ try {
     ");
 
     // --- DADOS DA EMPRESA ---
-// --- DADOS DA EMPRESA ---
-    // Removido o "cnpj" do SELECT para não dar conflito com o "cpnj" do banco
     $stmtEmpresa = $pdo->prepare("SELECT razao_social, nome_fantasia, logo_url FROM companies WHERE id = ?");
     $stmtEmpresa->execute([$company_id]);
 
@@ -40,31 +36,28 @@ try {
 
     if ($dados_banco) {
         $empresa = array_change_key_case($dados_banco, CASE_LOWER);
-        // Pega a razão social de forma forçada. Se o banco trouxer nulo, avisa.
         $razao_social_final = !empty($empresa['razao_social']) ? $empresa['razao_social'] : 'Razão Social não preenchida';
     } else {
-        // Se a consulta falhar ou o ID não existir
         $razao_social_final = 'Empresa Não Encontrada';
         $empresa = ['nome_fantasia' => '', 'logo_url' => null];
     }
 
-    $nome_empresa = !empty($empresa['nome_fantasia']) ? $empresa['nome_fantasia'] : $razao_social_final;
-    $logo_url = $empresa['logo_url'] ?? null;
+    // CORREÇÃO: $nome_exibicao não existia — a sidebar usava essa variável, mas só $nome_empresa era criada.
+    $nome_empresa  = !empty($empresa['nome_fantasia']) ? $empresa['nome_fantasia'] : $razao_social_final;
+    $nome_exibicao = $nome_empresa; // usado na sidebar
+    $logo_url      = $empresa['logo_url'] ?? null;
 
     // --- CÁLCULO DE SALDO REAL ---
-    // 1. Soma de todas as vendas CONCLUÍDAS
     $stmtTotalVendas = $pdo->prepare("SELECT COALESCE(SUM(proposed_total), 0) FROM negotiations WHERE seller_company_id = ? AND status = 'concluded'");
     $stmtTotalVendas->execute([$company_id]);
     $total_ganho = (float) $stmtTotalVendas->fetchColumn();
 
-    // 2. Soma de todos os saques solicitados (Pendentes ou já Concluídos)
     $stmtTotalSaques = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM withdrawals WHERE company_id = ? AND status IN ('pending', 'completed')");
     $stmtTotalSaques->execute([$company_id]);
     $total_sacado = (float) $stmtTotalSaques->fetchColumn();
 
-    // 3. Saldo Disponível Final
     $saldo_disponivel = $total_ganho - $total_sacado;
-    if ($saldo_disponivel < 0) $saldo_disponivel = 0; // Proteção extra
+    if ($saldo_disponivel < 0) $saldo_disponivel = 0;
 
     // --- ANÚNCIOS E VIEWS ---
     $stmtAnuncios = $pdo->prepare("SELECT COUNT(id) FROM listings WHERE company_id = ? AND status = 'active' AND deleted_at IS NULL");
@@ -149,8 +142,6 @@ try {
     die("Erro ao carregar o painel: " . $e->getMessage());
 }
 
-
-
 $titulo_pagina = 'Estatísticas do Painel — Re.Source';
 include 'header.php';
 ?>
@@ -229,7 +220,6 @@ include 'header.php';
 .status-pendente { background: rgba(253, 126, 20, 0.1); color: #FD7E14; }
 .status-rejeitado { background: rgba(220, 53, 69, 0.1); color: #DC3545; }
 
-/* Mensagens de Retorno */
 .alert { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-weight: 500; font-size: 0.9rem; }
 .alert-success { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
 .alert-error { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
@@ -242,7 +232,7 @@ include 'header.php';
 </style>
 
 <main class="dashboard-layout">
-<aside class="dashboard-sidebar">
+    <aside class="dashboard-sidebar">
         <div class="sidebar-user">
             <div class="sidebar-avatar">
                 <?php if (!empty($logo_url)): ?>
@@ -258,7 +248,7 @@ include 'header.php';
         <nav class="sidebar-nav">
             <a href="estatisticas.php" class="sidebar-link active"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
             <a href="meusAnuncios.php" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
-            <a href="conta.php" class="sidebar-link "><i data-lucide="user"></i> Detalhes da Conta</a>
+            <a href="conta.php" class="sidebar-link"><i data-lucide="user"></i> Detalhes da Conta</a>
             <a href="configuracoes.php" class="sidebar-link"><i data-lucide="settings"></i> Configurações</a>
             <a href="logout.php" class="sidebar-link"><i data-lucide="log-out"></i> Sair</a>
         </nav>
@@ -450,7 +440,6 @@ include 'header.php';
         btnConfirmar.disabled = false;
     }
 
-    // Validação em tempo real
     inputValor.addEventListener('input', function() {
         if(parseFloat(this.value) > saldoMaximo) {
             msgErro.style.display = 'block';

@@ -43,7 +43,7 @@ if (!empty($_SESSION['user']['company_id'])) {
       <nav class="desktop-nav">
         <a href="/RE.SOURCE/base.php"><i data-lucide="home"></i> Página Inicial</a>
         <a href="/RE.SOURCE/sobre.php"><i data-lucide="info"></i> Sobre Nós</a>
-        <a href="#"><i data-lucide="phone"></i> Contato</a>
+        <a href="/RE.SOURCE/contato.php"><i data-lucide="phone"></i> Contato</a>
       </nav>
 
       <div class="header-actions">
@@ -67,9 +67,9 @@ if (!empty($_SESSION['user']['company_id'])) {
           }
           ?>
         </div>
-        <a href="/RE.SOURCE/conta.php" class="menu-btn">Detalhes da conta</a>
-        <a href="/RE.SOURCE/meusAnuncios.php" class="menu-btn">Meus Anúncios</a>
         <a href="/RE.SOURCE/estatisticas.php" class="menu-btn">Estatísticas</a>
+        <a href="/RE.SOURCE/meusAnuncios.php" class="menu-btn">Meus Anúncios</a>
+        <a href="/RE.SOURCE/conta.php" class="menu-btn">Detalhes da conta</a>
         <a href="/RE.SOURCE/configuracoes.php" class="menu-btn">Configurações</a>
 
         <div class="dropdown-divider"></div>

@@ -118,59 +118,84 @@ include 'header.php';
 ?>
 
 <style>
-body { font-family: var(--font-body); background: white; color: var(--dark); min-height: 100vh; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--dark); min-height: 100vh; }
 
-.form-container { max-width: 850px; margin: 3rem auto; padding: 3rem; background: var(--white); border-radius: 1rem; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+.form-container { max-width: 850px; margin: 3rem auto; padding: 3rem; background: var(--white); border-radius: 1rem; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 
-.form-title-group { margin-bottom: 2.5rem; border-bottom: 1px solid #f3f4f6; padding-bottom: 1.5rem; }
-.form-title-group h2 { font-family: var(--font-main); color: #111827; font-size: 1.875rem; font-weight: 800; letter-spacing: -0.025em; }
+.form-title-group { margin-bottom: 2.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; }
+.form-title-group h2 { font-family: var(--font-main); color: var(--dark); font-size: 1.875rem; font-weight: 800; letter-spacing: -0.025em; }
 .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 .full-width { grid-column: span 2; }
 
 .input-box { display: flex; flex-direction: column; gap: 0.4rem; }
-.input-box label { font-family: var(--font-main); font-size: 0.875rem; font-weight: 600; color: #374151; }
+.input-box label { font-family: var(--font-main); font-size: 0.875rem; font-weight: 600; color: var(--dark); }
 
 .input-box input[type="text"],
 .input-box input[type="number"],
 .input-box select,
 .input-box textarea {
-    width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem;
-    background-color: #f9fafb; color: #1f2937; font-size: 0.95rem; font-family: var(--font-body);
+    width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem;
+    background-color: var(--bg); color: var(--dark); font-size: 0.95rem; font-family: var(--font-body);
     transition: all 0.2s ease;
 }
 .input-box input:focus, .input-box select:focus, .input-box textarea:focus {
-    border-color: var(--green); background-color: #ffffff; box-shadow: 0 0 0 4px rgba(21,115,71,0.15); outline: none;
+    border-color: var(--green); background-color: var(--white); box-shadow: 0 0 0 4px rgba(21,115,71,0.15); outline: none;
 }
-.input-box input[type="file"] { background-color: #ffffff; border: 1px dashed #d1d5db; padding: 1.5rem; cursor: pointer; border-radius: 0.5rem; }
-.input-box input[type="file"]:hover { border-color: var(--green); background-color: #f0fdf4; }
+.input-box input[type="file"] { background-color: var(--white); border: 1px dashed var(--border-color); padding: 1.5rem; cursor: pointer; border-radius: 0.5rem; }
+.input-box input[type="file"]:hover { border-color: var(--green); background-color: var(--bg); }
 
 .radio-group { display: flex; gap: 1.5rem; margin-top: 0.25rem; }
-.radio-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; color: #4b5563; font-weight: 500; }
-.checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; margin-top: 0.5rem; color: #4b5563; font-weight: 500; }
+.radio-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; color: var(--muted); font-weight: 500; }
+.checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; margin-top: 0.5rem; color: var(--muted); font-weight: 500; }
 
 .alert { padding: 1rem 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.95rem; font-weight: 500; }
 .alert-danger  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
 .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
 
-.submit-wrap { margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; border-top: 1px solid #f3f4f6; }
-.btn-submit { padding: 0.875rem 2.5rem; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; color: var(--white); background: var(--green); cursor: pointer; border: none; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 6px -1px rgba(21,115,71,0.3); }
+.submit-wrap { margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+.btn-submit { padding: 0.875rem 2.5rem; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; color: #fff; background: var(--green); cursor: pointer; border: none; transition: background 0.2s, transform 0.1s; box-shadow: 0 4px 6px -1px rgba(21,115,71,0.3); }
 .btn-submit:hover { background: var(--green-d); transform: translateY(-1px); }
-.btn-back { color: #6b7280; text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.2s; }
-.btn-back:hover { color: #111827; }
+.btn-back { color: var(--muted); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.2s; }
+.btn-back:hover { color: var(--dark); }
 
 /* Grid estilo OLX */
 .olx-preview-container { margin-top: 1rem; width: 100%; display: none; }
-.olx-grid { display: grid; gap: 8px; background-color: #f3f4f6; padding: 8px; border-radius: 8px; overflow: hidden; width: 100%; height: 400px; }
+.olx-grid { display: grid; gap: 8px; background-color: var(--bg); padding: 8px; border-radius: 8px; overflow: hidden; width: 100%; height: 400px; }
 .olx-grid.count-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
 .olx-grid.count-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
 .olx-grid.count-3, .olx-grid.count-4, .olx-grid.count-default { grid-template-columns: 1.5fr 1fr; grid-template-rows: repeat(2, 1fr); }
-.olx-item { position: relative; width: 100%; height: 100%; overflow: hidden; cursor: pointer; background: #e5e7eb; border-radius: 4px; }
+.olx-item { position: relative; width: 100%; height: 100%; overflow: hidden; cursor: pointer; background: var(--bg); border-radius: 4px; }
 .olx-grid.count-3 .olx-item:nth-child(1),
 .olx-grid.count-4 .olx-item:nth-child(1),
 .olx-grid.count-default .olx-item:nth-child(1) { grid-row: span 2; }
 .olx-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s, filter 0.2s; display: block; }
 .olx-item:hover img { transform: scale(1.02); filter: brightness(0.9); }
 .olx-overlay-more { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; }
+
+/* Botão de excluir imagem no preview */
+.btn-remove-preview {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ef4444;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.2s, background 0.2s;
+    font-size: 16px;
+    line-height: 1;
+}
+.btn-remove-preview:hover {
+    background: #dc2626;
+    transform: scale(1.15);
+}
 
 /* Lightbox */
 .custom-lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 99999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
@@ -374,28 +399,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const olxGrid          = document.getElementById('olxGrid');
     let loadedImagesArray  = [];
     let currentLightboxIndex = 0;
+    let selectedFiles = []; // to keep track of files
 
     imageInput.addEventListener('change', function() {
+        selectedFiles = Array.from(this.files);
+        renderPreview();
+    });
+
+    function renderPreview() {
         olxGrid.innerHTML = '';
         loadedImagesArray = [];
-        const files = Array.from(this.files);
-        if (files.length === 0) { previewContainer.style.display = 'none'; return; }
+        if (selectedFiles.length === 0) { 
+            previewContainer.style.display = 'none'; 
+            const dt = new DataTransfer();
+            imageInput.files = dt.files;
+            return; 
+        }
+
+        const dt = new DataTransfer();
+        selectedFiles.forEach(f => dt.items.add(f));
+        imageInput.files = dt.files;
 
         previewContainer.style.display = 'block';
         olxGrid.className = 'olx-grid';
-        if      (files.length === 1) olxGrid.classList.add('count-1');
-        else if (files.length === 2) olxGrid.classList.add('count-2');
-        else if (files.length === 3) olxGrid.classList.add('count-3');
-        else if (files.length === 4) olxGrid.classList.add('count-4');
+        if      (selectedFiles.length === 1) olxGrid.classList.add('count-1');
+        else if (selectedFiles.length === 2) olxGrid.classList.add('count-2');
+        else if (selectedFiles.length === 3) olxGrid.classList.add('count-3');
+        else if (selectedFiles.length === 4) olxGrid.classList.add('count-4');
         else                         olxGrid.classList.add('count-default');
 
         const maxVisivel = 4;
 
-        files.forEach((file, index) => {
+        selectedFiles.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64Url = e.target.result;
-                loadedImagesArray.push(base64Url);
+                loadedImagesArray[index] = base64Url;
 
                 if (index < maxVisivel) {
                     const item = document.createElement('div');
@@ -406,15 +445,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     img.src = base64Url;
                     item.appendChild(img);
 
-                    if (index === maxVisivel - 1 && files.length > maxVisivel) {
+                    const btnRemove = document.createElement('button');
+                    btnRemove.type = 'button';
+                    btnRemove.className = 'btn-remove-preview';
+                    btnRemove.innerHTML = '&times;';
+                    btnRemove.title = 'Remover Imagem';
+                    btnRemove.addEventListener('click', function(evt) {
+                        evt.stopPropagation();
+                        selectedFiles.splice(index, 1);
+                        renderPreview();
+                    });
+                    item.appendChild(btnRemove);
+
+                    if (index === maxVisivel - 1 && selectedFiles.length > maxVisivel) {
                         const overlay = document.createElement('div');
                         overlay.className = 'olx-overlay-more';
-                        overlay.innerText = `+${files.length - maxVisivel + 1}`;
+                        overlay.innerText = `+${selectedFiles.length - maxVisivel + 1}`;
                         item.appendChild(overlay);
                     }
 
                     item.addEventListener('click', function() {
-                        openLightbox(parseInt(this.getAttribute('data-index')));
+                        openLightbox(index);
                     });
 
                     olxGrid.appendChild(item);
@@ -422,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             reader.readAsDataURL(file);
         });
-    });
+    }
 
     // Lightbox
     const lightbox      = document.getElementById('lightbox');

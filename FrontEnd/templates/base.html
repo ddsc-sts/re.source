@@ -48,88 +48,84 @@ include 'header.php';
 ?>
 
 <style>
+/* --- Seção de Listagem de Anúncios (página inicial) --- */
 .listings-section {
     max-width: 1400px;
     margin: 4rem auto;
     padding: 0 2rem;
 }
 
-/* --- NOVO HEADER DA LISTAGEM --- */
+/* --- Header da listagem --- */
 .listings-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid #f3f4f6;
+    border-bottom: 2px solid var(--border-color);
 }
 
 .listings-title {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #111827;
-    font-family: 'Sora', sans-serif;
+    color: var(--dark);
+    font-family: var(--font-main);
 }
 
-/* --- NOVO BOTÃO VER TODOS ESTILIZADO --- */
+/* --- Botão Ver Todos --- */
 .btn-ver-todos {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1.2rem;
-    background-color: #ffffff;
-    color: #157347; /* Verde do tema */
-    border: 1px solid #157347;
+    background-color: var(--white);
+    color: var(--green);
+    border: 1px solid var(--green);
     border-radius: 0.5rem;
     font-size: 0.9rem;
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s ease;
 }
-
 .btn-ver-todos:hover {
-    background-color: #157347;
+    background-color: var(--green);
     color: #ffffff;
     box-shadow: 0 4px 6px -1px rgba(21, 115, 71, 0.15);
 }
-
 .btn-ver-todos i {
     width: 16px;
     height: 16px;
     transition: transform 0.2s ease;
 }
+.btn-ver-todos:hover i { transform: translateX(4px); }
 
-.btn-ver-todos:hover i {
-    transform: translateX(4px); /* Sutil efeito da setinha indo para a direita */
-}
-
-/* --- GRADE E CARDS REAPROVEITADOS DO BUSCA.PHP --- */
+/* --- Grade de cards --- */
 .listings-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
 }
 
+/* --- Card de anúncio --- */
 .ad-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
     overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border-color 0.3s;
     display: flex;
     flex-direction: column;
 }
-
 .ad-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-card);
 }
 
 .ad-image {
     width: 100%;
     height: 180px;
     object-fit: cover;
-    background: #f3f4f6;
+    background: var(--bg);
 }
 
 .ad-content {
@@ -149,67 +145,70 @@ include 'header.php';
     width: fit-content;
     margin-bottom: 0.5rem;
 }
-.badge-offer { background: #e0f2fe; color: #0284c7; }
+.badge-offer  { background: #e0f2fe; color: #0284c7; }
 .badge-demand { background: #fef3c7; color: #d97706; }
 
 .ad-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--dark);
     margin-bottom: 0.5rem;
     line-height: 1.4;
     display: -webkit-box;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 3.1rem; /* Mantém o alinhamento mesmo com títulos de tamanhos diferentes */
+    height: 3.1rem;
+    transition: color 0.3s;
 }
 
 .ad-meta {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--muted);
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
     margin-bottom: 1rem;
+    transition: color 0.3s;
 }
 
 .ad-footer {
     margin-top: auto;
     padding-top: 1rem;
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: border-color 0.3s;
 }
 
 .ad-price {
     font-size: 1.15rem;
     font-weight: 800;
-    color: #157347;
+    color: var(--green);
 }
 
 .btn-view {
     padding: 0.5rem 1rem;
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--bg);
+    color: var(--dark);
     text-decoration: none;
     border-radius: 0.5rem;
     font-size: 0.875rem;
     font-weight: 600;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.3s;
+    border: 1px solid var(--border-color);
 }
-
-.btn-view:hover {
-    background: #e5e7eb;
-}
+.btn-view:hover { background: var(--border-color); }
 
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    background: #ffffff;
-    border: 1px dashed #d1d5db;
-    border-radius: 1rem;
-    color: #6b7280;
+    background: var(--white);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius);
+    color: var(--muted);
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
 </style>
 

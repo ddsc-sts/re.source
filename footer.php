@@ -31,21 +31,21 @@
     <div class="footer-col">
       <h4>O que você procura?</h4>
       <ul>
-        <li><a href="#">Plástico</a></li>
-        <li><a href="#">Metal</a></li>
-        <li><a href="#">Madeira</a></li>
-        <li><a href="#">Têxtil</a></li>
-        <li><a href="#">Eletrônicos</a></li>
+        <li><a href="/RE.SOURCE/busca.php?cat_nome=Plástico">Plástico</a></li>
+        <li><a href="/RE.SOURCE/busca.php?cat_nome=Metal">Metal</a></li>
+        <li><a href="/RE.SOURCE/busca.php?cat_nome=Madeira">Madeira</a></li>
+        <li><a href="/RE.SOURCE/busca.php?cat_nome=Têxtil">Têxtil</a></li>
+        <li><a href="/RE.SOURCE/busca.php?cat_nome=Eletrônicos">Eletrônicos</a></li>
       </ul>
     </div>
 
     <div class="footer-col">
       <h4>Na Re.Source</h4>
       <ul>
-        <li><a href="#">A Re.Source</a></li>
-        <li><a href="#">Sobre Nós</a></li>
-        <li><a href="#">Serviços</a></li>
-        <li><a href="#">Anúncios</a></li>
+        <li><a href="/RE.SOURCE/base.php">Início</a></li>
+        <li><a href="/RE.SOURCE/sobre.php">Sobre Nós</a></li>
+        <li><a href="/RE.SOURCE/contato.php">Contato</a></li>
+        <li><a href="/RE.SOURCE/busca.php">Anúncios</a></li>
       </ul>
     </div>
 

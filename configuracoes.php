@@ -93,7 +93,7 @@ include 'header.php';
     justify-content: space-between;
     align-items: center;
     padding: 1rem 0;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color);
 }
 .setting-row:last-child { border-bottom: none; }
 
@@ -121,7 +121,9 @@ input:checked + .slider:before { transform: translateX(22px); }
 .btn-danger { background: #ef4444; color: white; border: none; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
 .btn-danger:hover { background: #dc2626; }
 
-.btn-logout { background: transparent; border: 1px solid #d1d5db; color: #4b5563; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
+[data-theme="dark"] .danger-zone { background: var(--white); border-color: var(--border-color); }
+
+.btn-logout { background: transparent; border: 1px solid #d1d5db; color: #ef4444; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
 .btn-logout:hover { background: #f3f4f6; color: var(--dark); }
 
 .sidebar-user { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
@@ -305,7 +307,7 @@ input:checked + .slider:before { transform: translateX(22px); }
             
             <div class="setting-row" style="border: none;">
                 <div class="setting-info">
-                    <label style="color: #b91c1c;">Desconectar desta Máquina</label>
+                    <label style="color: #ef4444;">Desconectar desta Máquina</label>
                     <p>Encerra o token de login atual e limpa os cookies de sessão de forma segura.</p>
                 </div>
                 <button type="button" class="btn-logout" onclick="window.location.href='logout.php'">
@@ -313,9 +315,9 @@ input:checked + .slider:before { transform: translateX(22px); }
                 </button>
             </div>
 
-            <div class="setting-row" style="border-top: 1px solid #fee2e2; padding-top: 1.5rem; margin-top: 0.5rem;">
+            <div class="setting-row" style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 0.5rem;">
                 <div class="setting-info">
-                    <label style="color: #b91c1c;">Excluir Conta Corporativa</label>
+                    <label style="color: #ef4444;">Excluir Conta Corporativa</label>
                     <p>Ação irreversível. Apaga permanentemente seus anúncios ativos, histórico de propostas e relatórios fiscais.</p>
                 </div>
                 <form action="excluir_conta.php" method="POST" onsubmit="return confirm('Tem certeza absoluta? Esta ação não pode ser desfeita.');">

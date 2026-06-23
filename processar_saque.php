@@ -4,7 +4,7 @@
 session_start();
 require_once __DIR__ . "/BackEnd/config/conexao.php"; 
 
-$company_id = $_SESSION['company_id'] ?? null;
+$company_id = $_SESSION['user']['company_id'] ?? null;
 
 if (!$company_id || $_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: estatisticas.php");

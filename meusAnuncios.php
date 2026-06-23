@@ -60,13 +60,28 @@ try {
     $mensagem = "<div class='alert alert-danger'>Erro ao carregar anúncios: " . $e->getMessage() . "</div>";
 }
 
-// Busca dados da empresa para a sidebar
+// CORREÇÃO SIDEBAR: Busca e padroniza dados da empresa igual ao arquivo de referência (estatisticas.php)
 try {
-    $stmtEmp = $pdo->prepare("SELECT nome_fantasia, razao_social, logo_url FROM companies WHERE id = ?");
-    $stmtEmp->execute([$company_id]);
-    $empresa = $stmtEmp->fetch();
+    $stmtEmpresa = $pdo->prepare("SELECT razao_social, nome_fantasia, logo_url FROM companies WHERE id = ?");
+    $stmtEmpresa->execute([$company_id]);
+
+    $dados_banco = $stmtEmpresa->fetch(PDO::FETCH_ASSOC);
+
+    if ($dados_banco) {
+        $empresa = array_change_key_case($dados_banco, CASE_LOWER);
+        $razao_social_final = !empty($empresa['razao_social']) ? $empresa['razao_social'] : 'Razão Social não preenchida';
+    } else {
+        $razao_social_final = 'Empresa Não Encontrada';
+        $empresa = ['nome_fantasia' => '', 'logo_url' => null];
+    }
+
+    $nome_empresa  = !empty($empresa['nome_fantasia']) ? $empresa['nome_fantasia'] : $razao_social_final;
+    $nome_exibicao = $nome_empresa; // Usado na sidebar
+    $logo_url      = $empresa['logo_url'] ?? null; // Usado na sidebar
 } catch (PDOException $e) {
-    $empresa = [];
+    $razao_social_final = 'Erro ao carregar';
+    $nome_exibicao = 'Erro ao carregar';
+    $logo_url = null;
 }
 
 $titulo_pagina = "Meus Anúncios — Re.Source";
@@ -203,7 +218,7 @@ include 'header.php';
 
 <main class="dashboard-layout">
     
-<aside class="dashboard-sidebar">
+    <aside class="dashboard-sidebar">
         <div class="sidebar-user">
             <div class="sidebar-avatar">
                 <?php if (!empty($logo_url)): ?>
@@ -245,7 +260,7 @@ include 'header.php';
                 </div>
             <?php else: ?>
                 <?php foreach ($anuncios as $ad): ?>
-                    <div class="listing-card">
+                    <div class="listing-card" onclick="window.location.href='anuncio.php?id=<?= $ad['id']; ?>';" style="cursor: pointer;" title="Ver detalhes do anúncio">
                         
                         <?php if (!empty($ad['main_image'])): ?>
                             <img src="<?= htmlspecialchars($ad['main_image']); ?>" alt="Imagem" class="listing-img">
@@ -276,13 +291,13 @@ include 'header.php';
                         </div>
 
                         <div class="listing-actions">
-                            <a href="editarResiduo.php?id=<?= $ad['id']; ?>" class="btn-action" title="Editar">
+                            <a href="editarResiduo.php?id=<?= $ad['id']; ?>" class="btn-action" title="Editar" onclick="event.stopPropagation();">
                                 <i data-lucide="pencil" style="width: 18px; height: 18px;"></i>
                             </a>
                             <a href="meusAnuncios.php?action=delete&id=<?= $ad['id']; ?>" 
                                class="btn-action btn-delete" 
                                title="Excluir" 
-                               onclick="return confirm('⚠️ Deseja realmente apagar este anúncio?\nEsta ação não pode ser desfeita.');">
+                               onclick="event.stopPropagation(); return confirm('⚠️ Deseja realmente apagar este anúncio?\nEsta ação não pode ser desfeita.');">
                                 <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
                             </a>
                         </div>

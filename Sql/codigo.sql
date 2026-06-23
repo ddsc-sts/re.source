@@ -582,6 +582,21 @@ ADD COLUMN theme VARCHAR(20) DEFAULT 'system',
 ADD COLUMN notify_proposals TINYINT(1) DEFAULT 1,
 ADD COLUMN notify_chat TINYINT(1) DEFAULT 1;
 
+-- 1. Adicionar a coluna de saldo na tabela de empresas (ou usuários)
+ALTER TABLE companies ADD COLUMN balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00;
+
+-- 2. Criar uma tabela de histórico de transações (Essencial para auditoria, saques e depósitos)
+CREATE TABLE financial_transactions (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     company_id INT UNSIGNED NOT NULL, -- Mudado para INT UNSIGNED
+     type ENUM('deposit', 'withdrawal', 'sale', 'refund') NOT NULL, 
+     amount DECIMAL(10, 2) NOT NULL,                               
+     status ENUM('pending', 'completed', 'failed', 'canceled') NOT NULL DEFAULT 'pending',
+     description VARCHAR(255) NULL,                                
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
 
 SET FOREIGN_KEY_CHECKS = 1;
 
