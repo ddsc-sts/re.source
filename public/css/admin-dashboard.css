@@ -1003,3 +1003,15 @@ img { display: block; max-width: 100%; }
       grid-template-columns:1fr;
   }
 }
+
+.chart-box{
+  position: relative;
+  height: 320px;
+  width: 100%;
+  padding: 20px;
+}
+
+.chart-box canvas{
+  width: 100% !important;
+  height: 100% !important;
+}

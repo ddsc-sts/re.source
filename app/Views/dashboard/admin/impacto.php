@@ -147,7 +147,7 @@ $userName = htmlspecialchars($user['name'] ?? 'Administrador');
 
                 </div>
 
-                <div style="padding:20px;">
+                <div class="chart-box">
                     <canvas id="categoriasChart"></canvas>
                 </div>
 
@@ -322,7 +322,7 @@ new Chart(
 
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'bottom'
