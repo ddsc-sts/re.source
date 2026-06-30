@@ -1,0 +1,351 @@
+/* ====== ESG DASHBOARD ====== */
+
+.esg-grid {
+
+    display: grid;
+    
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    
+    gap: 1.5rem;
+    
+    margin-bottom: 2rem;
+    
+    }
+    
+    .esg-card {
+    
+    background: #fff;
+    
+    border-radius: 20px;
+    
+    padding: 1.5rem;
+    
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    
+    border: 1px solid rgba(0,0,0,0.04);
+    
+    transition: all 0.25s ease;
+    
+    }
+    
+    .esg-card:hover {
+    
+    transform: translateY(-4px);
+    
+    box-shadow: 0 14px 32px rgba(0,0,0,0.08);
+    
+    }
+    
+    .esg-card-header {
+    
+    display: flex;
+    
+    align-items: center;
+    
+    justify-content: space-between;
+    
+    margin-bottom: 1rem;
+    
+    }
+    
+    .esg-card-header i {
+    
+    width: 24px;
+    
+    height: 24px;
+    
+    color: #157347;
+    
+    }
+    
+    .esg-label {
+    
+    font-size: 0.9rem;
+    
+    color: #6b7280;
+    
+    font-weight: 600;
+    
+    text-transform: uppercase;
+    
+    letter-spacing: 0.04em;
+    
+    }
+    
+    .esg-value {
+    
+    font-size: 2rem;
+    
+    font-weight: 800;
+    
+    color: #111827;
+    
+    line-height: 1.1;
+    
+    margin-bottom: 0.5rem;
+    
+    }
+    
+    .esg-sub {
+    
+    font-size: 0.95rem;
+    
+    color: #6b7280;
+    
+    }
+    
+    /* ====== GRÁFICOS ====== */
+    
+    .charts-grid {
+    
+    display: grid;
+    
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    
+    gap: 1.5rem;
+    
+    margin-bottom: 2rem;
+    
+    }
+    
+    .chart-card {
+    
+    background: #fff;
+    
+    border-radius: 20px;
+    
+    padding: 1.5rem;
+    
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    
+    border: 1px solid rgba(0,0,0,0.04);
+    
+    }
+    
+    .chart-card h3 {
+    
+    margin-bottom: 1rem;
+    
+    font-size: 1.1rem;
+    
+    font-weight: 700;
+    
+    color: #111827;
+    
+    }
+    
+    .chart-card canvas {
+    
+    width: 100% !important;
+    
+    height: 320px !important;
+    
+    }
+    
+    /* ====== TABELA ESG ====== */
+    
+    .esg-table-card {
+    
+    background: #fff;
+    
+    border-radius: 20px;
+    
+    padding: 1.5rem;
+    
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    
+    border: 1px solid rgba(0,0,0,0.04);
+    
+    }
+    
+    .esg-table-card h3 {
+    
+    margin-bottom: 1rem;
+    
+    font-size: 1.1rem;
+    
+    font-weight: 700;
+    
+    color: #111827;
+    
+    }
+    
+    .esg-table {
+    
+    width: 100%;
+    
+    border-collapse: collapse;
+    
+    }
+    
+    .esg-table th {
+    
+    text-align: left;
+    
+    padding: 0.9rem 1rem;
+    
+    font-size: 0.8rem;
+    
+    font-weight: 700;
+    
+    text-transform: uppercase;
+    
+    letter-spacing: 0.05em;
+    
+    color: #6b7280;
+    
+    border-bottom: 1px solid #e5e7eb;
+    
+    }
+    
+    .esg-table td {
+    
+    padding: 1rem;
+    
+    border-bottom: 1px solid #f3f4f6;
+    
+    color: #111827;
+    
+    font-weight: 500;
+    
+    }
+    
+    .esg-table tr:last-child td {
+    
+    border-bottom: none;
+    
+    }
+    
+    .esg-table tr:hover {
+    
+    background: rgba(21,115,71,0.03);
+    
+    }
+    
+    /* ====== BADGES ====== */
+    
+    .esg-badge {
+    
+    display: inline-flex;
+    
+    align-items: center;
+    
+    gap: 0.35rem;
+    
+    padding: 0.35rem 0.7rem;
+    
+    border-radius: 999px;
+    
+    font-size: 0.8rem;
+    
+    font-weight: 700;
+    
+    }
+    
+    .esg-badge.green {
+    
+    background: rgba(21,115,71,0.12);
+    
+    color: #157347;
+    
+    }
+    
+    .esg-badge.blue {
+    
+    background: rgba(29,78,216,0.12);
+    
+    color: #1d4ed8;
+    
+    }
+    
+    .esg-badge.orange {
+    
+    background: rgba(234,88,12,0.12);
+    
+    color: #ea580c;
+    
+    }
+    
+    .esg-badge.purple {
+    
+    background: rgba(124,58,237,0.12);
+    
+    color: #7c3aed;
+    
+    }
+    
+    /* ====== RESPONSIVO ====== */
+    
+    @media (max-width: 768px) {
+    
+    .charts-grid {
+    
+    grid-template-columns: 1fr;
+    
+    }
+    
+    .chart-card canvas {
+    
+    height: 260px !important;
+    
+    }
+    
+    .esg-value {
+    
+    font-size: 1.7rem;
+    
+    }
+    
+    .esg-table-card {
+    
+    overflow-x: auto;
+    
+    }
+    
+    .esg-table {
+    
+    min-width: 700px;
+    
+    }
+    
+    }
+
+    .esg-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin: 24px 0;
+    }
+    
+    .esg-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 12px rgba(0,0,0,.04);
+    }
+    
+    .esg-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .esg-label {
+        font-size: .9rem;
+        color: #6b7280;
+        font-weight: 600;
+    }
+    
+    .esg-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #157347;
+        margin-bottom: 8px;
+    }
+    
+    .esg-sub {
+        color: #6b7280;
+        font-size: .9rem;
+    }

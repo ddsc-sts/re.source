@@ -1,0 +1,26 @@
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1rem;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .3s, background .3s;
+}
+
+.strength-label {
+  font-size: .75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}

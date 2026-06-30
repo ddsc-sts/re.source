@@ -1,0 +1,23 @@
+# re.source/.htaccess
+# Ambiente: XAMPP local, projeto em htdocs/re.source/
+# Acessado via http://localhost/re.source/
+#
+# Redireciona todas as requisicoes para public/index.php,
+# exceto arquivos/diretorios que realmente existem (css, js, img, uploads...)
+
+RewriteEngine On
+RewriteBase /re.source/
+
+# Se a requisicao ja eh para algo dentro de /public, deixa passar
+RewriteCond %{REQUEST_URI} ^/re\.source/public/ [NC]
+RewriteRule ^ - [L]
+
+# Se o arquivo ou diretorio pedido existe fisicamente, serve direto
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Caso contrario, manda tudo para o front controller
+RewriteRule ^(.*)$ public/index.php [QSA,L]
+
+

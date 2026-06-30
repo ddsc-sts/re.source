@@ -1,0 +1,410 @@
+<?php
+
+require_once __DIR__ . '/../../config/conexao.php';
+
+class BaseController
+{
+    public static function index(): void
+    {
+        global $pdo;
+
+        $anunciosRecentes = self::getAnunciosRecentes($pdo);
+
+        require_once __DIR__ . '/../Views/dashboard/index.php';
+    }
+
+    /**
+     * Proxy robusto para busca de CNPJ com cache de 24h e múltiplos fallbacks (ReceitaWS, cnpj.ws, BrasilAPI)
+     */
+    public static function cnpj(): void
+    {
+        header('Content-Type: application/json');
+        header('Access-Control-Allow-Origin: *');
+
+        $cnpj = preg_replace('/\D/', '', $_GET['cnpj'] ?? '');
+
+        if (strlen($cnpj) !== 14) {
+            http_response_code(400);
+            echo json_encode(['error' => 'CNPJ inválido.']);
+            return;
+        }
+
+        $cacheDir = ROOT_PATH . '/storage/cache';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+
+        $cacheFile = $cacheDir . '/' . $cnpj . '.json';
+        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 86400) {
+            echo file_get_contents($cacheFile);
+            return;
+        }
+
+        $apis = [
+            "https://receitaws.com.br/v1/cnpj/{$cnpj}",
+            "https://publica.cnpj.ws/cnpj/{$cnpj}",
+            "https://brasilapi.com.br/api/cnpj/v1/{$cnpj}",
+        ];
+
+        $response = null;
+        $httpCode = 0;
+
+        foreach ($apis as $url) {
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 8);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Re.Source/1.0');
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200) break;
+        }
+
+        if ($httpCode === 200 && !empty($response)) {
+            $data = json_decode($response, true);
+            
+            // Normaliza ReceitaWS para o mesmo padrão da BrasilAPI
+            if (isset($data['nome']) && !isset($data['razao_social'])) {
+                $data['razao_social'] = $data['nome'];
+                $data['municipio']    = $data['municipio'] ?? '';
+                $response = json_encode($data);
+            }
+
+            // Normaliza cnpj.ws
+            if (isset($data['razao_social']) && isset($data['estabelecimento'])) {
+                $data['municipio'] = $data['estabelecimento']['cidade']['nome'] ?? '';
+                $data['uf']        = $data['estabelecimento']['estado']['sigla'] ?? '';
+                $response = json_encode($data);
+            }
+
+            file_put_contents($cacheFile, $response);
+        }
+
+        http_response_code($httpCode === 0 ? 502 : $httpCode);
+        echo $response ?: json_encode(['error' => 'Não foi possível consultar o CNPJ.']);
+    }
+
+    public static function conta(): void
+    {
+        global $pdo;
+        $company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 1;
+
+        try {
+            $stmt = $pdo->prepare("
+                SELECT c.*, a.zip_code, a.street, a.number, a.complement, a.district, a.city, a.state 
+                FROM companies c
+                LEFT JOIN addresses a ON c.address_id = a.id
+                WHERE c.id = ?
+            ");
+            $stmt->execute([$company_id]);
+            $empresa = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            $stmtUser = $pdo->prepare("SELECT name, email FROM users WHERE company_id = ? AND role = 'admin_company' LIMIT 1");
+            $stmtUser->execute([$company_id]);
+            $admin = $stmtUser->fetch(\PDO::FETCH_ASSOC);
+
+        } catch (\PDOException $e) {
+            die("Erro ao carregar dados: " . $e->getMessage());
+        }
+
+        $titulo_pagina = 'Configurações da Conta — Re.Source';
+        view('dashboard/conta', [
+            'titulo_pagina' => $titulo_pagina,
+            'empresa'       => $empresa,
+            'admin'         => $admin
+        ]);
+    }
+
+    public static function atualizarConta(): void
+    {
+        global $pdo;
+        $company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 1;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /re.source/conta");
+            exit();
+        }
+
+        $nome_fantasia    = filter_input(INPUT_POST, 'nome_fantasia', FILTER_SANITIZE_SPECIAL_CHARS);
+        $razao_social     = filter_input(INPUT_POST, 'razao_social', FILTER_SANITIZE_SPECIAL_CHARS);
+        $segment          = filter_input(INPUT_POST, 'segment', FILTER_SANITIZE_SPECIAL_CHARS);
+        $phone            = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHARS);
+        $email_comercial  = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+        $responsible_name = filter_input(INPUT_POST, 'responsible_name', FILTER_SANITIZE_SPECIAL_CHARS);
+
+        $zip_code   = filter_input(INPUT_POST, 'zip_code', FILTER_SANITIZE_SPECIAL_CHARS);
+        $street     = filter_input(INPUT_POST, 'street', FILTER_SANITIZE_SPECIAL_CHARS);
+        $number     = filter_input(INPUT_POST, 'number', FILTER_SANITIZE_SPECIAL_CHARS);
+        $complement = filter_input(INPUT_POST, 'complement', FILTER_SANITIZE_SPECIAL_CHARS);
+        $city       = filter_input(INPUT_POST, 'city', FILTER_SANITIZE_SPECIAL_CHARS);
+        $state      = filter_input(INPUT_POST, 'state', FILTER_SANITIZE_SPECIAL_CHARS);
+
+        if (!$email_comercial) {
+            $_SESSION['error'] = "E-mail comercial inválido.";
+            header("Location: /re.source/conta");
+            exit();
+        }
+
+        try {
+            $pdo->beginTransaction();
+
+            $stmt = $pdo->prepare("SELECT address_id, logo_url FROM companies WHERE id = ?");
+            $stmt->execute([$company_id]);
+            $empresa_atual = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $address_id = $empresa_atual['address_id'] ?? null;
+            $logo_url = $empresa_atual['logo_url'] ?? null;
+
+            if (isset($_FILES['logo_empresa']) && $_FILES['logo_empresa']['error'] === UPLOAD_ERR_OK) {
+                $fileTmpPath = $_FILES['logo_empresa']['tmp_name'];
+                $fileName = $_FILES['logo_empresa']['name'];
+                $fileSize = $_FILES['logo_empresa']['size'];
+                
+                $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                $allowedExtensions = ['jpg', 'jpeg', 'png'];
+
+                if (in_array($fileExtension, $allowedExtensions)) {
+                    if ($fileSize <= 2 * 1024 * 1024) {
+                        $uploadFileDir = ROOT_PATH . '/uploads/logos/';
+                        if (!is_dir($uploadFileDir)) {
+                            mkdir($uploadFileDir, 0755, true);
+                        }
+
+                        $newFileName = md5(time() . $company_id) . '.' . $fileExtension;
+                        $dest_path = 'uploads/logos/' . $newFileName;
+
+                        if (move_uploaded_file($fileTmpPath, ROOT_PATH . '/' . $dest_path)) {
+                            if ($logo_url && file_exists(ROOT_PATH . '/' . $logo_url)) {
+                                @unlink(ROOT_PATH . '/' . $logo_url);
+                            }
+                            $logo_url = '/re.source/' . $dest_path;
+                        }
+                    } else {
+                        throw new \Exception("O logotipo excede o tamanho máximo de 2MB.");
+                    }
+                } else {
+                    throw new \Exception("Formato de imagem não suportado. Use apenas JPG, JPEG ou PNG.");
+                }
+            }
+
+            if ($address_id) {
+                $sqlAddress = "UPDATE addresses SET zip_code = ?, street = ?, number = ?, complement = ?, city = ?, state = ? WHERE id = ?";
+                $stmtAddress = $pdo->prepare($sqlAddress);
+                $stmtAddress->execute([$zip_code, $street, $number, $complement, $city, $state, $address_id]);
+            } else {
+                $sqlAddress = "INSERT INTO addresses (zip_code, street, number, complement, city, state) VALUES (?, ?, ?, ?, ?, ?)";
+                $stmtAddress = $pdo->prepare($sqlAddress);
+                $stmtAddress->execute([$zip_code, $street, $number, $complement, $city, $state]);
+                $address_id = $pdo->lastInsertId();
+            }
+
+            $sqlCompany = "UPDATE companies SET 
+                            nome_fantasia = ?, 
+                            razao_social = ?, 
+                            segment = ?, 
+                            phone = ?, 
+                            email = ?, 
+                            responsible_name = ?, 
+                            logo_url = ?,
+                            address_id = ?
+                           WHERE id = ?";
+            
+            $stmtCompany = $pdo->prepare($sqlCompany);
+            $stmtCompany->execute([
+                $nome_fantasia, 
+                $razao_social, 
+                $segment, 
+                $phone, 
+                $email_comercial, 
+                $responsible_name, 
+                $logo_url,
+                $address_id,
+                $company_id
+            ]);
+
+            $pdo->commit();
+            $_SESSION['success'] = "Dados cadastrais atualizados com sucesso!";
+        } catch (\Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $_SESSION['error'] = "Erro ao atualizar: " . $e->getMessage();
+        }
+
+        header("Location: /re.source/conta");
+        exit();
+    }
+
+    public static function configuracoes(): void
+    {
+        global $pdo;
+        $company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 1;
+
+        try {
+            $stmt = $pdo->prepare("SELECT theme, notify_proposals, notify_chat, razao_social, nome_fantasia, logo_url FROM companies WHERE id = ?");
+            $stmt->execute([$company_id]);
+            $company_data = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
+            $prefs = [
+                'theme' => $company_data['theme'] ?? 'light',
+                'notify_proposals' => isset($company_data['notify_proposals']) ? (bool)$company_data['notify_proposals'] : true,
+                'notify_chat' => isset($company_data['notify_chat']) ? (bool)$company_data['notify_chat'] : true
+            ];
+
+            $nome_empresa = !empty($company_data['nome_fantasia']) ? $company_data['nome_fantasia'] : ($company_data['razao_social'] ?? 'Minha Empresa');
+            $logo_url = $company_data['logo_url'] ?? null;
+
+        } catch (\PDOException $e) {
+            $prefs = [ 'theme' => 'light', 'notify_proposals' => true, 'notify_chat' => true ];
+            $nome_empresa = 'Minha Empresa';
+            $logo_url = null;
+        }
+
+        $_SESSION['user_theme'] = $prefs['theme'];
+        $titulo_pagina = 'Configurações do Sistema — Re.Source';
+        view('dashboard/configuracoes', [
+            'titulo_pagina' => $titulo_pagina,
+            'prefs'         => $prefs,
+            'nome_empresa'  => $nome_empresa,
+            'logo_url'      => $logo_url
+        ]);
+    }
+
+    public static function salvarPreferencias(): void
+    {
+        global $pdo;
+        $company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 1;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /re.source/configuracoes");
+            exit();
+        }
+
+        $theme = filter_input(INPUT_POST, 'theme', FILTER_SANITIZE_SPECIAL_CHARS) ?? 'system';
+        $notify_proposals = isset($_POST['notify_proposals']) ? 1 : 0;
+        $notify_chat      = isset($_POST['notify_chat']) ? 1 : 0;
+
+        try {
+            $sql = "UPDATE companies SET theme = ?, notify_proposals = ?, notify_chat = ? WHERE id = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$theme, $notify_proposals, $notify_chat, $company_id]);
+
+            $_SESSION['success'] = "Preferências do sistema atualizadas!";
+            $_SESSION['user_theme'] = $theme;
+        } catch (\PDOException $e) {
+            $_SESSION['error'] = "Erro ao salvar preferências: " . $e->getMessage();
+        }
+
+        header("Location: /re.source/configuracoes");
+        exit();
+    }
+
+    public static function excluirConta(): void
+    {
+        global $pdo;
+        $company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
+
+        if (!$company_id || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /re.source/configuracoes");
+            exit();
+        }
+
+        try {
+            $pdo->beginTransaction();
+
+            $stmtCompany = $pdo->prepare("UPDATE companies SET status = 'inactive', deactivated_at = CURRENT_TIMESTAMP WHERE id = ?");
+            $stmtCompany->execute([$company_id]);
+
+            $stmtUsers = $pdo->prepare("UPDATE users SET is_active = 0, deleted_at = CURRENT_TIMESTAMP WHERE company_id = ?");
+            $stmtUsers->execute([$company_id]);
+
+            $stmtListings = $pdo->prepare("UPDATE listings SET status = 'paused', deleted_at = CURRENT_TIMESTAMP WHERE company_id = ?");
+            $stmtListings->execute([$company_id]);
+
+            try {
+                $stmtAudit = $pdo->prepare("INSERT INTO audit_logs (company_id, action, severity, ip_address, user_agent) VALUES (?, 'ACCOUNT_DEACTIVATED_BY_USER', 'critical', ?, ?)");
+                $stmtAudit->execute([
+                    $company_id, 
+                    $_SERVER['REMOTE_ADDR'] ?? null, 
+                    $_SERVER['HTTP_USER_AGENT'] ?? null
+                ]);
+            } catch (\PDOException $e_audit) {
+                // ignora
+            }
+
+            $pdo->commit();
+
+            $_SESSION = array();
+
+            if (ini_get("session.use_cookies")) {
+                $params = session_get_cookie_params();
+                setcookie(
+                    session_name(), 
+                    '', 
+                    time() - 42000,
+                    $params["path"], 
+                    $params["domain"],
+                    $params["secure"], 
+                    $params["httponly"]
+                );
+            }
+
+            session_destroy();
+
+            header("Location: /re.source/login?account=deleted");
+            exit();
+        } catch (\PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            die("Erro crítico ao processar a exclusão da conta: " . $e->getMessage());
+        }
+    }
+
+    public static function negociacoes(): void
+    {
+        echo "Página de Negociações do Usuário (Em desenvolvimento)";
+    }
+
+    public static function logistica(): void
+    {
+        echo "Página de Logística do Usuário (Em desenvolvimento)";
+    }
+
+    public static function impacto(): void
+    {
+        echo "Página de Impacto do Usuário (Em desenvolvimento)";
+    }
+
+    public static function suporte(): void
+    {
+        echo "Página de Suporte do Usuário (Em desenvolvimento)";
+    }
+
+    private static function getAnunciosRecentes($pdo): array
+    {
+        try {
+            $stmt = $pdo->query("
+                SELECT
+                    l.id,
+                    l.title,
+                    l.type,
+                    l.quantity,
+                    l.unit,
+                    l.price,
+                    l.location_city,
+                    l.location_state,
+                    (SELECT url FROM listing_images li WHERE li.listing_id = l.id ORDER BY `order` ASC LIMIT 1) AS main_image
+                FROM listings l
+                WHERE l.status = 'active'
+                  AND l.deleted_at IS NULL
+                ORDER BY l.created_at DESC
+                LIMIT 8
+            ");
+            return $stmt->fetchAll();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+}

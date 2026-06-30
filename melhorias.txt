@@ -1,0 +1,217 @@
+================================================================================
+  RE.SOURCE — REGISTRO DE MELHORIAS E PENDÊNCIAS
+  Atualizado em: 24/06/2026
+================================================================================
+
+
+════════════════════════════════════════════════════════════════════════════════
+  ✅ O QUE JÁ FOI FEITO — MIGRAÇÃO MVC + URLs LIMPAS
+════════════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────────
+ 1. ROTEADOR (public/index.php + bootstrap.php)
+────────────────────────────────────────────────────────────────────────────────
+ [✅] Criado roteador central em public/index.php que despacha todas as
+      requisições para os Controllers via routes/web.php.
+ [✅] Criado bootstrap.php com a função helper view() para carregar views
+      com variáveis injetadas por extract().
+ [✅] .htaccess configurado para redirecionar tudo para public/index.php,
+      exceto arquivos físicos (css, js, imagens).
+
+────────────────────────────────────────────────────────────────────────────────
+ 2. ROTAS (routes/web.php)
+────────────────────────────────────────────────────────────────────────────────
+ [✅] /                          → HomeController@index
+ [✅] /login                     → AuthController@login
+ [✅] /cadastro                  → AuthController@cadastro
+ [✅] /pendente                  → AuthController@pendente
+ [✅] /reset                     → AuthController@showReset
+ [✅] /logout                    → AuthController@logout
+ [✅] /process                   → AuthController@process
+ [✅] /cnpj                      → BaseController@cnpj
+ [✅] /base                      → BaseController@index  (dashboard usuário)
+ [✅] /busca                     → SearchController@index
+ [✅] /anuncio                   → ListingController@showDetail
+ [✅] /meus-anuncios             → ListingController@showMeus
+ [✅] /anuncios/novo             → ListingController@showCreate
+ [✅] /anuncios/novo/processar   → ListingController@processCreate
+ [✅] /anuncios/editar           → ListingController@showEdit
+ [✅] /anuncios/editar/processar → ListingController@processEdit
+ [✅] /anuncios/excluir          → ListingController@processDelete
+ [✅] /conta                     → BaseController@conta
+ [✅] /conta/atualizar           → BaseController@atualizarConta
+ [✅] /conta/excluir             → BaseController@excluirConta
+ [✅] /configuracoes             → BaseController@configuracoes
+ [✅] /configuracoes/salvar      → BaseController@salvarPreferencias
+ [✅] /estatisticas              → EstatisticasController@index
+ [✅] /estatisticas/processar-saque → EstatisticasController@processarSaque
+ [✅] /negociacoes               → BaseController@negociacoes
+ [✅] /logistica                 → BaseController@logistica
+ [✅] /impacto                   → BaseController@impacto
+ [✅] /suporte                   → BaseController@suporte
+ [✅] /admin                     → AdminController@dashboard
+ [✅] /admin/empresas            → AdminController@empresas
+ [✅] /admin/anuncios            → AdminController@anuncios
+ [✅] /admin/negociacoes         → AdminController@negociacoes
+ [✅] /admin/impacto             → AdminController@impacto
+ [✅] /admin/logistica           → AdminController@logistica
+ [✅] /admin/suporte             → AdminController@suporte
+ [✅] /admin/configuracoes       → AdminController@configuracoes_admin
+
+────────────────────────────────────────────────────────────────────────────────
+ 3. CONTROLLERS (app/Controllers/)
+────────────────────────────────────────────────────────────────────────────────
+ [✅] HomeController.php         — Renderiza landing page
+ [✅] AuthController.php         — Login, cadastro, pendente, reset de senha,
+                                   logout, process (ações POST via fetch)
+ [✅] BaseController.php         — index (dashboard), cnpj (proxy BrasilAPI
+                                   com cache 24h e 3 fallbacks), conta,
+                                   atualizarConta (com upload de logo),
+                                   configuracoes, salvarPreferencias,
+                                   excluirConta (desativa empresa + usuários
+                                   + anúncios + audit_log), negociacoes,
+                                   logistica, impacto, suporte
+ [✅] EstatisticasController.php — index, processarSaque
+ [✅] ListingController.php      — showDetail (visualizações únicas por dia),
+                                   showCreate, showEdit, showMeus,
+                                   processCreate, processEdit, processDelete
+ [✅] SearchController.php       — index (busca com filtros)
+ [✅] AdminController.php        — dashboard, empresas, anuncios, negociacoes,
+                                   impacto, logistica, suporte,
+                                   configuracoes_admin
+
+────────────────────────────────────────────────────────────────────────────────
+ 4. VIEWS (app/Views/)
+────────────────────────────────────────────────────────────────────────────────
+ [✅] home/index.php             — Landing page (links já com URLs limpas)
+ [✅] auth/login.php             — Tela de login
+ [✅] auth/cadastro.php          — Tela de cadastro de empresa
+ [✅] auth/pendente.php          — Conta aguardando aprovação
+ [✅] dashboard/index.php        — Dashboard do usuário logado
+ [✅] dashboard/conta.php        — Dados cadastrais da empresa
+ [✅] dashboard/configuracoes.php — Preferências (tema, notificações)
+ [✅] estatisticas/index.php     — Estatísticas e gráficos da empresa
+ [✅] listings/detail.php        — Detalhe de um anúncio (lightbox, mosaico OLX)
+ [✅] search/index.php           — Página de busca com filtros
+ [✅] components/header.php      — Cabeçalho global (links sem .php)
+ [✅] components/footer.php      — Rodapé global com scripts
+ [✅] components/navbar.php      — Sidebar admin (links MVC + ativo via REQUEST_URI)
+ [✅] components/topbar.php      — Topbar do dashboard
+
+────────────────────────────────────────────────────────────────────────────────
+ 5. MIDDLEWARE (app/Middleware/)
+────────────────────────────────────────────────────────────────────────────────
+ [✅] UserAuth.php               — required(): redireciona para /login se não autenticado
+ [✅] AdminAuth.php              — required(): redireciona se não for admin;
+                                   can(): verifica permissões granulares
+
+
+════════════════════════════════════════════════════════════════════════════════
+  🧹 O QUE PODE SER APAGADO DA RAIZ (após validação manual)
+════════════════════════════════════════════════════════════════════════════════
+
+  Os seguintes arquivos .php da raiz foram completamente migrados para o MVC
+  e podem ser removidos depois que você confirmar que tudo funciona:
+
+  admin.php              → /admin (AdminController@dashboard)
+  anuncio.php            → /anuncio (ListingController@showDetail)
+  anuncios.php           → /admin/anuncios (AdminController@anuncios)
+  atualizar_conta.php    → /conta/atualizar (BaseController@atualizarConta)
+  base.php               → /base (BaseController@index)
+  busca.php              → /busca (SearchController@index)
+  cadastro.php           → /cadastro (AuthController@cadastro)
+  cnpj.php               → /cnpj (BaseController@cnpj)
+  configuracoes.php      → /configuracoes (BaseController@configuracoes)
+  configuracoes_admin.php → /admin/configuracoes (AdminController@configuracoes_admin)
+  conta.php              → /conta (BaseController@conta)
+  empresas.php           → /admin/empresas (AdminController@empresas)
+  estatisticas.php       → /estatisticas (EstatisticasController@index)
+  excluir_conta.php      → /conta/excluir (BaseController@excluirConta)
+  impacto.php            → /admin/impacto (AdminController@impacto)
+  index.php (raiz)       → / (HomeController@index)
+  login.php              → /login (AuthController@login)
+  logout.php             → /logout (AuthController@logout)
+  logistica.php          → /admin/logistica (AdminController@logistica)
+  negociacoes.php        → /admin/negociacoes (AdminController@negociacoes)
+  pendente.php           → /pendente (AuthController@pendente)
+  process.php            → /process (AuthController@process)
+  processar_saque.php    → /estatisticas/processar-saque (EstatisticasController@processarSaque)
+  salvar_preferencias.php → /configuracoes/salvar (BaseController@salvarPreferencias)
+  suporte.php            → /admin/suporte (AdminController@suporte)
+  header.php (raiz)      → app/Views/components/header.php
+  base.php               → substituído pelo roteador MVC
+
+  ⚠️  NÃO APAGAR ainda:
+  bootstrap.php          → usado pelo roteador (necessário)
+  config/                → configurações de banco e ambiente
+  vendor/                → dependências Composer
+
+
+════════════════════════════════════════════════════════════════════════════════
+  ⏳ O QUE AINDA PRECISA SER FEITO
+════════════════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────────────────
+ PRIORIDADE ALTA
+────────────────────────────────────────────────────────────────────────────────
+ [ ] Criar app/Views/listings/create.php
+       A view de criação de anúncio ainda está sendo referenciada via
+       require_once em ListingController::showCreate() mas o arquivo
+       app/Views/listings/create.php pode não existir — verificar.
+
+ [ ] Criar app/Views/listings/edit.php
+       Mesma situação da create.php — verificar se o arquivo existe.
+
+ [ ] Criar app/Views/listings/index.php (meus anúncios)
+       O método showMeus() chama este arquivo.
+
+ [ ] Criar app/Views/dashboard/admin/ (area admin completa)
+       Verificar se todos os sub-templates do admin (empresas, anúncios,
+       negociações, etc.) já existem em app/Views/dashboard/admin/.
+
+ [ ] Implementar páginas "Em desenvolvimento":
+       BaseController::negociacoes() → só faz echo, sem view real.
+       BaseController::logistica()   → idem.
+       BaseController::impacto()     → idem.
+       BaseController::suporte()     → idem.
+
+────────────────────────────────────────────────────────────────────────────────
+ PRIORIDADE MÉDIA
+────────────────────────────────────────────────────────────────────────────────
+ [ ] Criar página de reset de senha completa
+       AuthController::showReset() existe, mas verificar se a view existe
+       e se o fluxo de e-mail de redefinição está implementado.
+
+ [ ] Adicionar rota para app/Views/listings/detail.php exibir anúncios
+       da seção "Anúncios relevantes" (relevantAds) — a variável é passada
+       pelo controller mas a view ainda não exibe esse bloco.
+
+ [ ] Unificar sistema de notificações de sessão ($_SESSION['success'],
+       $_SESSION['error']) em um componente reutilizável de flash message.
+
+────────────────────────────────────────────────────────────────────────────────
+ PRIORIDADE BAIXA / FUTURO
+────────────────────────────────────────────────────────────────────────────────
+ [ ] Implementar chat interno entre empresas (botão "Entrar em Contato"
+       atualmente exibe alert() de desenvolvimento).
+
+ [ ] Sistema de negociações real (proposta, aceite, recusa).
+
+ [ ] Módulo de logística (rastreamento, frete, etc.).
+
+ [ ] Módulo de impacto ESG com métricas reais de CO₂, resíduos desviados.
+
+ [ ] Sistema de suporte com tickets.
+
+ [ ] Notificações por e-mail (propostas, chat, aprovação de conta).
+
+ [ ] Paginação na busca e em listagens do admin.
+
+ [ ] Implementar upload de imagens via AJAX no form de criação/edição
+       de anúncio sem reload de página.
+
+ [ ] Adicionar proteção CSRF nos formulários POST críticos.
+
+ [ ] Implementar rate limiting no endpoint /process para prevenir brute force.
+
+================================================================================
