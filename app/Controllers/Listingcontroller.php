@@ -4,118 +4,22 @@ require_once __DIR__ . '/../../config/conexao.php';
 
 class ListingController
 {
+    private static function companyId(): ?int
+    {
+        $companyId = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
+        return $companyId ? (int) $companyId : null;
+    }
+
     // ══════════════════════════════════════════
     // VIEWS
     // ══════════════════════════════════════════
 
-    public static function showDetail(): void
-    {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        global $pdo;
 
-        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-        if (!$id) {
-            header('Location: /re.source/busca');
-            exit;
-        }
-
-        try {
-            // ── 0. Lógica de visualizações únicas por sessão/dia ──────────
-            $viewer_company_id = $_SESSION['company_id'] ?? null;
-            $viewer_session_id = session_id();
-
-            $stmtCheckView = $pdo->prepare("
-                SELECT id FROM views_history
-                WHERE listing_id = ?
-                AND DATE(created_at) = CURDATE()
-                AND (session_id = ? OR (company_id IS NOT NULL AND company_id = ?))
-            ");
-            $stmtCheckView->execute([$id, $viewer_session_id, $viewer_company_id]);
-
-            if (!$stmtCheckView->fetch()) {
-                $stmtInsertView = $pdo->prepare("INSERT INTO views_history (listing_id, company_id, session_id) VALUES (?, ?, ?)");
-                $stmtInsertView->execute([$id, $viewer_company_id, $viewer_session_id]);
-
-                $stmtUpdateTotal = $pdo->prepare("UPDATE listings SET views_count = views_count + 1 WHERE id = ?");
-                $stmtUpdateTotal->execute([$id]);
-            }
-
-            // ── 1. Dados do anúncio principal ─────────────────────────────
-            $stmt = $pdo->prepare("
-                SELECT
-                    l.*,
-                    c.nome_fantasia AS company_name,
-                    cat.name AS category_name
-                FROM listings l
-                INNER JOIN companies c ON c.id = l.company_id
-                INNER JOIN categories cat ON cat.id = l.category_id
-                WHERE l.id = ? AND l.deleted_at IS NULL
-            ");
-            $stmt->execute([$id]);
-            $anuncio = $stmt->fetch();
-
-            if (!$anuncio) {
-                http_response_code(404);
-                die("<h1>Anúncio não encontrado ou indisponível.</h1>");
-            }
-
-            // ── 2. Imagens do anúncio ─────────────────────────────────────
-            $stmtImg = $pdo->prepare("SELECT url FROM listing_images WHERE listing_id = ? ORDER BY `order` ASC");
-            $stmtImg->execute([$id]);
-            $imagens = $stmtImg->fetchAll(\PDO::FETCH_COLUMN);
-            if (empty($imagens)) {
-                $imagens[] = '/re.source/public/img/no-image.png';
-            }
-
-            // ── 3. Mais anúncios desse vendedor (máx 4) ──────────────────
-            $stmtSeller = $pdo->prepare("
-                SELECT l.id, l.title, l.price, l.type, l.location_city, l.location_state,
-                       (SELECT url FROM listing_images li WHERE li.listing_id = l.id ORDER BY `order` ASC LIMIT 1) as thumb
-                FROM listings l
-                WHERE l.company_id = ? AND l.id != ? AND l.status = 'active' AND l.deleted_at IS NULL
-                ORDER BY l.created_at DESC LIMIT 4
-            ");
-            $stmtSeller->execute([$anuncio['company_id'], $id]);
-            $sellerAds = $stmtSeller->fetchAll();
-
-            // ── 4. Anúncios relevantes da mesma categoria (máx 4) ─────────
-            $stmtRelevant = $pdo->prepare("
-                SELECT l.id, l.title, l.price, l.type, l.location_city, l.location_state,
-                       (SELECT url FROM listing_images li WHERE li.listing_id = l.id ORDER BY `order` ASC LIMIT 1) as thumb
-                FROM listings l
-                WHERE l.category_id = ? AND l.company_id != ? AND l.id != ? AND l.status = 'active' AND l.deleted_at IS NULL
-                ORDER BY l.created_at DESC LIMIT 4
-            ");
-            $stmtRelevant->execute([$anuncio['category_id'], $anuncio['company_id'], $id]);
-            $relevantAds = $stmtRelevant->fetchAll();
-
-        } catch (\PDOException $e) {
-            die("Erro no banco de dados: " . $e->getMessage());
-        }
-
-        $unitLabel = [
-            'kg'      => 'Kg',
-            'ton'     => 'Ton',
-            'm2'      => 'm²',
-            'm3'      => 'm³',
-            'unidade' => 'un.',
-            'litro'   => 'L',
-            'outro'   => '',
-        ];
-
-        view('listings/detail', [
-            'anuncio'     => $anuncio,
-            'imagens'     => $imagens,
-            'sellerAds'   => $sellerAds,
-            'relevantAds' => $relevantAds,
-            'unitLabel'   => $unitLabel,
-        ]);
-    }
 
     public static function showCreate(): void
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['company_id'])) {
+        if (!self::companyId()) {
             header('Location: /re.source/login');
             exit;
         }
@@ -126,13 +30,16 @@ class ListingController
         } catch (PDOException $e) {
             $categorias = [];
         }
+        $sucesso = false;
+        $erros = [];
         require_once __DIR__ . '/../Views/listings/create.php';
     }
 
     public static function showMeus(): void
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['company_id'])) {
+        $companyId = self::companyId();
+        if (!$companyId) {
             header('Location: /re.source/login');
             exit;
         }
@@ -149,19 +56,31 @@ class ListingController
                     WHERE l.company_id = :company_id
                     ORDER BY l.created_at DESC";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([':company_id' => $_SESSION['company_id']]);
+            $stmt->execute([':company_id' => $companyId]);
             $anuncios = $stmt->fetchAll();
         } catch (PDOException $e) {
             $anuncios = [];
             $mensagem = "<div class='alert alert-danger'>Erro ao carregar anúncios: " . $e->getMessage() . "</div>";
         }
+        try {
+            $stmtEmpresa = $pdo->prepare("SELECT razao_social, nome_fantasia, logo_url FROM companies WHERE id = ?");
+            $stmtEmpresa->execute([$companyId]);
+            $empresa = $stmtEmpresa->fetch();
+            $nome_exibicao = !empty($empresa['nome_fantasia']) ? $empresa['nome_fantasia'] : ($empresa['razao_social'] ?? 'Minha Empresa');
+            $logo_url = $empresa['logo_url'] ?? null;
+        } catch (PDOException $e) {
+            $nome_exibicao = 'Erro';
+            $logo_url = null;
+        }
+
         require_once __DIR__ . '/../Views/listings/index.php';
     }
 
     public static function showEdit(): void
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['company_id'])) {
+        $companyId = self::companyId();
+        if (!$companyId) {
             header('Location: /re.source/login');
             exit;
         }
@@ -172,32 +91,9 @@ class ListingController
             exit;
         }
 
-        // Exclusão de imagem individual
-        if (isset($_GET['delete_image'])) {
-            $img_id = filter_input(INPUT_GET, 'delete_image', FILTER_VALIDATE_INT);
-            if ($img_id) {
-                try {
-                    $stmtImg = $pdo->prepare("SELECT url FROM listing_images WHERE id = :img_id AND listing_id = :listing_id");
-                    $stmtImg->execute([':img_id' => $img_id, ':listing_id' => $id]);
-                    $imgData = $stmtImg->fetch();
-                    if ($imgData) {
-                        $nome_arquivo = basename($imgData['url']);
-                        $caminho_fisico = __DIR__ . '/../../uploads/listings/' . $nome_arquivo;
-                        if (file_exists($caminho_fisico)) unlink($caminho_fisico);
-                        $stmtDelImg = $pdo->prepare("DELETE FROM listing_images WHERE id = :img_id");
-                        $stmtDelImg->execute([':img_id' => $img_id]);
-                        header("Location: /re.source/anuncios/editar?id=$id&msg=img_deleted");
-                        exit;
-                    }
-                } catch (Exception $e) {
-                    // continua para a view com o erro
-                }
-            }
-        }
-
         try {
             $stmtAnuncio = $pdo->prepare("SELECT * FROM listings WHERE id = :id AND company_id = :company_id");
-            $stmtAnuncio->execute([':id' => $id, ':company_id' => $_SESSION['company_id']]);
+            $stmtAnuncio->execute([':id' => $id, ':company_id' => $companyId]);
             $anuncio = $stmtAnuncio->fetch();
             if (!$anuncio) {
                 header('Location: /re.source/meus-anuncios');
@@ -208,6 +104,7 @@ class ListingController
             $stmtImgs = $pdo->prepare("SELECT * FROM listing_images WHERE listing_id = :id ORDER BY `order` ASC");
             $stmtImgs->execute([':id' => $id]);
             $imagens_atuais = $stmtImgs->fetchAll();
+            $erros = !empty($_GET['erros']) ? explode('|', (string) $_GET['erros']) : [];
         } catch (PDOException $e) {
             die("Erro crítico: " . $e->getMessage());
         }
@@ -223,7 +120,8 @@ class ListingController
         if (session_status() === PHP_SESSION_NONE) session_start();
         header('Content-Type: application/json; charset=utf-8');
 
-        if (!isset($_SESSION['company_id'])) {
+        $companyId = self::companyId();
+        if (!$companyId) {
             echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
             exit;
         }
@@ -271,7 +169,7 @@ class ListingController
                     VALUES (:company_id, :category_id, :type, :title, :description, :quantity, :unit, :price, :is_negotiable, :state, :city, 'active')";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
-                ':company_id'    => $_SESSION['company_id'],
+                ':company_id'    => $companyId,
                 ':category_id'   => $category_id,
                 ':type'          => $type,
                 ':title'         => $title,
@@ -307,7 +205,11 @@ class ListingController
             }
 
             $pdo->commit();
-            echo json_encode(['success' => true, 'redirect' => '/re.source/meus-anuncios']);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Anúncio publicado com sucesso!',
+                'redirect' => '/re.source/anuncio?id=' . (int) $listing_id,
+            ]);
         } catch (Exception $e) {
             $pdo->rollBack();
             echo json_encode(['success' => false, 'message' => 'Erro ao salvar: ' . $e->getMessage()]);
@@ -322,7 +224,8 @@ class ListingController
     public static function processEdit(): void
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['company_id'])) {
+        $companyId = self::companyId();
+        if (!$companyId) {
             header('Location: /re.source/login');
             exit;
         }
@@ -344,6 +247,10 @@ class ListingController
         $location_state = trim(filter_input(INPUT_POST, 'location_state', FILTER_DEFAULT));
         $location_city  = trim(filter_input(INPUT_POST, 'location_city', FILTER_DEFAULT));
         $description    = trim(filter_input(INPUT_POST, 'description', FILTER_DEFAULT));
+        $deleteImageIds = array_values(array_unique(array_filter(
+            array_map('intval', (array) ($_POST['delete_image_ids'] ?? [])),
+            static fn (int $imageId): bool => $imageId > 0
+        )));
 
         $erros = [];
         if (!in_array($type, ['offer', 'demand'])) $erros[] = "Selecione o tipo do anúncio.";
@@ -371,6 +278,7 @@ class ListingController
 
         try {
             $pdo->beginTransaction();
+            $imageFilesToDelete = [];
             $sql = "UPDATE listings SET
                         type = :type, title = :title, description = :description,
                         category_id = :category_id, quantity = :quantity, unit = :unit,
@@ -390,8 +298,38 @@ class ListingController
                 ':state'         => strtoupper($location_state),
                 ':city'          => $location_city,
                 ':id'            => $id,
-                ':company_id'    => $_SESSION['company_id'],
+                ':company_id'    => $companyId,
             ]);
+
+            if ($stmt->rowCount() === 0) {
+                $stmtOwner = $pdo->prepare("SELECT id FROM listings WHERE id = :id AND company_id = :company_id");
+                $stmtOwner->execute([':id' => $id, ':company_id' => $companyId]);
+                if (!$stmtOwner->fetchColumn()) {
+                    throw new RuntimeException('Anúncio não encontrado ou sem permissão para edição.');
+                }
+            }
+
+            if ($deleteImageIds) {
+                $placeholders = implode(',', array_fill(0, count($deleteImageIds), '?'));
+                $stmtImages = $pdo->prepare("
+                    SELECT li.id, li.url
+                    FROM listing_images li
+                    INNER JOIN listings l ON l.id = li.listing_id
+                    WHERE li.listing_id = ? AND l.company_id = ? AND li.id IN ($placeholders)
+                ");
+                $stmtImages->execute(array_merge([$id, $companyId], $deleteImageIds));
+                $imagesToDelete = $stmtImages->fetchAll(PDO::FETCH_ASSOC);
+
+                if ($imagesToDelete) {
+                    $authorizedIds = array_column($imagesToDelete, 'id');
+                    $deletePlaceholders = implode(',', array_fill(0, count($authorizedIds), '?'));
+                    $stmtDeleteImages = $pdo->prepare("DELETE FROM listing_images WHERE listing_id = ? AND id IN ($deletePlaceholders)");
+                    $stmtDeleteImages->execute(array_merge([$id], $authorizedIds));
+                    foreach ($imagesToDelete as $imageToDelete) {
+                        $imageFilesToDelete[] = __DIR__ . '/../../uploads/listings/' . basename($imageToDelete['url']);
+                    }
+                }
+            }
 
             if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
                 $upload_dir = __DIR__ . '/../../uploads/listings/';
@@ -413,6 +351,11 @@ class ListingController
             }
 
             $pdo->commit();
+            foreach ($imageFilesToDelete as $imageFile) {
+                if (is_file($imageFile)) {
+                    unlink($imageFile);
+                }
+            }
             header("Location: /re.source/anuncios/editar?id=$id&success=1");
         } catch (Exception $e) {
             $pdo->rollBack();
@@ -428,7 +371,8 @@ class ListingController
     public static function processDelete(): void
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
-        if (!isset($_SESSION['company_id'])) {
+        $companyId = self::companyId();
+        if (!$companyId) {
             header('Location: /re.source/login');
             exit;
         }
@@ -439,10 +383,17 @@ class ListingController
         if ($id) {
             try {
                 $pdo->beginTransaction();
+                $stmtOwner = $pdo->prepare("SELECT id FROM listings WHERE id = :id AND company_id = :company_id FOR UPDATE");
+                $stmtOwner->execute([':id' => $id, ':company_id' => $companyId]);
+                if (!$stmtOwner->fetchColumn()) {
+                    $pdo->rollBack();
+                    header("Location: /re.source/meus-anuncios");
+                    exit;
+                }
                 $stmtImg = $pdo->prepare("DELETE FROM listing_images WHERE listing_id = :id");
                 $stmtImg->execute([':id' => $id]);
                 $stmtDel = $pdo->prepare("DELETE FROM listings WHERE id = :id AND company_id = :company_id");
-                $stmtDel->execute([':id' => $id, ':company_id' => $_SESSION['company_id']]);
+                $stmtDel->execute([':id' => $id, ':company_id' => $companyId]);
                 $pdo->commit();
                 header("Location: /re.source/meus-anuncios?deleted=1");
                 exit;

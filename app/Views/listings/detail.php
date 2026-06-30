@@ -1,6 +1,8 @@
 <?php
-// app/Views/listings/detail.php
-require_once VIEW_PATH . '/components/header.php';
+$titulo_pagina = $anuncio['title'] . " — Re.Source";
+$unitLabel = ['kg'=>'Kg','ton'=>'Ton','m2'=>'m²','m3'=>'m³','unidade'=>'un.','litro'=>'L','outro'=>''];
+
+require_once __DIR__ . '/../components/header.php';
 ?>
 
 <style>
@@ -8,7 +10,7 @@ require_once VIEW_PATH . '/components/header.php';
    ESTILOS GERAIS
    ========================================= */
 body {
-    background-color: #f9fafb;
+    background-color: var(--bg);
 }
 
 .anuncio-main {
@@ -20,7 +22,7 @@ body {
 .anuncio-topo-titulo {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--dark);
     margin-bottom: 1.5rem;
     font-family: 'Sora', sans-serif;
 }
@@ -39,10 +41,10 @@ body {
 .olx-grid {
     display: grid;
     gap: 8px;
-    background-color: #ffffff;
+    background-color: var(--white);
     padding: 8px;
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color);
     overflow: hidden;
     width: 100%;
     height: 480px; 
@@ -54,7 +56,7 @@ body {
     height: 100%;
     overflow: hidden;
     cursor: pointer;
-    background: #e5e7eb;
+    background: var(--bg);
     border-radius: 4px;
 }
 
@@ -185,46 +187,46 @@ body {
    CARD DE COMPRA & BLOCOS DE INFORMAÇÃO
    ========================================= */
 .card-compra {
-    background: #ffffff;
+    background: var(--white);
     padding: 2rem;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color);
 }
 
-.preco-enorme { font-size: 2.5rem; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
-.txt-parcelas { font-size: 0.9rem; color: #6b7280; margin-bottom: 2rem; display: block; }
+.preco-enorme { font-size: 2.5rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
+.txt-parcelas { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; display: block; }
 .btn-acao { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 1rem; border-radius: 2rem; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; }
 .btn-chat { background-color: #157347; color: white; transition: filter 0.2s; }
 .btn-chat:hover { filter: brightness(0.9); }
-.disclaimer-contato { font-size: 0.75rem; color: #9ca3af; text-align: center; line-height: 1.4; margin-top: 1rem; }
+.disclaimer-contato { font-size: 0.75rem; color: var(--muted); text-align: center; line-height: 1.4; margin-top: 1rem; }
 
-.bloco-info { background: #ffffff; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 1.5rem; }
-.bloco-titulo { font-size: 1.25rem; font-weight: 700; color: #111827; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6; }
+.bloco-info { background: var(--white); padding: 2rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+.bloco-titulo { font-size: 1.25rem; font-weight: 700; color: var(--dark); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
 .grid-detalhes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
 .detalhe-item { display: flex; align-items: flex-start; gap: 1rem; }
-.detalhe-icone { color: #6b7280; padding-top: 0.2rem; }
+.detalhe-icone { color: var(--muted); padding-top: 0.2rem; }
 .detalhe-textos { display: flex; flex-direction: column; }
-.detalhe-label { font-size: 0.85rem; color: #6b7280; margin-bottom: 0.2rem; }
-.detalhe-valor { font-size: 1rem; color: #111827; font-weight: 600; }
-.texto-descricao { font-size: 1rem; line-height: 1.7; color: #374151; white-space: pre-line; }
+.detalhe-label { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.2rem; }
+.detalhe-valor { font-size: 1rem; color: var(--dark); font-weight: 600; }
+.texto-descricao { font-size: 1rem; line-height: 1.7; color: var(--dark); white-space: pre-line; }
 
 .localizacao-box { display: flex; align-items: center; gap: 1rem; }
-.icone-cidade { width: 48px; height: 48px; background: #ffffff; color: #157347; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #e5e7eb; overflow: hidden; }
+.icone-cidade { width: 48px; height: 48px; background: var(--white); color: #157347; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); overflow: hidden; }
 .icone-cidade img { width: 100%; height: 100%; object-fit: cover; }
 
 /* Carrossel de mais anúncios */
 .carrosel-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; margin-top: 3rem; }
-.carrosel-titulo { font-size: 1.25rem; font-weight: 700; color: #111827; }
+.carrosel-titulo { font-size: 1.25rem; font-weight: 700; color: var(--dark); }
 .link-ver-todos { color: #157347; font-size: 0.9rem; font-weight: 600; text-decoration: none; }
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
-.mini-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; text-decoration: none; color: inherit; transition: box-shadow 0.2s; position: relative; }
+.mini-card { background: var(--white); border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; text-decoration: none; color: inherit; transition: box-shadow 0.2s; position: relative; }
 .mini-card:hover { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
 .mini-card img { width: 100%; height: 160px; object-fit: cover; }
 .mini-card-info { padding: 1rem; }
-.mini-card-titulo { font-size: 0.95rem; font-weight: 600; color: #111827; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-card-titulo { font-size: 0.95rem; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mini-card-preco { font-size: 1.1rem; font-weight: 700; color: #157347; }
-.mini-card-local { font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem; }
+.mini-card-local { font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem; }
 .badge-card { position: absolute; color: white; font-size: 0.7rem; font-weight: bold; padding: 0.2rem 0.5rem; border-radius: 0.2rem; margin: 0.5rem; text-transform: uppercase; }
 
 @media (max-width: 900px) {
@@ -348,9 +350,9 @@ body {
             <i data-lucide="building-2"></i>
         </div>
         <div>
-            <div style="font-weight: 600; color: #111827; font-size: 1.1rem;"><?= htmlspecialchars($anuncio['company_name'] ?? 'Empresa Sem Nome') ?></div>
+            <div style="font-weight: 600; color: var(--dark); font-size: 1.1rem;"><?= htmlspecialchars($anuncio['company_name'] ?? 'Empresa Sem Nome') ?></div>
             
-            <div style="color: #6b7280; font-size: 0.9rem;">
+            <div style="color: var(--muted); font-size: 0.9rem;">
                 <?= htmlspecialchars($anuncio['location_city'] ?? 'Cidade não informada') ?>, 
                 <?= htmlspecialchars($anuncio['location_state'] ?? 'SC') ?>
             </div>
@@ -393,7 +395,14 @@ body {
     </div>
 </div>
 
+<script src="https://unpkg.com/lucide@latest"></script>
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+
     const loadedImagesArray = <?php echo json_encode($imagens, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
     let indiceAtual = 0;
 
@@ -445,4 +454,4 @@ body {
     });
 </script>
 
-<?php require_once VIEW_PATH . '/components/footer.php'; ?>
+<?php require_once __DIR__ . '/../components/footer.php'; ?>

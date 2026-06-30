@@ -12,8 +12,9 @@ class UserAuth
             session_start();
         }
 
-        // Verifica se há dados de usuário ou company_id na sessão
-        if (empty($_SESSION['user']) && empty($_SESSION['company_id'])) {
+        // Mantém compatibilidade com sessões antigas, mas exige uma empresa válida.
+        $companyId = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
+        if (empty($companyId)) {
             header('Location: /re.source/login?aviso=' . urlencode('Faça login para continuar.'));
             exit;
         }

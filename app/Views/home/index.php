@@ -50,8 +50,8 @@
       <a href="#impacto">Impacto ESG</a>
       <a href="#seguranca">Segurança</a>
      <div class="mobile-nav-ctas">
-        <a href="/re.source/login.php" class="btn-cta-nav">Entrar</a>
-        <a href="/re.source/cadastro.php" class="btn-cta-nav">Cadastrar minha empresa</a>
+        <a href="/re.source/login" class="btn-cta-nav">Entrar</a>
+        <a href="/re.source/cadastro" class="btn-cta-nav">Cadastrar minha empresa</a>
       </div>
     </div>
   </header>

@@ -1,26 +1,47 @@
 <?php
-// app/Views/estatisticas/index.php
-require_once VIEW_PATH . '/components/header.php';
+$nome_exibicao = $nome_empresa;
+$titulo_pagina = $titulo_pagina ?? 'Estatísticas do Painel — Re.Source';
+require_once __DIR__ . '/../components/header.php';
 ?>
 
 <style>
 /* Layout Base Unificado */
-.dashboard-layout { max-width: 1280px; margin: 2rem auto; padding: 0 1.5rem; display: grid; grid-template-columns: 260px 1fr; gap: 2rem; align-items: start; }
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.dashboard-layout {
+    max-width: 1280px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+.dashboard-sidebar {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem 1rem;
+    position: sticky;
+    top: 100px;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+}
 
-.dashboard-sidebar { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 1.5rem 1rem; position: sticky; top: 100px; height: calc(100vh - 120px); overflow-y: auto; }
 .sidebar-user { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-.sidebar-avatar { width: 64px; height: 64px; background: var(--bg); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; color: var(--green); }
-.sidebar-user h3 { font-family: var(--font-main); font-size: 1rem; color: var(--dark); }
-.sidebar-user p { font-size: 0.75rem; color: var(--muted); }
+.sidebar-avatar {
+    width: 64px; height: 64px;
+    background: var(--bg);
+    border-radius: 50%;
+    margin: 0 auto 0.75rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--green);
+    overflow: hidden;
+    border: 2px solid var(--border-color);
+}
+.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
 .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.9rem; font-weight: 500; color: var(--muted); transition: all 0.2s; }
 .sidebar-link:hover { background: var(--bg); color: var(--dark); }
 .sidebar-link.active { background: rgba(21, 115, 71, 0.1); color: var(--green); font-weight: 600; }
-.sidebar-link i { width: 18px; height: 18px; }
 
 .dashboard-content { display: flex; flex-direction: column; gap: 1.5rem; position: sticky; top: 100px; height: calc(100vh - 120px); overflow-y: auto; padding-right: 10px; }
 .dash-header { display: flex; justify-content: space-between; align-items: center; }
@@ -36,7 +57,7 @@ require_once VIEW_PATH . '/components/header.php';
 .icon-blue { background: rgba(13, 110, 253, 0.1); color: #0D6EFD; }
 .dash-card-value { font-family: var(--font-main); font-size: 2rem; font-weight: 700; color: var(--dark); }
 
-.btn-sacar { background-color: var(--green); color: white; border: none; border-radius: 0.5rem; padding: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s; text-align: center; width: 100%; }
+.btn-sacar { display: block; box-sizing: border-box; background-color: var(--green); color: white; border: none; border-radius: 0.5rem; padding: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s; text-align: center; text-decoration: none; width: 100%; }
 .btn-sacar:hover { background-color: #0f5132; }
 .btn-sacar:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.7; }
 
@@ -57,7 +78,6 @@ require_once VIEW_PATH . '/components/header.php';
 .status-pendente { background: rgba(253, 126, 20, 0.1); color: #FD7E14; }
 .status-rejeitado { background: rgba(220, 53, 69, 0.1); color: #DC3545; }
 
-/* Mensagens de Retorno */
 .alert { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-weight: 500; font-size: 0.9rem; }
 .alert-success { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
 .alert-error { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
@@ -71,17 +91,18 @@ require_once VIEW_PATH . '/components/header.php';
 
 <main class="dashboard-layout">
     <aside class="dashboard-sidebar">
-    <div class="sidebar-user">
-            <div class="sidebar-avatar" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">
                 <?php if (!empty($logo_url)): ?>
-                    <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da Empresa" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da empresa">
                 <?php else: ?>
-                    <i data-lucide="building-2" style="width: 32px; height: 32px;"></i>
+                    <i data-lucide="building-2" style="width:32px;height:32px;"></i>
                 <?php endif; ?>
             </div>
-            <h3><?= htmlspecialchars($nome_empresa); ?></h3>
-            <p>Razão Social: <?= htmlspecialchars($empresa['razao_social'] ?? 'Não informada'); ?></p>
+            <h3><?= htmlspecialchars($nome_exibicao) ?></h3>
+            <p>Conta B2B Verificada</p>
         </div>
+
         <nav class="sidebar-nav">
             <a href="/re.source/estatisticas" class="sidebar-link active"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
             <a href="/re.source/meus-anuncios" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
@@ -103,7 +124,7 @@ require_once VIEW_PATH . '/components/header.php';
 
         <?php if(isset($_SESSION['saque_msg'])): ?>
             <div class="alert alert-<?= $_SESSION['saque_tipo']; ?>">
-                <?= $_SESSION['saque_msg']; ?>
+                <?= htmlspecialchars($_SESSION['saque_msg'], ENT_QUOTES, 'UTF-8'); ?>
             </div>
             <?php unset($_SESSION['saque_msg']); unset($_SESSION['saque_tipo']); ?>
         <?php endif; ?>
@@ -116,7 +137,7 @@ require_once VIEW_PATH . '/components/header.php';
                 </div>
                 <div class="dash-card-value">R$ <?= number_format($saldo_disponivel, 2, ',', '.'); ?></div>
                 <?php if($saldo_disponivel > 0): ?>
-                    <button class="btn-sacar" onclick="abrirModal()">Solicitar Saque</button>
+                    <a class="btn-sacar" href="/re.source/estatisticas/saque">Solicitar Saque</a>
                 <?php else: ?>
                     <button class="btn-sacar" disabled>Saldo Insuficiente</button>
                 <?php endif; ?>
@@ -240,57 +261,13 @@ require_once VIEW_PATH . '/components/header.php';
     </div>
 </main>
 
-<div class="modal-overlay" id="modalSaque">
-    <div class="modal-content">
-        <h3 style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="banknotes" style="color: var(--green);"></i> Solicitar Saque</h3>
-        <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem;">Saldo liberado: <strong>R$ <?= number_format($saldo_disponivel, 2, ',', '.'); ?></strong></p>
-        
-        <form action="/re.source/estatisticas/processar-saque" method="POST" id="formSaque">
-            <label style="font-size: 0.85rem; font-weight: 600; color: var(--dark);">Valor a sacar (R$)</label>
-            <input type="number" name="valor_saque" id="inputValor" max="<?= $saldo_disponivel; ?>" step="0.01" required placeholder="Ex: 1000.00">
-            
-            <label style="font-size: 0.85rem; font-weight: 600; color: var(--dark);">Chave PIX</label>
-            <input type="text" name="chave_pix" required placeholder="CNPJ, E-mail, Celular ou Aleatória">
-            
-            <p id="msgErroSaldo" style="color: #dc3545; font-size: 0.85rem; display: none; margin-top: -0.5rem; margin-bottom: 1rem;">O valor solicitado excede o saldo disponível.</p>
-
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button type="button" class="btn-sacar" style="background: transparent; color: #6c757d; border: 1px solid #cbd5e1;" onclick="fecharModal()">Cancelar</button>
-                <button type="submit" class="btn-sacar" id="btnConfirmarSaque">Confirmar Saque</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const saldoMaximo = <?= $saldo_disponivel; ?>;
-    const inputValor = document.getElementById('inputValor');
-    const msgErro = document.getElementById('msgErroSaldo');
-    const btnConfirmar = document.getElementById('btnConfirmarSaque');
-
-    function abrirModal() { document.getElementById('modalSaque').style.display = 'flex'; }
-    function fecharModal() { 
-        document.getElementById('modalSaque').style.display = 'none'; 
-        inputValor.value = '';
-        msgErro.style.display = 'none';
-        btnConfirmar.disabled = false;
-    }
-
-    // Validação em tempo real
-    inputValor.addEventListener('input', function() {
-        if(parseFloat(this.value) > saldoMaximo) {
-            msgErro.style.display = 'block';
-            btnConfirmar.disabled = true;
-        } else {
-            msgErro.style.display = 'none';
-            btnConfirmar.disabled = false;
-        }
-    });
-
     document.addEventListener("DOMContentLoaded", function() {
-        const labelsViews = <?= json_encode($labelsViews); ?>;
-        const dataViews = <?= json_encode($dataViews); ?>;
+        if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+        
+        const labelsViews = <?= json_encode($labelsViews, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+        const dataViews = <?= json_encode($dataViews, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
         
         const ctxViews = document.getElementById('viewsChart').getContext('2d');
         let gradientGreen = ctxViews.createLinearGradient(0, 0, 0, 400);
@@ -323,8 +300,8 @@ require_once VIEW_PATH . '/components/header.php';
             }
         });
 
-        const labelsCategorias = <?= json_encode($catLabels); ?>;
-        const dataCategorias = <?= json_encode($catData); ?>;
+        const labelsCategorias = <?= json_encode($catLabels, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+        const dataCategorias = <?= json_encode($catData, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
         const cores = ['#157347', '#0D6EFD', '#FD7E14', '#6C757D', '#6f42c1', '#d63384', '#0dcaf0'];
 
         const ctxMaterials = document.getElementById('materialsChart').getContext('2d');
@@ -352,4 +329,4 @@ require_once VIEW_PATH . '/components/header.php';
     });
 </script>
 
-<?php require_once VIEW_PATH . '/components/footer.php'; ?>
+<?php require_once __DIR__ . '/../components/footer.php'; ?>

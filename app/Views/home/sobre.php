@@ -1,0 +1,203 @@
+<?php 
+// 1. Configurações dinâmicas para esta página específica
+$titulo_pagina = $titulo_pagina ?? "Sobre Nós — Re.Source";
+$css_especifico = "/re.source/public/css/sobre.css";
+
+// 2. Puxa o cabeçalho global
+require_once __DIR__ . '/../components/header.php'; 
+?>
+
+<section class="about-hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span>Economia Circular · Joinville · ESG</span>
+    </div>
+    <h1 class="hero-title">
+      Acreditamos que<br />
+      <em>resíduo é recurso.</em>
+    </h1>
+    <p class="hero-subtitle">
+      A Re.Source nasceu para transformar a forma como a indústria catarinense 
+      enxerga seus rejeitos — conectando quem descarta com quem pode aproveitar.
+    </p>
+    <div class="hero-scroll-hint">
+      <i data-lucide="chevrons-down"></i>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-img-wrap">
+      <img src="https://images.unsplash.com/photo-1766246719951-0d21674dd9b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=900" alt="Fábrica sustentável" />
+      <div class="hero-img-overlay"></div>
+      <div class="hero-img-badge">
+        <div class="badge-dot"></div>
+        <span>Plataforma B2B Sustentável</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mvv-section">
+  <div class="mvv-inner">
+    <div class="mvv-card">
+      <div class="mvv-icon"><i data-lucide="target"></i></div>
+      <h3>Missão</h3>
+      <p>Facilitar a circulação de resíduos industriais criando uma ponte eficiente entre empresas geradoras e empresas consumidoras, reduzindo o impacto ambiental e gerando valor econômico.</p>
+    </div>
+    <div class="mvv-card featured">
+      <div class="mvv-icon"><i data-lucide="eye"></i></div>
+      <h3>Visão</h3>
+      <p>Ser a principal plataforma de economia circular do Sul do Brasil até 2030, tornando Joinville referência nacional em gestão sustentável de resíduos industriais.</p>
+    </div>
+    <div class="mvv-card">
+      <div class="mvv-icon"><i data-lucide="heart"></i></div>
+      <h3>Valores</h3>
+      <p>Sustentabilidade, transparência, inovação e responsabilidade socioambiental guiam cada decisão que tomamos — do código à conexão entre empresas.</p>
+    </div>
+  </div>
+</section>
+
+<section class="story-section">
+  <div class="story-inner">
+    <div class="story-text">
+      <div class="section-tag">Nossa História</div>
+      <h2 class="section-heading">De um problema real<br />para uma solução real.</h2>
+      <p>Tudo começou quando um group de estudantes do Senai Joinville percebeu que as indústrias da região descartavam toneladas de materiais reaproveitáveis todos os meses — enquanto outras empresas pagavam caro pelos mesmos insumos.</p>
+      <p>O problema não era falta de recurso. Era falta de conexão.</p>
+      <p>Em 2024, a Re.Source nasceu como projeto acadêmico com um objetivo claro: criar a ponte que faltava. Uma plataforma simples, eficiente e acessível para que qualquer indústria de Joinville possa anunciar seus resíduos ou encontrar os materiais que precisa.</p>
+      <div class="story-highlight">
+        <i data-lucide="quote"></i>
+        <blockquote>
+          "O resíduo de uma empresa é a matéria-prima de outra. Nosso papel é tornar essa troca óbvia e fácil."
+        </blockquote>
+      </div>
+    </div>
+    <div class="story-visual">
+      <div class="story-img-stack">
+        <img class="img-back" src="https://images.unsplash.com/photo-1748944079305-8d2a86e7ad32?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Equipe Re.Source" />
+        <img class="img-front" src="https://images.unsplash.com/photo-1646803101279-d1a2461a5eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" alt="Economia circular" />
+        <div class="img-stat-chip">
+          <span class="chip-value">2026</span>
+          <span class="chip-label">Fundação</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how-section">
+  <div class="how-inner">
+    <div class="section-tag center">Como Funciona</div>
+    <h2 class="section-heading center">Simples assim.</h2>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-number">01</div>
+        <div class="step-icon"><i data-lucide="building-2"></i></div>
+        <h4>Cadastre sua Empresa</h4>
+        <p>Crie seu perfil gratuitamente e homologue sua empresa na plataforma em poucos minutos.</p>
+      </div>
+      <div class="how-connector"><i data-lucide="arrow-right"></i></div>
+      <div class="how-step">
+        <div class="step-number">02</div>
+        <div class="step-icon"><i data-lucide="megaphone"></i></div>
+        <h4>Anuncie ou Busque</h4>
+        <p>Publique seus resíduos disponíveis ou pesquise por materiais que sua operação precisa.</p>
+      </div>
+      <div class="how-connector"><i data-lucide="arrow-right"></i></div>
+      <div class="how-step">
+        <div class="step-number">03</div>
+        <div class="step-icon"><i data-lucide="handshake"></i></div>
+        <h4>Conecte e Negocie</h4>
+        <p>Entre em contato diretamente com a empresa, feche o acordo e gere valor para ambos os lados.</p>
+      </div>
+      <div class="how-connector"><i data-lucide="arrow-right"></i></div>
+      <div class="how-step">
+        <div class="step-number">04</div>
+        <div class="step-icon"><i data-lucide="leaf"></i></div>
+        <h4>Impacto Real</h4>
+        <p>Menos resíduo no aterro, menos custo operacional, mais ESG para o seu relatório.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="team-section">
+  <div class="team-inner">
+    <div class="section-tag">Quem Faz</div>
+    <h2 class="section-heading">A equipe por trás<br />da Re.Source.</h2>
+    <p class="team-desc">Estudantes do Senai Joinville unidos por um propósito: provar que tecnologia e sustentabilidade andam juntas.</p>
+
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar" style="background: linear-gradient(135deg, #157347 0%, #0D4A2E 100%);">
+          <i data-lucide="user"></i>
+        </div>
+        <div class="team-info">
+          <h4>Desenvolvimento</h4>
+          <span>Front-end & Back-end</span>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background: linear-gradient(135deg, #0D6EFD 0%, #0043a8 100%);">
+          <i data-lucide="palette"></i>
+        </div>
+        <div class="team-info">
+          <h4>Design UX/UI</h4>
+          <span>Interface & Experiência</span>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background: linear-gradient(135deg, #DC3545 0%, #8B0000 100%);">
+          <i data-lucide="bar-chart-2"></i>
+        </div>
+        <div class="team-info">
+          <h4>Negócios</h4>
+          <span>Estratégia & Mercado</span>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background: linear-gradient(135deg, #fd7e14 0%, #c44d00 100%);">
+          <i data-lucide="shield-check"></i>
+        </div>
+        <div class="team-info">
+          <h4>Sustentabilidade</h4>
+          <span>ESG & Impacto</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-glow"></div>
+    <div class="cta-content">
+      <h2>Faça parte da mudança.</h2>
+      <p>Cadastre sua empresa e comece a transformar resíduos em receita hoje mesmo.</p>
+      <div class="cta-buttons">
+        <a href="cadastro.html" class="cta-btn-primary">Cadastrar Empresa</a>
+        <a href="#" class="cta-btn-secondary">Ver Anúncios</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Scroll reveal (Efeito de surgimento dos cards ao rolar a página)
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('revealed'); }
+    });
+  }, { threshold: 0.15 });
+  
+  document.querySelectorAll('.mvv-card, .how-step, .team-card, .story-text, .story-visual').forEach(el => {
+    el.classList.add('reveal');
+    observer.observe(el);
+  });
+</script>
+
+<?php 
+// 3. Puxa o rodapé global
+require_once __DIR__ . '/../components/footer.php'; 
+?>

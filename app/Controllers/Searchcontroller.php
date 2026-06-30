@@ -19,7 +19,8 @@ class SearchController
         $q           = trim(filter_input(INPUT_GET, 'q',             FILTER_DEFAULT) ?? '');
         $category_id = filter_input(INPUT_GET, 'category_id',        FILTER_VALIDATE_INT) ?: null;
         $type        = filter_input(INPUT_GET, 'type',               FILTER_DEFAULT) ?? '';
-        $state       = strtoupper(trim(filter_input(INPUT_GET, 'state', FILTER_DEFAULT) ?? ''));
+        $state       = strtoupper(trim(filter_input(INPUT_GET, 'location_state', FILTER_DEFAULT) ?? ''));
+        $city        = trim(filter_input(INPUT_GET, 'location_city', FILTER_DEFAULT) ?? '');
 
         // ── Categorias para o filtro lateral ────────────────
         try {
@@ -85,6 +86,11 @@ class SearchController
             if (!empty($state)) {
                 $sql .= " AND l.location_state = :state";
                 $params[':state'] = $state;
+            }
+
+            if (!empty($city)) {
+                $sql .= " AND l.location_city = :city";
+                $params[':city'] = $city;
             }
 
             $sql .= " ORDER BY l.created_at DESC";

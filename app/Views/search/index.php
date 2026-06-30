@@ -1,266 +1,451 @@
-<!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>
-    <?php echo $categoriaSelecionada ? htmlspecialchars($categoriaSelecionada) . ' — ' : ''; ?>
-    Buscar Resíduos — Re.Source
-  </title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <link rel="stylesheet" href="/re.source/public/css/base.css" />
-  <link rel="stylesheet" href="/re.source/public/css/search.css" />
-</head>
-<body>
+<?php
+$titulo_pagina = "Buscar Resíduos — Re.Source";
+require_once __DIR__ . '/../components/header.php';
+?>
 
-<!-- ══ HEADER (igual ao da base) ══ -->
-<header>
-  <div class="header-top">
-    <div class="header-top-inner">
+<style>
+/* =========================================
+   ESTILOS DA PÁGINA DE BUSCA
+   ========================================= */
+.search-page {
+    max-width: 1400px; /* Aumentei de 1200px para 1400px para empurrar o menu pra esquerda */
+    margin: 2rem auto;
+    padding: 0 2rem;
+    display: flex;
+    gap: 2.5rem; /* Dei um espacinho um pouco maior entre os filtros e os cards */
+    align-items: flex-start;
+}
 
-      <div class="logo">
-        <img src="/re.source/public/img/logos/logo.png" alt="Re.Source" />
-      </div>
+/* --- BARRA LATERAL (FILTROS) --- */
+.filters-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--white, #ffffff);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    position: sticky;
+    top: 2rem;
+}
 
-      <nav class="desktop-nav">
-        <a href="/re.source/base"><i data-lucide="home"></i> Página Inicial</a>
-        <a href="/re.source/sobre"><i data-lucide="info"></i> Sobre Nós</a>
-        <a href="#"><i data-lucide="phone"></i> Contato</a>
-      </nav>
+.filters-sidebar h3 {
+    font-family: var(--font-main, sans-serif);
+    font-size: 1.25rem;
+    color: #111827;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
 
-      <div class="header-actions">
-        <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
-          <i data-lucide="menu" class="icon-menu"></i>
-          <i data-lucide="x"   class="icon-close"></i>
-        </button>
-      </div>
+.filter-group {
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
 
-      <div class="dropdown-menu" id="dropdownMenu">
-        <div class="dropdown-label">Minha Conta</div>
-        <a href="/re.source/conta" class="menu-btn">Detalhes da conta</a>
-        <a href="#" class="menu-btn">Estatísticas</a>
-        <a href="#" class="menu-btn">Configurações</a>
-        <div class="dropdown-divider"></div>
-        <button class="btn-announce">Anunciar Resíduo</button>
-      </div>
+.filter-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+}
 
-    </div>
-  </div>
+.filter-group input[type="text"],
+.filter-group select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s;
+}
 
-  <div class="search-bar-wrap">
-    <div class="search-bar-inner">
-      <form class="search-pill" action="/re.source/busca" method="GET" id="headerSearchForm">
-        <div class="search-field">
-          <label>O que busca?</label>
-          <input type="text" name="q" id="headerQ" placeholder="Ex: Serragem" value="<?php echo htmlspecialchars($q); ?>" />
-        </div>
+.filter-group input[type="text"]:focus,
+.filter-group select:focus {
+    border-color: var(--green, #157347);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(21, 115, 71, 0.1);
+}
 
-        <div class="category-field">
-          <label>Categoria</label>
-          <button type="button" class="category-trigger" id="categoryTrigger">
-            <span id="categoryLabel"><?php echo $categoriaSelecionada ?? 'Todas as categorias'; ?></span>
-            <i data-lucide="chevron-down"></i>
-          </button>
-          <div class="category-dropdown" id="categoryDropdown">
-            <button type="button" onclick="selectCategory('', 'Todas as categorias')">Todas as categorias</button>
-            <?php foreach ($categorias as $cat): ?>
-              <button type="button" onclick="selectCategory('<?php echo $cat['id']; ?>', '<?php echo htmlspecialchars($cat['name']); ?>')">
-                <?php echo htmlspecialchars($cat['name']); ?>
-              </button>
-            <?php endforeach; ?>
-          </div>
-          <input type="hidden" name="category_id" id="headerCategoryId" value="<?php echo htmlspecialchars($category_id ?? ''); ?>" />
-        </div>
+.radio-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
 
-        <button type="submit" class="search-btn" id="headerSearchBtn"><i data-lucide="search"></i></button>
-      </form>
-    </div>
-  </div>
-</header>
+.radio-group-vertical label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
 
-<!-- ══ CONTEÚDO PRINCIPAL ══ -->
-<main class="search-layout">
+.btn-filter {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    background: var(--green, #157347);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
 
-  <!-- ── SIDEBAR DE FILTROS ── -->
-  <aside class="search-sidebar">
-    <div class="sidebar-header">
-      <i data-lucide="sliders-horizontal"></i>
-      <span>Filtros</span>
-    </div>
+.btn-filter:hover { background: var(--green-d, #0f5132); }
+.btn-clear {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+}
+.btn-clear:hover { background: #f3f4f6; color: #111827; }
 
-    <form action="/re.source/busca" method="GET" class="filters-form">
+/* --- RESULTADOS --- */
+.results-area {
+    flex: 1;
+}
 
-      <div class="filter-group">
-        <label for="q">O que você procura?</label>
-        <input
-          type="text"
-          id="q"
-          name="q"
-          value="<?php echo htmlspecialchars($q); ?>"
-          placeholder="Ex: Paletes, Plástico..."
-        />
-      </div>
+.results-header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-      <div class="filter-group">
-        <label>Tipo de Anúncio</label>
-        <div class="radio-group">
-          <label class="radio-label <?php echo empty($type) ? 'active' : ''; ?>">
-            <input type="radio" name="type" value="" <?php echo empty($type) ? 'checked' : ''; ?>>
-            <span>Todos</span>
-          </label>
-          <label class="radio-label <?php echo $type === 'offer' ? 'active' : ''; ?>">
-            <input type="radio" name="type" value="offer" <?php echo $type === 'offer' ? 'checked' : ''; ?>>
-            <span>Ofertas</span>
-          </label>
-          <label class="radio-label <?php echo $type === 'demand' ? 'active' : ''; ?>">
-            <input type="radio" name="type" value="demand" <?php echo $type === 'demand' ? 'checked' : ''; ?>>
-            <span>Demandas</span>
-          </label>
-        </div>
-      </div>
+.results-header h2 {
+    font-size: 1.5rem;
+    color: #111827;
+}
 
-      <div class="filter-group">
-        <label for="category_id">Categoria</label>
-        <select id="category_id" name="category_id">
-          <option value="">Todas as categorias</option>
-          <?php foreach ($categorias as $cat): ?>
-            <option value="<?php echo $cat['id']; ?>" <?php echo ((int)$category_id === (int)$cat['id']) ? 'selected' : ''; ?>>
-              <?php echo htmlspecialchars($cat['name']); ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+.results-count {
+    color: #6b7280;
+    font-size: 0.95rem;
+}
 
-      <div class="filter-group">
-        <label for="state">Estado</label>
-        <select id="state" name="state" data-selected="<?php echo htmlspecialchars($state); ?>">
-          <option value="">Todos os estados</option>
-        </select>
-      </div>
+.cards-grid {
+    display: grid;
+    /* Reduzi um pouquinho o tamanho mínimo para garantir que caibam 3 cards com folga */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+    gap: 1.5rem;
+}
 
-      <div class="filter-actions">
-        <button type="submit" class="btn-filter">
-          <i data-lucide="search"></i> Buscar
-        </button>
-        <a href="/re.source/busca" class="btn-clear">
-          <i data-lucide="x"></i> Limpar
-        </a>
-      </div>
+.ad-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
 
-    </form>
-  </aside>
+.ad-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
 
-  <!-- ── ÁREA DE RESULTADOS ── -->
-  <section class="search-results">
+.ad-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: #f3f4f6;
+}
 
-    <div class="results-header">
-      <div class="results-title">
-        <?php if ($categoriaSelecionada): ?>
-          <h1><?php echo htmlspecialchars($categoriaSelecionada); ?></h1>
-        <?php elseif (!empty($q)): ?>
-          <h1>Resultados para "<?php echo htmlspecialchars($q); ?>"</h1>
-        <?php else: ?>
-          <h1>Todos os Anúncios</h1>
-        <?php endif; ?>
-        <span class="results-count"><?php echo count($anuncios); ?> anúncio(s) encontrado(s)</span>
-      </div>
-    </div>
+.ad-image-placeholder {
+    width: 100%;
+    height: 180px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
 
-    <?php if (empty($anuncios)): ?>
-      <div class="empty-state">
-        <i data-lucide="search-x"></i>
-        <h3>Nenhum resultado encontrado</h3>
-        <p>Tente ajustar os filtros ou buscar por palavras diferentes.</p>
-        <a href="/re.source/busca" class="btn-filter">Ver todos os anúncios</a>
-      </div>
+.ad-content {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
 
-    <?php else: ?>
-      <div class="listings-grid-search">
-        <?php foreach ($anuncios as $ad): ?>
-          <a href="/re.source/anuncio?id=<?php echo $ad['id']; ?>" class="listing-card-search">
+.ad-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
-            <div class="card-img-wrap">
-              <?php if (!empty($ad['main_image'])): ?>
-                <img src="<?php echo htmlspecialchars($ad['main_image']); ?>" alt="<?php echo htmlspecialchars($ad['title']); ?>" />
-              <?php else: ?>
-                <div class="card-img-placeholder">
-                  <i data-lucide="image"></i>
+.ad-meta {
+    font-size: 0.85rem;
+    color: #6b7280;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    width: fit-content;
+    margin-bottom: 0.5rem;
+}
+.badge-offer { background: #e0f2fe; color: #0284c7; }
+.badge-demand { background: #fef3c7; color: #d97706; }
+
+.ad-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ad-price {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--green, #157347);
+}
+
+.btn-view {
+    padding: 0.5rem 1rem;
+    background: #f3f4f6;
+    color: #111827;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-view:hover {
+    background: #e5e7eb;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #ffffff;
+    border: 1px dashed #d1d5db;
+    border-radius: 1rem;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .search-page { flex-direction: column; }
+    .filters-sidebar { width: 100%; position: static; }
+}
+</style>
+
+<main class="search-page">
+    
+    <aside class="filters-sidebar">
+        <h3><i data-lucide="sliders-horizontal"></i> Filtros</h3>
+        
+        <form action="/re.source/busca" method="GET">
+            <div class="filter-group">
+                <label for="q">O que você procura?</label>
+                <input type="text" id="q" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="Ex: Paletes, Plástico...">
+            </div>
+
+            <div class="filter-group">
+                <label>Tipo de Anúncio</label>
+                <div class="radio-group-vertical">
+                    <label>
+                        <input type="radio" name="type" value="" <?php echo empty($type) ? 'checked' : ''; ?>> 
+                        Todos
+                    </label>
+                    <label>
+                        <input type="radio" name="type" value="offer" <?php echo ($type === 'offer') ? 'checked' : ''; ?>> 
+                        Ofertas (Disponíveis)
+                    </label>
+                    <label>
+                        <input type="radio" name="type" value="demand" <?php echo ($type === 'demand') ? 'checked' : ''; ?>> 
+                        Demandas (Procurando)
+                    </label>
                 </div>
-              <?php endif; ?>
-
-              <span class="card-badge <?php echo $ad['type'] === 'demand' ? 'badge-demand' : ''; ?>">
-                <?php echo $ad['type'] === 'offer' ? 'Oferta' : 'Demanda'; ?>
-              </span>
             </div>
 
-            <div class="card-body">
-              <span class="card-category"><?php echo htmlspecialchars($ad['category_name']); ?></span>
-              <h3 class="card-title"><?php echo htmlspecialchars($ad['title']); ?></h3>
-
-              <div class="card-meta">
-                <span>
-                  <i data-lucide="box"></i>
-                  <?php echo number_format((float)$ad['quantity'], 0, ',', '.') . ' ' . $ad['unit']; ?>
-                </span>
-                <?php if (!empty($ad['location_city'])): ?>
-                  <span>
-                    <i data-lucide="map-pin"></i>
-                    <?php echo htmlspecialchars($ad['location_city'] . ' — ' . $ad['location_state']); ?>
-                  </span>
-                <?php endif; ?>
-              </div>
-
-              <div class="card-footer">
-                <?php if ($ad['type'] === 'offer'): ?>
-                  <span class="card-price">
-                    <?php if ((float)$ad['price'] > 0): ?>
-                      R$ <?php echo number_format((float)$ad['price'], 2, ',', '.'); ?>
-                    <?php else: ?>
-                      Doação
-                    <?php endif; ?>
-                  </span>
-                <?php else: ?>
-                  <span class="card-price demand">Procurando</span>
-                <?php endif; ?>
-
-                <span class="card-company">
-                  <i data-lucide="building-2"></i>
-                  <?php echo htmlspecialchars($ad['company_name'] ?? ''); ?>
-                </span>
-              </div>
+            <div class="filter-group">
+                <label for="category_id">Categoria</label>
+                <select id="category_id" name="category_id">
+                    <option value="">Todas as Categorias</option>
+                    <?php foreach ($categorias as $cat): ?>
+                        <option value="<?php echo $cat['id']; ?>" <?php echo ($category_id == $cat['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($cat['name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
-          </a>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
+            <div class="filter-group">
+                <label for="location_state">Estado</label>
+                <select id="location_state" name="location_state" data-selected="<?php echo htmlspecialchars($state); ?>">
+                    <option value="">Todos os Estados</option>
+                </select>
+            </div>
 
-  </section>
+            <div class="filter-group">
+                <label for="location_city">Cidade</label>
+                <select id="location_city" name="location_city" disabled data-selected="<?php echo htmlspecialchars($city); ?>">
+                    <option value="">Selecione o Estado primeiro</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-filter">Aplicar Filtros</button>
+            <a href="/re.source/busca" class="btn-clear">Limpar Busca</a>
+        </form>
+    </aside>
+
+    <section class="results-area">
+        <div class="results-header">
+            <h2>Resultados da Busca</h2>
+            <span class="results-count"><?php echo count($anuncios); ?> anúncio(s) encontrado(s)</span>
+        </div>
+
+        <?php if (empty($anuncios)): ?>
+            <div class="empty-state">
+                <i data-lucide="search-x" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <h3>Nenhum resultado encontrado</h3>
+                <p>Tente ajustar os filtros ou buscar por palavras diferentes.</p>
+            </div>
+        <?php else: ?>
+            <div class="cards-grid">
+                <?php foreach ($anuncios as $ad): ?>
+                    <div class="ad-card">
+                        <?php if (!empty($ad['main_image'])): ?>
+                            <img src="<?php echo htmlspecialchars($ad['main_image']); ?>" alt="Imagem" class="ad-image">
+                        <?php else: ?>
+                            <div class="ad-image-placeholder">
+                                <i data-lucide="image" style="width: 32px; height: 32px;"></i>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="ad-content">
+                            <?php if ($ad['type'] === 'offer'): ?>
+                                <span class="badge badge-offer">Oferta</span>
+                            <?php else: ?>
+                                <span class="badge badge-demand">Demanda</span>
+                            <?php endif; ?>
+                            
+                            <h3 class="ad-title"><?php echo htmlspecialchars($ad['title']); ?></h3>
+                            
+                            <div class="ad-meta">
+                                <span><i data-lucide="tag" style="width:14px; height:14px; vertical-align:middle;"></i> <?php echo htmlspecialchars($ad['category_name']); ?></span>
+                                <span><i data-lucide="box" style="width:14px; height:14px; vertical-align:middle;"></i> <?php echo floatval($ad['quantity']) . ' ' . $ad['unit']; ?></span>
+                                <span><i data-lucide="map-pin" style="width:14px; height:14px; vertical-align:middle;"></i> <?php echo htmlspecialchars($ad['location_city'] . ' - ' . $ad['location_state']); ?></span>
+                            </div>
+
+                            <div class="ad-footer">
+                                <?php if ($ad['type'] === 'offer'): ?>
+                                    <span class="ad-price">
+                                        <?php echo ($ad['price'] > 0) ? 'R$ ' . number_format($ad['price'], 2, ',', '.') : 'Doação'; ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span class="ad-price" style="color: #d97706;">Busca</span>
+                                <?php endif; ?>
+
+                                <a href="/re.source/anuncio?id=<?php echo $ad['id']; ?>" class="btn-view">Ver Detalhes</a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </section>
 
 </main>
 
-<script src="/re.source/public/js/base.js"></script>
-<script src="/re.source/public/js/search.js"></script>
 <script>
-// Busca pelo header pill — redireciona com os parâmetros preenchidos
-document.getElementById('headerSearchBtn').addEventListener('click', function () {
-  const q    = document.getElementById('headerQ').value.trim();
-  const catId = document.getElementById('headerCategoryId').value;
-  let url = '/re.source/busca?';
-  if (q)     url += 'q='           + encodeURIComponent(q) + '&';
-  if (catId) url += 'category_id=' + encodeURIComponent(catId) + '&';
-  window.location.href = url.replace(/&$/, '');
-});
+// ==========================================
+// INTEGRAÇÃO COM API DO IBGE
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
-// Seleção de categoria no dropdown do header
-function selectCategory(id, label) {
-  document.getElementById('categoryLabel').textContent = label;
-  document.getElementById('headerCategoryId').value = id;
-  document.getElementById('categoryDropdown').classList.remove('open');
-  document.getElementById('categoryTrigger').classList.toggle('selected', id !== '');
-}
+    const ufSelect = document.getElementById('location_state');
+    const citySelect = document.getElementById('location_city');
+    const selectedUf = ufSelect.getAttribute('data-selected');
+    const selectedCity = citySelect.getAttribute('data-selected');
+
+    // 1. Carregar Estados
+    fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
+        .then(response => response.json())
+        .then(states => {
+            ufSelect.innerHTML = '<option value="">Todos os Estados</option>';
+            states.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state.sigla;
+                option.textContent = state.nome;
+                if(state.sigla === selectedUf) option.selected = true;
+                ufSelect.appendChild(option);
+            });
+            
+            // Se já tem um estado preenchido via GET, carrega as cidades
+            if(selectedUf) loadCities(selectedUf, selectedCity);
+        });
+
+    // 2. Evento ao trocar o estado manualmente
+    ufSelect.addEventListener('change', function() {
+        if(this.value) {
+            loadCities(this.value, '');
+        } else {
+            citySelect.innerHTML = '<option value="">Selecione o Estado primeiro</option>';
+            citySelect.disabled = true;
+        }
+    });
+
+    // 3. Função para carregar cidades
+    function loadCities(uf, cityToSelect) {
+        citySelect.innerHTML = '<option value="">Carregando Cidades...</option>';
+        citySelect.disabled = true;
+
+        fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`)
+            .then(response => response.json())
+            .then(cities => {
+                citySelect.innerHTML = '<option value="">Todas as Cidades</option>';
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.nome;
+                    option.textContent = city.nome;
+                    if(city.nome === cityToSelect) option.selected = true;
+                    citySelect.appendChild(option);
+                });
+                citySelect.disabled = false;
+            });
+    }
+});
 </script>
-</body>
-</html>
+
+<?php require_once __DIR__ . '/../components/footer.php'; ?>

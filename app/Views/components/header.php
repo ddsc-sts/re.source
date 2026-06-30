@@ -1,19 +1,25 @@
 <?php
-// app/Views/components/header.php
-// Busca o tema do banco antes de renderizar o header
-$theme = 'light'; // padrão
-$company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
+// header.php
+// Este componente é incluído dentro de view(), portanto precisa importar
+// explicitamente a conexão criada pelo bootstrap no escopo global.
+global $pdo;
 
-if ($company_id) {
-    try {
-        $stmt = $pdo->prepare("SELECT theme FROM companies WHERE id = ?");
-        $stmt->execute([$company_id]);
-        $result = $stmt->fetch();
-        if ($result && $result['theme']) {
-            $theme = $result['theme'];
+$theme = 'light';
+$headerCompanyName = 'Minha Conta';
+$headerCompanyId = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
+
+if ($headerCompanyId) {
+    $stmt = $pdo->prepare("SELECT theme, nome_fantasia FROM companies WHERE id = ?");
+    $stmt->execute([$headerCompanyId]);
+    $headerCompany = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($headerCompany) {
+        if (!empty($headerCompany['theme'])) {
+            $theme = $headerCompany['theme'];
         }
-    } catch (\Throwable $e) {
-        // ignora
+        if (!empty($headerCompany['nome_fantasia'])) {
+            $headerCompanyName = $headerCompany['nome_fantasia'];
+        }
     }
 }
 ?>
@@ -22,11 +28,11 @@ if ($company_id) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><?php echo isset($titulo_pagina) ? htmlspecialchars($titulo_pagina) : 'Re.Source — Economia Circular'; ?></title>
+  <title><?php echo isset($titulo_pagina) ? $titulo_pagina : 'Re.Source — Economia Circular'; ?></title>
   
-  <link rel="stylesheet" href="/re.source/public/css/base.css" />
+  <link rel="stylesheet" href="/re.source/public/css/style.css" />
   <?php if (isset($css_especifico)): ?>
-    <link rel="stylesheet" href="<?php echo htmlspecialchars($css_especifico); ?>" />
+    <link rel="stylesheet" href="<?php echo $css_especifico; ?>" />
   <?php endif; ?>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,7 +54,7 @@ if ($company_id) {
       <nav class="desktop-nav">
         <a href="/re.source/base"><i data-lucide="home"></i> Página Inicial</a>
         <a href="/re.source/sobre"><i data-lucide="info"></i> Sobre Nós</a>
-        <a href="#"><i data-lucide="phone"></i> Contato</a>
+        <a href="/re.source/contato"><i data-lucide="phone"></i> Contato</a>
       </nav>
 
       <div class="header-actions">
@@ -60,21 +66,11 @@ if ($company_id) {
 
       <div class="dropdown-menu" id="dropdownMenu">
         <div class="dropdown-label">
-            <?php 
-            try {
-                // Buscamos o nome da empresa para exibir aqui
-                $stmt = $pdo->prepare("SELECT nome_fantasia FROM companies WHERE id = ?");
-                $stmt->execute([$company_id ?? 1]);
-                $empresa = $stmt->fetch();
-                echo htmlspecialchars($empresa['nome_fantasia'] ?? 'Minha Conta');
-            } catch (\Throwable $e) {
-                echo 'Minha Conta';
-            }
-            ?>
+          <?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?>
         </div>
-        <a href="/re.source/conta" class="menu-btn">Detalhes da conta</a>
-        <a href="/re.source/meus-anuncios" class="menu-btn">Meus Anúncios</a>
         <a href="/re.source/estatisticas" class="menu-btn">Estatísticas</a>
+        <a href="/re.source/meus-anuncios" class="menu-btn">Meus Anúncios</a>
+        <a href="/re.source/conta" class="menu-btn">Detalhes da conta</a>
         <a href="/re.source/configuracoes" class="menu-btn">Configurações</a>
 
         <div class="dropdown-divider"></div>
@@ -88,7 +84,6 @@ if ($company_id) {
 
   <div class="search-bar-wrap">
     <div class="search-bar-inner">
-      
       <form action="/re.source/busca" method="GET" class="search-pill">
         
         <div class="search-field">
@@ -104,32 +99,30 @@ if ($company_id) {
           </button>
           
           <div class="category-dropdown" id="categoryDropdown">
-            <button type="button" onclick="selectCategory('Todas as categorias', '')">Todas as categorias</button>
-            <button type="button" onclick="selectCategory('Madeira', 4)">Madeira</button>
-            <button type="button" onclick="selectCategory('Plástico', 3)">Plástico</button>
-            <button type="button" onclick="selectCategory('Têxtil', 1)">Têxtil</button>
-            <button type="button" onclick="selectCategory('Metal', 2)">Metal</button>
-            <button type="button" onclick="selectCategory('Papelão', 5)">Papelão</button>
-            <button type="button" onclick="selectCategory('Borracha', 7)">Borracha</button>
-            <button type="button" onclick="selectCategory('Eletrônicos', 8)">Eletrônicos</button>
-            <button type="button" onclick="selectCategory('Vidro', 6)">Vidro</button>
+            <button type="button" onclick="selectCategory('Todas as categorias')">Todas as categorias</button>
+            <button type="button" onclick="selectCategory('Madeira')">Madeira</button>
+            <button type="button" onclick="selectCategory('Plástico')">Plástico</button>
+            <button type="button" onclick="selectCategory('Têxtil')">Têxtil</button>
+            <button type="button" onclick="selectCategory('Metal')">Metal</button>
+            <button type="button" onclick="selectCategory('Papelão')">Papelão</button>
+            <button type="button" onclick="selectCategory('Borracha')">Borracha</button>
+            <button type="button" onclick="selectCategory('Eletrônicos')">Eletrônicos</button>
           </div>
           
-          <input type="hidden" name="category_id" id="categoryIdInput" value="">
+          <input type="hidden" name="cat_nome" id="hiddenCategory" value="">
         </div>
 
         <button type="submit" class="search-btn"><i data-lucide="search"></i></button>
         
       </form>
-
     </div>
   </div>
 </header>
 
 <script>
-function selectCategory(categoryName, categoryId) {
+function selectCategory(categoryName) {
     document.getElementById('categoryLabel').innerText = categoryName;
-    document.getElementById('categoryIdInput').value = categoryId;
+    document.getElementById('hiddenCategory').value = categoryName === 'Todas as categorias' ? '' : categoryName;
     document.getElementById('categoryDropdown').classList.remove('active'); 
 }
 </script>

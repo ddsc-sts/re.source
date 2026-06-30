@@ -8,6 +8,14 @@ return [
         'action' => ['HomeController', 'index'],
     ],
 
+    '/sobre' => [
+        'action' => ['BaseController', 'sobre'],
+    ],
+
+    '/contato' => [
+        'action' => ['BaseController', 'contato'],
+    ],
+
     // ── Auth (páginas) ────────────────────────────────────
     '/login' => [
         'action' => ['AuthController', 'login'],
@@ -120,6 +128,11 @@ return [
 
     '/estatisticas' => [
         'action'     => ['EstatisticasController', 'index'],
+        'middleware' => [['UserAuth', 'required']],
+    ],
+
+    '/estatisticas/saque' => [
+        'action'     => ['EstatisticasController', 'saque'],
         'middleware' => [['UserAuth', 'required']],
     ],
 

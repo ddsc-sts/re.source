@@ -8,9 +8,32 @@ class BaseController
     {
         global $pdo;
 
-        $anunciosRecentes = self::getAnunciosRecentes($pdo);
+        $recentListings = self::getAnunciosRecentes($pdo);
 
-        require_once __DIR__ . '/../Views/dashboard/index.php';
+        view('dashboard/index', [
+            'titulo_pagina'  => 'Re.Source — Economia Circular em Joinville',
+            'recentListings' => $recentListings,
+            'unitLabel'      => [
+                'kg' => 'Kg', 'ton' => 'Ton', 'm2' => 'm²', 'm3' => 'm³',
+                'unidade' => 'un.', 'litro' => 'L', 'outro' => ''
+            ],
+        ]);
+    }
+
+    public static function sobre(): void
+    {
+        $titulo_pagina = 'Sobre Nós — Re.Source';
+        view('home/sobre', [
+            'titulo_pagina' => $titulo_pagina
+        ]);
+    }
+
+    public static function contato(): void
+    {
+        $titulo_pagina = 'Contato — Re.Source';
+        view('home/contato', [
+            'titulo_pagina' => $titulo_pagina
+        ]);
     }
 
     /**
@@ -393,10 +416,18 @@ class BaseController
                     l.quantity,
                     l.unit,
                     l.price,
+                    l.is_negotiable,
                     l.location_city,
                     l.location_state,
-                    (SELECT url FROM listing_images li WHERE li.listing_id = l.id ORDER BY `order` ASC LIMIT 1) AS main_image
+                    c.nome_fantasia AS company_name,
+                    cat.name AS category_name,
+                    COALESCE(
+                        (SELECT url FROM listing_images li WHERE li.listing_id = l.id ORDER BY `order` ASC LIMIT 1),
+                        'https://images.unsplash.com/photo-1718473476174-21e7a853f5f6?w=600'
+                    ) AS thumb
                 FROM listings l
+                INNER JOIN companies c ON c.id = l.company_id
+                INNER JOIN categories cat ON cat.id = l.category_id
                 WHERE l.status = 'active'
                   AND l.deleted_at IS NULL
                 ORDER BY l.created_at DESC
