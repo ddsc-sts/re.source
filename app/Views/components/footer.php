@@ -31,11 +31,11 @@
     <div class="footer-col">
       <h4>O que você procura?</h4>
       <ul>
-        <li><a href="/re.source/busca?cat_nome=Plástico">Plástico</a></li>
-        <li><a href="/re.source/busca?cat_nome=Metal">Metal</a></li>
-        <li><a href="/re.source/busca?cat_nome=Madeira">Madeira</a></li>
-        <li><a href="/re.source/busca?cat_nome=Têxtil">Têxtil</a></li>
-        <li><a href="/re.source/busca?cat_nome=Eletrônicos">Eletrônicos</a></li>
+        <li><a href="/re.source/busca?category_id=3">Plástico</a></li>
+        <li><a href="/re.source/busca?category_id=2">Metal</a></li>
+        <li><a href="/re.source/busca?category_id=4">Madeira</a></li>
+        <li><a href="/re.source/busca?category_id=1">Têxtil</a></li>
+        <li><a href="/re.source/busca?category_id=8">Eletrônicos</a></li>
       </ul>
     </div>
 

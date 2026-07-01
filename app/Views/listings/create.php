@@ -211,7 +211,7 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--dark);
 
                 <div class="input-box full-width">
                     <label for="images">Fotos do Resíduo <span style="font-weight:normal;color:#9ca3af;">(Selecione uma ou mais imagens)</span></label>
-                    <input type="file" id="images" name="images[]" multiple accept="image/jpeg,image/png,image/webp">
+                    <input type="file" id="images" name="images[]" multiple accept="image/jpeg,image/png,image/webp" required>
 
                     <div class="olx-preview-container" id="previewContainer">
                         <label style="margin-bottom:0.5rem;display:block;">Pré-visualização do Álbum:</label>

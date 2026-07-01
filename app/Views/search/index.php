@@ -274,6 +274,9 @@ require_once __DIR__ . '/../components/header.php';
         <h3><i data-lucide="sliders-horizontal"></i> Filtros</h3>
         
         <form action="/re.source/busca" method="GET">
+            <?php if (!empty($company_id)): ?>
+                <input type="hidden" name="empresa" value="<?= (int) $company_id ?>">
+            <?php endif; ?>
             <div class="filter-group">
                 <label for="q">O que você procura?</label>
                 <input type="text" id="q" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="Ex: Paletes, Plástico...">

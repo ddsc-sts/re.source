@@ -4,10 +4,94 @@ require_once __DIR__ . '/../../config/conexao.php';
 
 class ListingController
 {
+    private const IMAGE_MIME_EXTENSIONS = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
+
+    private const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
     private static function companyId(): ?int
     {
         $companyId = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
         return $companyId ? (int) $companyId : null;
+    }
+
+    private static function validateImageUploads(array $files, array &$errors): array
+    {
+        if (!isset($files['error']) || !is_array($files['error'])) {
+            return [];
+        }
+
+        $uploads = [];
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+
+        foreach ($files['error'] as $index => $error) {
+            if ($error === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+            if ($error !== UPLOAD_ERR_OK) {
+                $errors[] = 'Não foi possível receber uma das imagens.';
+                continue;
+            }
+
+            $tmpName = $files['tmp_name'][$index] ?? '';
+            $size = (int) ($files['size'][$index] ?? 0);
+            if ($size <= 0 || $size > self::MAX_IMAGE_SIZE) {
+                $errors[] = 'Cada imagem deve ter no máximo 5 MB.';
+                continue;
+            }
+
+            $mime = $finfo->file($tmpName) ?: '';
+            if (!isset(self::IMAGE_MIME_EXTENSIONS[$mime])) {
+                $errors[] = 'Envie somente imagens JPG, PNG ou WebP.';
+                continue;
+            }
+
+            $uploads[] = [
+                'tmp_name' => $tmpName,
+                'extension' => self::IMAGE_MIME_EXTENSIONS[$mime],
+            ];
+        }
+
+        return $uploads;
+    }
+
+    private static function storeImageUploads(
+        PDO $pdo,
+        array $uploads,
+        int $listingId,
+        int $startOrder,
+        array &$storedFiles
+    ): void {
+        if (!$uploads) {
+            return;
+        }
+
+        $uploadDir = __DIR__ . '/../../uploads/listings/';
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true) && !is_dir($uploadDir)) {
+            throw new RuntimeException('Não foi possível preparar a pasta de imagens.');
+        }
+
+        $stmtImage = $pdo->prepare(
+            'INSERT INTO listing_images (listing_id, url, `order`) VALUES (:listing_id, :url, :order)'
+        );
+
+        foreach ($uploads as $offset => $upload) {
+            $filename = 'listing_' . $listingId . '_' . bin2hex(random_bytes(8)) . '.' . $upload['extension'];
+            $destination = $uploadDir . $filename;
+            if (!move_uploaded_file($upload['tmp_name'], $destination)) {
+                throw new RuntimeException('Não foi possível salvar uma das imagens.');
+            }
+
+            $storedFiles[] = $destination;
+            $stmtImage->execute([
+                ':listing_id' => $listingId,
+                ':url' => '/re.source/uploads/listings/' . $filename,
+                ':order' => $startOrder + $offset,
+            ]);
+        }
     }
 
     // ══════════════════════════════════════════
@@ -147,6 +231,11 @@ class ListingController
         if (empty($location_state))                 $erros[] = "Selecione o Estado.";
         if (empty($location_city))                  $erros[] = "Selecione a Cidade.";
 
+        $imageUploads = self::validateImageUploads($_FILES['images'] ?? [], $erros);
+        if (!$imageUploads) {
+            $erros[] = "Adicione pelo menos uma imagem válida ao anúncio.";
+        }
+
         $price = null;
         if ($type === 'offer') {
             if ($price_raw === '' || $price_raw === null) {
@@ -163,6 +252,7 @@ class ListingController
             exit;
         }
 
+        $storedFiles = [];
         try {
             $pdo->beginTransaction();
             $sql = "INSERT INTO listings (company_id, category_id, type, title, description, quantity, unit, price, is_negotiable, location_state, location_city, status)
@@ -183,26 +273,7 @@ class ListingController
             ]);
             $listing_id = $pdo->lastInsertId();
 
-            // Upload de imagens
-            if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
-                $upload_dir = __DIR__ . '/../../uploads/listings/';
-                if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-                $permitidos = ['image/jpeg', 'image/png', 'image/webp'];
-                foreach ($_FILES['images']['tmp_name'] as $index => $tmp_name) {
-                    if ($_FILES['images']['error'][$index] === UPLOAD_ERR_OK) {
-                        $mime = $_FILES['images']['type'][$index];
-                        if (in_array($mime, $permitidos)) {
-                            $ext = pathinfo($_FILES['images']['name'][$index], PATHINFO_EXTENSION);
-                            $nome_arquivo = 'listing_' . $listing_id . '_' . uniqid() . '.' . $ext;
-                            if (move_uploaded_file($tmp_name, $upload_dir . $nome_arquivo)) {
-                                $url_publica = '/re.source/uploads/listings/' . $nome_arquivo;
-                                $stmtImg = $pdo->prepare("INSERT INTO listing_images (listing_id, url, `order`) VALUES (:listing_id, :url, :order)");
-                                $stmtImg->execute([':listing_id' => $listing_id, ':url' => $url_publica, ':order' => $index]);
-                            }
-                        }
-                    }
-                }
-            }
+            self::storeImageUploads($pdo, $imageUploads, (int) $listing_id, 0, $storedFiles);
 
             $pdo->commit();
             echo json_encode([
@@ -210,8 +281,15 @@ class ListingController
                 'message' => 'Anúncio publicado com sucesso!',
                 'redirect' => '/re.source/anuncio?id=' . (int) $listing_id,
             ]);
-        } catch (Exception $e) {
-            $pdo->rollBack();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            foreach ($storedFiles as $storedFile) {
+                if (is_file($storedFile)) {
+                    unlink($storedFile);
+                }
+            }
             echo json_encode(['success' => false, 'message' => 'Erro ao salvar: ' . $e->getMessage()]);
         }
         exit;
@@ -260,6 +338,8 @@ class ListingController
         if (empty($location_state))                 $erros[] = "Selecione o Estado (UF).";
         if (empty($location_city))                  $erros[] = "Selecione a cidade.";
 
+        $imageUploads = self::validateImageUploads($_FILES['images'] ?? [], $erros);
+
         $price = null;
         if ($type === 'offer') {
             if ($price_raw === '' || $price_raw === null) {
@@ -276,9 +356,37 @@ class ListingController
             exit;
         }
 
+        $storedFiles = [];
         try {
             $pdo->beginTransaction();
             $imageFilesToDelete = [];
+
+            $stmtOwner = $pdo->prepare(
+                "SELECT id FROM listings WHERE id = :id AND company_id = :company_id FOR UPDATE"
+            );
+            $stmtOwner->execute([':id' => $id, ':company_id' => $companyId]);
+            if (!$stmtOwner->fetchColumn()) {
+                throw new RuntimeException('Anúncio não encontrado ou sem permissão para edição.');
+            }
+
+            $stmtCurrentImages = $pdo->prepare(
+                "SELECT id, url, `order` FROM listing_images WHERE listing_id = :id ORDER BY `order` ASC FOR UPDATE"
+            );
+            $stmtCurrentImages->execute([':id' => $id]);
+            $currentImages = $stmtCurrentImages->fetchAll(PDO::FETCH_ASSOC);
+            $currentImagesById = [];
+            foreach ($currentImages as $currentImage) {
+                $currentImagesById[(int) $currentImage['id']] = $currentImage;
+            }
+
+            $authorizedDeleteIds = array_values(array_intersect(
+                $deleteImageIds,
+                array_keys($currentImagesById)
+            ));
+            if ((count($currentImages) - count($authorizedDeleteIds) + count($imageUploads)) < 1) {
+                throw new RuntimeException('O anúncio deve permanecer com pelo menos uma imagem.');
+            }
+
             $sql = "UPDATE listings SET
                         type = :type, title = :title, description = :description,
                         category_id = :category_id, quantity = :quantity, unit = :unit,
@@ -301,54 +409,27 @@ class ListingController
                 ':company_id'    => $companyId,
             ]);
 
-            if ($stmt->rowCount() === 0) {
-                $stmtOwner = $pdo->prepare("SELECT id FROM listings WHERE id = :id AND company_id = :company_id");
-                $stmtOwner->execute([':id' => $id, ':company_id' => $companyId]);
-                if (!$stmtOwner->fetchColumn()) {
-                    throw new RuntimeException('Anúncio não encontrado ou sem permissão para edição.');
+            if ($authorizedDeleteIds) {
+                $deletePlaceholders = implode(',', array_fill(0, count($authorizedDeleteIds), '?'));
+                $stmtDeleteImages = $pdo->prepare(
+                    "DELETE FROM listing_images WHERE listing_id = ? AND id IN ($deletePlaceholders)"
+                );
+                $stmtDeleteImages->execute(array_merge([$id], $authorizedDeleteIds));
+                foreach ($authorizedDeleteIds as $imageId) {
+                    $imageFilesToDelete[] = __DIR__ . '/../../uploads/listings/'
+                        . basename($currentImagesById[$imageId]['url']);
                 }
             }
 
-            if ($deleteImageIds) {
-                $placeholders = implode(',', array_fill(0, count($deleteImageIds), '?'));
-                $stmtImages = $pdo->prepare("
-                    SELECT li.id, li.url
-                    FROM listing_images li
-                    INNER JOIN listings l ON l.id = li.listing_id
-                    WHERE li.listing_id = ? AND l.company_id = ? AND li.id IN ($placeholders)
-                ");
-                $stmtImages->execute(array_merge([$id, $companyId], $deleteImageIds));
-                $imagesToDelete = $stmtImages->fetchAll(PDO::FETCH_ASSOC);
-
-                if ($imagesToDelete) {
-                    $authorizedIds = array_column($imagesToDelete, 'id');
-                    $deletePlaceholders = implode(',', array_fill(0, count($authorizedIds), '?'));
-                    $stmtDeleteImages = $pdo->prepare("DELETE FROM listing_images WHERE listing_id = ? AND id IN ($deletePlaceholders)");
-                    $stmtDeleteImages->execute(array_merge([$id], $authorizedIds));
-                    foreach ($imagesToDelete as $imageToDelete) {
-                        $imageFilesToDelete[] = __DIR__ . '/../../uploads/listings/' . basename($imageToDelete['url']);
-                    }
-                }
-            }
-
-            if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
-                $upload_dir = __DIR__ . '/../../uploads/listings/';
-                if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-                $permitidos = ['image/jpeg', 'image/png', 'image/webp'];
-                foreach ($_FILES['images']['tmp_name'] as $index => $tmp_name) {
-                    if ($_FILES['images']['error'][$index] === UPLOAD_ERR_OK) {
-                        $mime = $_FILES['images']['type'][$index];
-                        if (in_array($mime, $permitidos)) {
-                            $ext = pathinfo($_FILES['images']['name'][$index], PATHINFO_EXTENSION);
-                            $nome_arquivo = 'listing_' . $id . '_' . uniqid() . '.' . $ext;
-                            move_uploaded_file($tmp_name, $upload_dir . $nome_arquivo);
-                            $url_publica = '/re.source/uploads/listings/' . $nome_arquivo;
-                            $stmtImg = $pdo->prepare("INSERT INTO listing_images (listing_id, url, `order`) VALUES (:listing_id, :url, :order)");
-                            $stmtImg->execute([':listing_id' => $id, ':url' => $url_publica, ':order' => $index + 10]);
-                        }
-                    }
-                }
-            }
+            $remainingOrders = array_map(
+                static fn (array $image): int => (int) $image['order'],
+                array_filter(
+                    $currentImages,
+                    static fn (array $image): bool => !in_array((int) $image['id'], $authorizedDeleteIds, true)
+                )
+            );
+            $startOrder = $remainingOrders ? max($remainingOrders) + 1 : 0;
+            self::storeImageUploads($pdo, $imageUploads, (int) $id, $startOrder, $storedFiles);
 
             $pdo->commit();
             foreach ($imageFilesToDelete as $imageFile) {
@@ -357,8 +438,15 @@ class ListingController
                 }
             }
             header("Location: /re.source/anuncios/editar?id=$id&success=1");
-        } catch (Exception $e) {
-            $pdo->rollBack();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            foreach ($storedFiles as $storedFile) {
+                if (is_file($storedFile)) {
+                    unlink($storedFile);
+                }
+            }
             header("Location: /re.source/anuncios/editar?id=$id&erros=" . urlencode('Erro ao atualizar: ' . $e->getMessage()));
         }
         exit;
@@ -390,11 +478,22 @@ class ListingController
                     header("Location: /re.source/meus-anuncios");
                     exit;
                 }
+                $stmtImageFiles = $pdo->prepare("SELECT url FROM listing_images WHERE listing_id = :id");
+                $stmtImageFiles->execute([':id' => $id]);
+                $imageFiles = array_map(
+                    static fn (string $url): string => __DIR__ . '/../../uploads/listings/' . basename($url),
+                    $stmtImageFiles->fetchAll(PDO::FETCH_COLUMN)
+                );
                 $stmtImg = $pdo->prepare("DELETE FROM listing_images WHERE listing_id = :id");
                 $stmtImg->execute([':id' => $id]);
                 $stmtDel = $pdo->prepare("DELETE FROM listings WHERE id = :id AND company_id = :company_id");
                 $stmtDel->execute([':id' => $id, ':company_id' => $companyId]);
                 $pdo->commit();
+                foreach ($imageFiles as $imageFile) {
+                    if (is_file($imageFile)) {
+                        unlink($imageFile);
+                    }
+                }
                 header("Location: /re.source/meus-anuncios?deleted=1");
                 exit;
             } catch (Exception $e) {
@@ -420,6 +519,26 @@ class ListingController
         }
 
         try {
+            // Confirma que o anúncio existe antes de registrar a visualização.
+            $stmt = $pdo->prepare("
+                SELECT
+                    l.*,
+                    c.nome_fantasia AS company_name,
+                    cat.name AS category_name
+                FROM listings l
+                INNER JOIN companies c ON c.id = l.company_id
+                INNER JOIN categories cat ON cat.id = l.category_id
+                WHERE l.id = ? AND l.deleted_at IS NULL
+            ");
+            $stmt->execute([$id]);
+            $anuncio = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$anuncio) {
+                http_response_code(404);
+                echo '<h1>Anúncio não encontrado ou indisponível.</h1>';
+                exit;
+            }
+
             // Lógica de Visualizações (Única por usuário/sessão por dia)
             $viewer_company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
             $viewer_session_id = session_id();
@@ -440,31 +559,10 @@ class ListingController
                 $stmtUpdateTotal->execute([$id]);
             }
 
-            // Dados do Anúncio Principal
-            $stmt = $pdo->prepare("
-                SELECT 
-                    l.*, 
-                    c.nome_fantasia AS company_name, 
-                    cat.name AS category_name
-                FROM listings l
-                INNER JOIN companies c ON c.id = l.company_id
-                INNER JOIN categories cat ON cat.id = l.category_id
-                WHERE l.id = ? AND l.deleted_at IS NULL
-            ");
-            $stmt->execute([$id]);
-            $anuncio = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            if (!$anuncio) {
-                die("<h1>Anúncio não encontrado ou indisponível.</h1>");
-            }
-
             // Imagens do Anúncio
             $stmtImg = $pdo->prepare("SELECT url FROM listing_images WHERE listing_id = ? ORDER BY `order` ASC");
             $stmtImg->execute([$id]);
             $imagens = $stmtImg->fetchAll(\PDO::FETCH_COLUMN);
-            if (empty($imagens)) {
-                $imagens[] = '/re.source/FrontEnd/img/no-image.png'; 
-            }
 
             // Mais Anúncios desse Vendedor (Máx 4)
             $stmtSeller = $pdo->prepare("

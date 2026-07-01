@@ -197,6 +197,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedUf   = ufSelect.getAttribute('data-selected');
     const selectedCity = citySelect.getAttribute('data-selected');
     const deletedImagesInputs = document.getElementById('deletedImagesInputs');
+    const editForm = document.getElementById('editListingForm');
+    const imageInput = document.getElementById('images');
+
+    editForm.addEventListener('submit', function(event) {
+        const remainingImages = document.querySelectorAll(
+            '.img-wrapper[data-image-id]:not(.marked-for-deletion)'
+        ).length;
+        if (remainingImages === 0 && imageInput.files.length === 0) {
+            event.preventDefault();
+            alert('O anúncio deve permanecer com pelo menos uma imagem.');
+        }
+    });
 
     document.querySelectorAll('.img-wrapper[data-image-id]').forEach(wrapper => {
         const button = wrapper.querySelector('.btn-del-img');

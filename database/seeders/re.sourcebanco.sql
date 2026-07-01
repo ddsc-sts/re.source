@@ -582,18 +582,54 @@ ADD COLUMN theme VARCHAR(20) DEFAULT 'system',
 ADD COLUMN notify_proposals TINYINT(1) DEFAULT 1,
 ADD COLUMN notify_chat TINYINT(1) DEFAULT 1;
 
+-- 1. Adicionar a coluna de saldo na tabela de empresas (ou usuários)
+ALTER TABLE companies ADD COLUMN balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00;
+
+-- 2. Criar uma tabela de histórico de transações (Essencial para auditoria, saques e depósitos)
+CREATE TABLE financial_transactions (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     company_id INT UNSIGNED NOT NULL, -- Mudado para INT UNSIGNED
+     type ENUM('deposit', 'withdrawal', 'sale', 'refund') NOT NULL,
+     amount DECIMAL(10, 2) NOT NULL,
+     status ENUM('pending', 'completed', 'failed', 'canceled') NOT NULL DEFAULT 'pending',
+     description VARCHAR(255) NULL,
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- 25. Solicitações de saque do painel de estatísticas
+CREATE TABLE IF NOT EXISTS withdrawals (
+    id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    company_id INT UNSIGNED NOT NULL,
+    amount     DECIMAL(10,2) NOT NULL,
+    pix_key    VARCHAR(255) NOT NULL,
+    pix_key_type VARCHAR(20) NULL,
+    account_holder_name VARCHAR(150) NULL,
+    account_holder_document VARCHAR(20) NULL,
+    request_note VARCHAR(500) NULL,
+    terms_accepted_at TIMESTAMP NULL,
+    reviewed_at TIMESTAMP NULL,
+    rejection_reason VARCHAR(500) NULL,
+    status     ENUM('pending', 'completed', 'rejected') NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_withdrawals_company_status (company_id, status),
+    CONSTRAINT fk_withdrawals_company FOREIGN KEY (company_id)
+        REFERENCES companies (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
 -- RESUMO — v3.1
--- 24 tabelas: plans, addresses, companies, users,
+-- 25 tabelas: plans, addresses, companies, users,
 --   email_verifications, user_sessions, password_resets,
 --   blocked_email_domains, categories, listings,
 --   listing_images, favorites, negotiations, proposals,
 --   messages, carriers, freights, transactions,
 --   notifications, uploads, cnpj_validations,
---   audit_logs, listing_status_history, search_alerts
+--   audit_logs, listing_status_history, search_alerts, withdrawals
 --
 -- Fluxo de cadastro (v3.1):
 --   Dados ficam em $_SESSION até confirmação do e-mail.

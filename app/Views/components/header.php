@@ -99,17 +99,17 @@ if ($headerCompanyId) {
           </button>
           
           <div class="category-dropdown" id="categoryDropdown">
-            <button type="button" onclick="selectCategory('Todas as categorias')">Todas as categorias</button>
-            <button type="button" onclick="selectCategory('Madeira')">Madeira</button>
-            <button type="button" onclick="selectCategory('Plástico')">Plástico</button>
-            <button type="button" onclick="selectCategory('Têxtil')">Têxtil</button>
-            <button type="button" onclick="selectCategory('Metal')">Metal</button>
-            <button type="button" onclick="selectCategory('Papelão')">Papelão</button>
-            <button type="button" onclick="selectCategory('Borracha')">Borracha</button>
-            <button type="button" onclick="selectCategory('Eletrônicos')">Eletrônicos</button>
+            <button type="button" onclick="selectCategory('Todas as categorias', '')">Todas as categorias</button>
+            <button type="button" onclick="selectCategory('Madeira', 4)">Madeira</button>
+            <button type="button" onclick="selectCategory('Plástico', 3)">Plástico</button>
+            <button type="button" onclick="selectCategory('Têxtil', 1)">Têxtil</button>
+            <button type="button" onclick="selectCategory('Metal', 2)">Metal</button>
+            <button type="button" onclick="selectCategory('Papelão', 5)">Papelão</button>
+            <button type="button" onclick="selectCategory('Borracha', 7)">Borracha</button>
+            <button type="button" onclick="selectCategory('Eletrônicos', 8)">Eletrônicos</button>
           </div>
           
-          <input type="hidden" name="cat_nome" id="hiddenCategory" value="">
+          <input type="hidden" name="category_id" id="hiddenCategory" value="">
         </div>
 
         <button type="submit" class="search-btn"><i data-lucide="search"></i></button>
@@ -120,9 +120,9 @@ if ($headerCompanyId) {
 </header>
 
 <script>
-function selectCategory(categoryName) {
+function selectCategory(categoryName, categoryId) {
     document.getElementById('categoryLabel').innerText = categoryName;
-    document.getElementById('hiddenCategory').value = categoryName === 'Todas as categorias' ? '' : categoryName;
+    document.getElementById('hiddenCategory').value = categoryId;
     document.getElementById('categoryDropdown').classList.remove('active'); 
 }
 </script>

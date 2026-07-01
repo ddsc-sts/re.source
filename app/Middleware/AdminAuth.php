@@ -40,8 +40,7 @@ class AdminAuth
         $user = $_SESSION['user'] ?? null;
 
         if (!$user) {
-            $base = rtrim(str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']), '/');
-            header('Location: ' . $base . '/../login.php?aviso=' . urlencode('Faça login para acessar o painel.'));
+            header('Location: /re.source/login?aviso=' . urlencode('Faça login para acessar o painel.'));
             exit;
         }
 
@@ -50,7 +49,7 @@ class AdminAuth
             echo '<!DOCTYPE html><html lang="pt-BR"><body style="font-family:sans-serif;padding:2rem">
                     <h2>Acesso negado</h2>
                     <p>Você não tem permissão para acessar esta área.</p>
-                    <a href="../base.php">← Voltar à plataforma</a>
+                    <a href="/re.source/base">← Voltar à plataforma</a>
                   </body></html>';
             exit;
         }

@@ -18,6 +18,8 @@ class SearchController
         // ── Parâmetros de busca ──────────────────────────────
         $q           = trim(filter_input(INPUT_GET, 'q',             FILTER_DEFAULT) ?? '');
         $category_id = filter_input(INPUT_GET, 'category_id',        FILTER_VALIDATE_INT) ?: null;
+        $cat_nome    = trim(filter_input(INPUT_GET, 'cat_nome',       FILTER_DEFAULT) ?? '');
+        $company_id  = filter_input(INPUT_GET, 'empresa',             FILTER_VALIDATE_INT) ?: null;
         $type        = filter_input(INPUT_GET, 'type',               FILTER_DEFAULT) ?? '';
         $state       = strtoupper(trim(filter_input(INPUT_GET, 'location_state', FILTER_DEFAULT) ?? ''));
         $city        = trim(filter_input(INPUT_GET, 'location_city', FILTER_DEFAULT) ?? '');
@@ -29,6 +31,24 @@ class SearchController
         } catch (\Throwable $e) {
             $categorias = [];
             error_log("Erro ao buscar categorias: " . $e->getMessage());
+        }
+
+        // O cabeçalho e o rodapé enviam o nome legível da categoria.
+        if (!$category_id && $cat_nome !== '') {
+            $normalizedCategoryName = mb_strtolower($cat_nome, 'UTF-8');
+            $legacyCategoryAliases = [
+                'papelão' => 'papel/papelão',
+                'eletrônicos' => 'eletrônico',
+            ];
+            $normalizedCategoryName = $legacyCategoryAliases[$normalizedCategoryName]
+                ?? $normalizedCategoryName;
+
+            foreach ($categorias as $cat) {
+                if (mb_strtolower(trim($cat['name']), 'UTF-8') === $normalizedCategoryName) {
+                    $category_id = (int) $cat['id'];
+                    break;
+                }
+            }
         }
 
         // ── Nome da categoria selecionada (para o título) ───
@@ -76,6 +96,11 @@ class SearchController
             if ($category_id) {
                 $sql .= " AND l.category_id = :category_id";
                 $params[':category_id'] = $category_id;
+            }
+
+            if ($company_id) {
+                $sql .= " AND l.company_id = :company_id";
+                $params[':company_id'] = $company_id;
             }
 
             if (!empty($type) && in_array($type, ['offer', 'demand'], true)) {

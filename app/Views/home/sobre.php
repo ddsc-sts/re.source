@@ -176,8 +176,8 @@ require_once __DIR__ . '/../components/header.php';
       <h2>Faça parte da mudança.</h2>
       <p>Cadastre sua empresa e comece a transformar resíduos em receita hoje mesmo.</p>
       <div class="cta-buttons">
-        <a href="cadastro.html" class="cta-btn-primary">Cadastrar Empresa</a>
-        <a href="#" class="cta-btn-secondary">Ver Anúncios</a>
+        <a href="/re.source/cadastro" class="cta-btn-primary">Cadastrar Empresa</a>
+        <a href="/re.source/busca" class="cta-btn-secondary">Ver Anúncios</a>
       </div>
     </div>
   </div>
