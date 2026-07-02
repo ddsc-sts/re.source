@@ -15,6 +15,56 @@
 
 class AuthController
 {
+    /** Confirma no backend que o CNPJ possui situacao cadastral ativa. */
+    private static function validateActiveCnpj(string $cnpj): array
+    {
+        $cacheFile = ROOT_PATH . '/storage/cache/' . $cnpj . '.json';
+        $data = null;
+
+        if (is_file($cacheFile) && (time() - filemtime($cacheFile)) < 86400) {
+            $data = json_decode((string) file_get_contents($cacheFile), true);
+        }
+
+        if (!is_array($data)) {
+            $ch = curl_init('https://brasilapi.com.br/api/cnpj/v1/' . $cnpj);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_CONNECTTIMEOUT => 3,
+                CURLOPT_TIMEOUT => 6,
+                CURLOPT_HTTPHEADER => ['Accept: application/json'],
+                CURLOPT_USERAGENT => 'Re.Source/1.0',
+            ]);
+            $response = curl_exec($ch);
+            $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && is_string($response)) {
+                $data = json_decode($response, true);
+                if (is_array($data)) {
+                    if (!is_dir(dirname($cacheFile))) {
+                        mkdir(dirname($cacheFile), 0755, true);
+                    }
+                    file_put_contents($cacheFile, json_encode($data, JSON_UNESCAPED_UNICODE));
+                }
+            }
+        }
+
+        if (!is_array($data)) {
+            return [false, 'Não foi possível validar o CNPJ agora. Tente novamente em alguns instantes.'];
+        }
+
+        $status = $data['descricao_situacao_cadastral']
+            ?? $data['situacao']
+            ?? ($data['estabelecimento']['situacao_cadastral'] ?? '');
+        $normalized = strtoupper(trim((string) $status));
+
+        if ($normalized !== 'ATIVA') {
+            return [false, 'O CNPJ precisa estar com situação ATIVA para realizar o cadastro.'];
+        }
+
+        return [true, null];
+    }
+
     // ══════════════════════════════════════════
     // VIEWS
     // ══════════════════════════════════════════
@@ -39,6 +89,33 @@ class AuthController
         require_once __DIR__ . '/../Views/auth/pendente.php';
     }
 
+    public static function aguardandoAprovacao(): void
+    {
+        global $pdo;
+
+        $companyId = (int) ($_SESSION['user']['company_id'] ?? 0);
+        $stmt = $pdo->prepare('SELECT razao_social, nome_fantasia, status FROM companies WHERE id = ? LIMIT 1');
+        $stmt->execute([$companyId]);
+        $company = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$company) {
+            self::logout();
+        }
+
+        if ($company['status'] === 'active') {
+            $_SESSION['user']['company_status'] = 'active';
+            header('Location: /re.source/base');
+            exit;
+        }
+
+        if ($company['status'] !== 'pending') {
+            self::logout();
+        }
+
+        $_SESSION['user']['company_status'] = 'pending';
+        require_once __DIR__ . '/../Views/auth/aguardando_aprovacao.php';
+    }
+
     // ══════════════════════════════════════════
     // PROCESS LOGIN
     // ══════════════════════════════════════════
@@ -49,6 +126,13 @@ class AuthController
         if (session_status() === PHP_SESSION_NONE) session_start();
 
         header('Content-Type: application/json; charset=utf-8');
+
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || !csrf_validate()) {
+            http_response_code(403);
+            ob_clean();
+            echo json_encode(['success' => false, 'message' => 'Sessão expirada. Recarregue a página e tente novamente.']);
+            exit;
+        }
 
         $email = strtolower(trim($_POST['email'] ?? ''));
         $senha = $_POST['password'] ?? '';
@@ -92,7 +176,7 @@ class AuthController
                 exit;
             }
 
-            if ($user['company_status'] !== 'active') {
+            if (in_array($user['company_status'], ['suspended', 'inactive'], true)) {
                 ob_clean();
                 echo json_encode(['success' => false, 'message' => 'Empresa suspensa ou inativa. Entre em contato com o suporte.']);
                 exit;
@@ -112,6 +196,7 @@ class AuthController
                 'name'       => $user['name'],
                 'email'      => $user['email'],
                 'role'       => $user['role'],
+                'company_status' => $user['company_status'],
             ];
 
             $token     = bin2hex(random_bytes(32));
@@ -131,7 +216,7 @@ class AuthController
                 'expires'  => time() + (60 * 60 * 24 * 30),
                 'path'     => '/',
                 'httponly' => true,
-                'secure'   => false,
+                'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
                 'samesite' => 'Lax',
             ]);
 
@@ -140,10 +225,13 @@ class AuthController
 
             ob_clean();
 
-            // TODO: rota /admin já existe e exige AdminAuth::required().
-            // Confirmar se o campo "role" do usuário vindo do banco
-            // realmente bate com a checagem feita dentro do AdminAuth.
-            $redirect = $user['role'] === 'admin' ? '/re.source/admin' : '/re.source/base';
+            if (in_array($user['role'], ['admin', 'staff'], true)) {
+                $redirect = '/re.source/admin';
+            } elseif ($user['company_status'] === 'pending') {
+                $redirect = '/re.source/aguardando-aprovacao';
+            } else {
+                $redirect = '/re.source/base';
+            }
 
             echo json_encode([
                 'success'  => true,
@@ -207,6 +295,10 @@ class AuthController
             exit;
         }
 
+        if (!csrf_validate()) {
+            voltarComErro('Sua sessão expirou. Recarregue a página e tente novamente.');
+        }
+
         $nome      = trim($_POST['nome']        ?? '');
         $sobrenome = trim($_POST['sobrenome']    ?? '');
         $email     = strtolower(trim($_POST['email']    ?? ''));
@@ -266,6 +358,11 @@ class AuthController
 
         if (!cnpjValido($cnpj)) {
             voltarComErro('CNPJ inválido. Verifique os números informados.', [['field' => 'cnpj', 'msg' => 'CNPJ inválido.']]);
+        }
+
+        [$cnpjAtivo, $cnpjErro] = self::validateActiveCnpj($cnpj);
+        if (!$cnpjAtivo) {
+            voltarComErro((string) $cnpjErro, [['field' => 'cnpj', 'msg' => (string) $cnpjErro]]);
         }
 
         $passwordHash = password_hash($senha, PASSWORD_BCRYPT, ['cost' => 12]);
@@ -610,8 +707,8 @@ class AuthController
             $nomeCompleto = $pendente['nome'] . ' ' . $pendente['sobrenome'];
 
             $pdo->prepare(
-                "INSERT INTO companies (cnpj, razao_social, email, phone, address_id, plan_id, responsible_name, email_verified_at)
-                 VALUES (?,?,?,?,?,1,?,NOW())"
+                "INSERT INTO companies (cnpj, razao_social, email, phone, address_id, plan_id, responsible_name, status, email_verified_at)
+                 VALUES (?,?,?,?,?,1,?,'pending',NOW())"
             )->execute([
                 $pendente['cnpj'],
                 $pendente['razao'],
@@ -644,7 +741,7 @@ class AuthController
         }
 
         unset($_SESSION['cadastro_pendente']);
-        responderSucesso('/re.source/login?sucesso=' . urlencode('Conta criada com sucesso! Faça login.'));
+        responderSucesso('/re.source/login?sucesso=' . urlencode('Conta confirmada! Faça login para acompanhar a aprovação.'));
     }
 
     // ══════════════════════════════════════════

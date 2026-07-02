@@ -95,6 +95,7 @@
 
           <!-- 🚀 CORREÇÃO: Alterado de <div> para <form> para resolver o aviso do [DOM] -->
           <form class="form-body" id="formLogin">
+            <input type="hidden" id="loginCsrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-field">
               <label for="loginEmail">E-mail <span class="req">*</span></label>
               <div class="input-wrap">
@@ -199,6 +200,6 @@
   </footer>
 
   <!-- 🚀 CORREÇÃO: Adicionado o '?v=2' para forçar o navegador a carregar o seu JavaScript novo sem usar o cache -->
-  <script src="/re.source/public/js/login.js?v=2"></script>
+  <script src="/re.source/public/js/login.js?v=3"></script>
 </body>
 </html>

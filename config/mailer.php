@@ -3,13 +3,19 @@
 
 function enviarEmailCodigo(string $para, string $nomeDestinatario, string $codigo): bool {
 
-    $host          = 'smtp.gmail.com';
-    $port          = 587;
-    $user          = 're.source.com.br@gmail.com';
-    $pass          = 'rwpdcazjahiafozj';
-    $remetente     = 're.source.com.br@gmail.com';
-    $nomeRemetente = 'Re.Source';
+    $host          = (string) env('MAIL_HOST', 'smtp.gmail.com');
+    $port          = (int) env('MAIL_PORT', 587);
+    $user          = (string) env('MAIL_USERNAME', '');
+    $pass          = (string) env('MAIL_PASSWORD', '');
+    $remetente     = (string) env('MAIL_FROM_ADDRESS', $user);
+    $nomeRemetente = (string) env('MAIL_FROM_NAME', 'Re.Source');
+    $verifyTls     = (bool) env('MAIL_VERIFY_TLS', true);
     $assunto       = 'Seu código de verificação — Re.Source';
+
+    if ($user === '' || $pass === '' || $remetente === '') {
+        error_log('SMTP nao configurado: preencha as variaveis MAIL_* no arquivo .env.');
+        return false;
+    }
 
     $html = <<<HTML
 <!DOCTYPE html>
@@ -81,7 +87,7 @@ HTML;
 
     $ch = curl_init();
     curl_setopt_array($ch, [
-        CURLOPT_URL            => "smtp://smtp.gmail.com:587",
+        CURLOPT_URL            => "smtp://{$host}:{$port}",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_USE_SSL        => CURLUSESSL_ALL,
         CURLOPT_USERNAME       => $user,
@@ -91,8 +97,8 @@ HTML;
         CURLOPT_READDATA       => $tmp,
         CURLOPT_UPLOAD         => true,
         CURLOPT_VERBOSE        => false,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_SSL_VERIFYPEER => $verifyTls,
+        CURLOPT_SSL_VERIFYHOST => $verifyTls ? 2 : 0,
     ]);
 
     $ok    = curl_exec($ch);
@@ -105,13 +111,19 @@ HTML;
 
 function enviarEmailRecuperacao(string $para, string $nomeDestinatario, string $link): bool {
 
-    $host          = 'smtp.gmail.com';
-    $port          = 587;
-    $user          = 're.source.com.br@gmail.com';
-    $pass          = 'rwpdcazjahiafozj';
-    $remetente     = 're.source.com.br@gmail.com';
-    $nomeRemetente = 'Re.Source';
+    $host          = (string) env('MAIL_HOST', 'smtp.gmail.com');
+    $port          = (int) env('MAIL_PORT', 587);
+    $user          = (string) env('MAIL_USERNAME', '');
+    $pass          = (string) env('MAIL_PASSWORD', '');
+    $remetente     = (string) env('MAIL_FROM_ADDRESS', $user);
+    $nomeRemetente = (string) env('MAIL_FROM_NAME', 'Re.Source');
+    $verifyTls     = (bool) env('MAIL_VERIFY_TLS', true);
     $assunto       = 'Redefinição de senha — Re.Source';
+
+    if ($user === '' || $pass === '' || $remetente === '') {
+        error_log('SMTP nao configurado: preencha as variaveis MAIL_* no arquivo .env.');
+        return false;
+    }
 
     $html = <<<HTML
 <!DOCTYPE html>
@@ -193,7 +205,7 @@ HTML;
 
     $ch = curl_init();
     curl_setopt_array($ch, [
-        CURLOPT_URL            => 'smtp://smtp.gmail.com:587',
+        CURLOPT_URL            => "smtp://{$host}:{$port}",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_USE_SSL        => CURLUSESSL_ALL,
         CURLOPT_USERNAME       => $user,
@@ -203,8 +215,8 @@ HTML;
         CURLOPT_READDATA       => $tmp,
         CURLOPT_UPLOAD         => true,
         CURLOPT_VERBOSE        => false,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_SSL_VERIFYPEER => $verifyTls,
+        CURLOPT_SSL_VERIFYHOST => $verifyTls ? 2 : 0,
     ]);
 
     $ok    = curl_exec($ch);

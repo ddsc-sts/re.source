@@ -118,6 +118,7 @@
         <form id="formCadastro" novalidate
               action="/re.source/process?action=cadastro&tipo=empresa"
               method="POST">
+          <?= csrf_field() ?>
 
           <fieldset class="form-step active" id="step1">
             <div class="step-heading">

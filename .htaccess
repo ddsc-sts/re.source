@@ -8,6 +8,14 @@
 RewriteEngine On
 RewriteBase /re.source/
 
+# Nunca servir segredos, metadados do Git ou codigo interno diretamente.
+RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
+RewriteRule ^(?:app|config|database|Docs|storage|tests|vendor|routes)(?:/|$) - [F,L,NC]
+
+<FilesMatch "(^\.|\.env(?:\..*)?$|composer\.(?:json|lock)$|.*\.(?:sql|log|ini))$">
+    Require all denied
+</FilesMatch>
+
 # Se a requisicao ja eh para algo dentro de /public, deixa passar
 RewriteCond %{REQUEST_URI} ^/re\.source/public/ [NC]
 RewriteRule ^ - [L]

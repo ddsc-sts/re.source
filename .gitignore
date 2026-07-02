@@ -1,0 +1,35 @@
+# Segredos e configuracoes locais
+.env
+.env.*
+!.env.example
+
+# Dependencias reproduziveis
+/vendor/
+
+# Arquivos gerados em execucao
+/storage/cache/*
+/storage/logs/*
+/storage/temp/*
+/storage/uploads/*
+/uploads/*
+!/storage/cache/.gitkeep
+!/storage/logs/.gitkeep
+!/storage/temp/.gitkeep
+!/storage/uploads/.gitkeep
+!/uploads/.gitkeep
+
+# Testes e cobertura
+/.phpunit.cache/
+/.phpunit.result.cache
+/coverage/
+
+# IDE e sistema operacional
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Planejamento interno da equipe
+/planejamento.txt
+/melhorias.txt

@@ -32,7 +32,7 @@ const token  = params.get('token') || '';
 async function validarToken() {
   if (!token) { showScreen('screenInvalid'); return; }
   try {
-    const res  = await fetch(`/process?action=reset&validate=1&token=${encodeURIComponent(token)}`);
+    const res  = await fetch(`/re.source/process?action=reset&validate=1&token=${encodeURIComponent(token)}`);
     const data = await res.json();
     showScreen(data.success ? 'screenReset' : 'screenInvalid');
   } catch {
@@ -141,7 +141,7 @@ document.getElementById('btnReset').addEventListener('click', async () => {
         document.getElementById('redirectCount').textContent = count;
         if (count <= 0) {
           clearInterval(iv);
-          location.href = '/login';
+          location.href = '/re.source/login';
         }
       }, 1000);
     } else {

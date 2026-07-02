@@ -131,6 +131,7 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--dark);
         <div class="alert" id="formFeedback" hidden></div>
 
         <form action="/re.source/anuncios/novo/processar" method="POST" enctype="multipart/form-data" id="createListingForm">
+            <?= csrf_field() ?>
             <div class="form-grid">
 
                 <div class="input-box full-width">

@@ -545,4 +545,84 @@ class AdminController
         require_once __DIR__ . '/../Views/dashboard/admin/empresas.php';
     }
 
+    public static function aprovarEmpresa(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+            http_response_code(405);
+            exit('Método não permitido.');
+        }
+
+        if (!AdminAuth::can('company_approve')) {
+            http_response_code(403);
+            exit('Você não possui permissão para aprovar empresas.');
+        }
+
+        if (!csrf_validate()) {
+            $_SESSION['admin_error'] = 'A sessão do formulário expirou. Tente novamente.';
+            header('Location: /re.source/admin/empresas');
+            exit;
+        }
+
+        $companyId = filter_input(INPUT_POST, 'company_id', FILTER_VALIDATE_INT);
+        if (!$companyId) {
+            $_SESSION['admin_error'] = 'Empresa inválida.';
+            header('Location: /re.source/admin/empresas');
+            exit;
+        }
+
+        global $pdo;
+        $adminUser = AdminAuth::user();
+
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare('SELECT status FROM companies WHERE id = ? LIMIT 1 FOR UPDATE');
+            $stmt->execute([$companyId]);
+            $oldStatus = $stmt->fetchColumn();
+
+            if ($oldStatus === false) {
+                throw new DomainException('Empresa não encontrada.');
+            }
+
+            if ($oldStatus !== 'pending') {
+                throw new DomainException('A empresa não está aguardando aprovação.');
+            }
+
+            $stmt = $pdo->prepare(
+                "UPDATE companies
+                 SET status = 'active', approved_at = NOW(), approved_by_user_id = ?
+                 WHERE id = ? AND status = 'pending'"
+            );
+            $stmt->execute([(int) $adminUser['id'], $companyId]);
+
+            $stmt = $pdo->prepare(
+                "INSERT INTO audit_logs
+                    (user_id, company_id, action, severity, entity_type, entity_id,
+                     old_values_json, new_values_json, ip_address, user_agent)
+                 VALUES (?, ?, 'COMPANY_APPROVED', 'info', 'company', ?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                (int) $adminUser['id'],
+                $companyId,
+                $companyId,
+                json_encode(['status' => $oldStatus], JSON_UNESCAPED_UNICODE),
+                json_encode(['status' => 'active'], JSON_UNESCAPED_UNICODE),
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            ]);
+
+            $pdo->commit();
+            $_SESSION['admin_success'] = 'Empresa aprovada e acesso completo liberado.';
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $_SESSION['admin_error'] = $e instanceof DomainException
+                ? $e->getMessage()
+                : 'Não foi possível aprovar a empresa.';
+        }
+
+        header('Location: /re.source/admin/empresas');
+        exit;
+    }
+
 }

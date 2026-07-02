@@ -7,9 +7,10 @@ global $pdo;
 $theme = 'light';
 $headerCompanyName = 'Minha Conta';
 $headerCompanyId = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
+$headerCompanyStatus = $_SESSION['user']['company_status'] ?? null;
 
 if ($headerCompanyId) {
-    $stmt = $pdo->prepare("SELECT theme, nome_fantasia FROM companies WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT theme, nome_fantasia, status FROM companies WHERE id = ?");
     $stmt->execute([$headerCompanyId]);
     $headerCompany = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -20,8 +21,12 @@ if ($headerCompanyId) {
         if (!empty($headerCompany['nome_fantasia'])) {
             $headerCompanyName = $headerCompany['nome_fantasia'];
         }
+        $headerCompanyStatus = $headerCompany['status'];
+        $_SESSION['user']['company_status'] = $headerCompanyStatus;
     }
 }
+$headerIsPending = $headerCompanyStatus === 'pending';
+$headerHomeUrl = $headerIsPending ? '/re.source/aguardando-aprovacao' : '/re.source/base';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="<?php echo $theme; ?>">
@@ -46,13 +51,13 @@ if ($headerCompanyId) {
     <div class="header-top-inner">
 
       <div class="logo">
-        <a href="/re.source/base">
+        <a href="<?= $headerHomeUrl ?>">
           <img src="/re.source/public/img/logos/logo.png" alt="Re.Source" />
         </a>
       </div>
 
       <nav class="desktop-nav">
-        <a href="/re.source/base"><i data-lucide="home"></i> Página Inicial</a>
+        <a href="<?= $headerHomeUrl ?>"><i data-lucide="home"></i> Página Inicial</a>
         <a href="/re.source/sobre"><i data-lucide="info"></i> Sobre Nós</a>
         <a href="/re.source/contato"><i data-lucide="phone"></i> Contato</a>
       </nav>
@@ -67,16 +72,25 @@ if ($headerCompanyId) {
       <div class="dropdown-menu" id="dropdownMenu">
         <div class="dropdown-label">
           <?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?>
+          <?php if ($headerIsPending): ?>
+            <span style="display:block;margin-top:5px;color:#9a6700;font-size:.7rem;font-weight:700;">AGUARDANDO APROVAÇÃO</span>
+          <?php endif; ?>
         </div>
-        <a href="/re.source/estatisticas" class="menu-btn">Estatísticas</a>
-        <a href="/re.source/meus-anuncios" class="menu-btn">Meus Anúncios</a>
+        <?php if ($headerIsPending): ?>
+          <a href="/re.source/aguardando-aprovacao" class="menu-btn">Status da aprovação</a>
+        <?php else: ?>
+          <a href="/re.source/estatisticas" class="menu-btn">Estatísticas</a>
+          <a href="/re.source/meus-anuncios" class="menu-btn">Meus Anúncios</a>
+        <?php endif; ?>
         <a href="/re.source/conta" class="menu-btn">Detalhes da conta</a>
         <a href="/re.source/configuracoes" class="menu-btn">Configurações</a>
 
-        <div class="dropdown-divider"></div>
-        <a href="/re.source/anuncios/novo">
-          <button class="btn-announce">Anunciar Resíduo</button>
-        </a>
+        <?php if (!$headerIsPending): ?>
+          <div class="dropdown-divider"></div>
+          <a href="/re.source/anuncios/novo">
+            <button class="btn-announce">Anunciar Resíduo</button>
+          </a>
+        <?php endif; ?>
       </div>
 
     </div>

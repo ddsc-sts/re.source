@@ -209,12 +209,13 @@ require_once __DIR__ . '/../components/header.php';
                             <a href="/re.source/anuncios/editar?id=<?= $ad['id']; ?>" class="btn-action" title="Editar" onclick="event.stopPropagation();">
                                 <i data-lucide="pencil" style="width: 18px; height: 18px;"></i>
                             </a>
-                            <a href="/re.source/anuncios/excluir?id=<?= $ad['id']; ?>" 
-                               class="btn-action btn-delete" 
-                               title="Excluir" 
-                               onclick="event.stopPropagation(); return confirm('⚠️ Deseja realmente apagar este anúncio?\nEsta ação não pode ser desfeita.');">
-                                <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
-                            </a>
+                            <form action="/re.source/anuncios/excluir" method="POST" style="display:inline;" onclick="event.stopPropagation();" onsubmit="return confirm('⚠️ Deseja realmente apagar este anúncio?\nEsta ação não pode ser desfeita.');">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="id" value="<?= (int) $ad['id'] ?>">
+                                <button type="submit" class="btn-action btn-delete" title="Excluir" style="cursor:pointer;">
+                                    <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 <?php endforeach; ?>

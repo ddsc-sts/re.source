@@ -10,6 +10,14 @@ CREATE DATABASE IF NOT EXISTS resource
 
 USE resource;
 
+-- ============================================================
+--  Re.Source — Marketplace B2B de Materiais Industriais
+--  SQL FINAL CONSOLIDADO — v4.0 (MVP academico)
+--  MariaDB 10.4+ / MySQL 8.0+
+--  Importe este arquivo dentro do banco configurado em DB_DATABASE.
+--  O banco precisa existir antes da importacao.
+-- ============================================================
+
 SET FOREIGN_KEY_CHECKS = 0;
 SET SQL_MODE = 'STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO';
 
@@ -69,9 +77,15 @@ CREATE TABLE IF NOT EXISTS companies (
     address_id            INT UNSIGNED      NULL,
     logo_url              VARCHAR(500)      NULL,
     segment               VARCHAR(100)      NULL,
-    status                ENUM('active','suspended','inactive') NOT NULL DEFAULT 'active',
+    status                ENUM('pending','active','suspended','inactive') NOT NULL DEFAULT 'pending',
     plan_id               INT UNSIGNED  NOT NULL DEFAULT 1,
     email_verified_at     TIMESTAMP         NULL,
+    approved_at           TIMESTAMP         NULL,
+    approved_by_user_id   INT UNSIGNED      NULL,
+    theme                 VARCHAR(20)    NOT NULL DEFAULT 'system',
+    notify_proposals      TINYINT(1)     NOT NULL DEFAULT 1,
+    notify_chat           TINYINT(1)     NOT NULL DEFAULT 1,
+    balance               DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
     onboarding_completed  TINYINT(1)    NOT NULL DEFAULT 0,
     suspended_at          TIMESTAMP         NULL,
     deactivated_at        TIMESTAMP         NULL,
@@ -96,7 +110,7 @@ CREATE TABLE IF NOT EXISTS users (
     name            VARCHAR(120)  NOT NULL,
     email           VARCHAR(150)  NOT NULL,
     password_hash   VARCHAR(255)  NOT NULL,
-    role            ENUM('admin_company','operator') NOT NULL DEFAULT 'admin_company',
+    role            ENUM('admin','staff','admin_company','operator') NOT NULL DEFAULT 'admin_company',
     is_active       TINYINT(1)    NOT NULL DEFAULT 1,
     last_login_at   TIMESTAMP         NULL,
     deleted_at      TIMESTAMP         NULL,
@@ -568,36 +582,39 @@ CREATE TABLE IF NOT EXISTS search_alerts (
     CONSTRAINT fk_sa_company FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `views_history` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `listing_id` INT UNSIGNED NOT NULL,
-    `company_id` INT DEFAULT NULL,
-    `session_id` VARCHAR(128) NOT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`listing_id`) REFERENCES `listings`(`id`) ON DELETE CASCADE
-);
+-- ============================================================
+-- 25. HISTORICO DE VISUALIZACOES
+-- ============================================================
+CREATE TABLE IF NOT EXISTS views_history (
+    id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    listing_id  INT UNSIGNED NOT NULL,
+    company_id  INT UNSIGNED     NULL,
+    session_id  VARCHAR(128) NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_views_listing_date (listing_id, created_at),
+    INDEX idx_views_company (company_id),
+    CONSTRAINT fk_views_listing FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE,
+    CONSTRAINT fk_views_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE companies 
-ADD COLUMN theme VARCHAR(20) DEFAULT 'system',
-ADD COLUMN notify_proposals TINYINT(1) DEFAULT 1,
-ADD COLUMN notify_chat TINYINT(1) DEFAULT 1;
+-- ============================================================
+-- 26. MOVIMENTACOES FINANCEIRAS DO SALDO
+-- ============================================================
+CREATE TABLE IF NOT EXISTS financial_transactions (
+    id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    company_id  INT UNSIGNED NOT NULL,
+    type        ENUM('deposit','withdrawal','sale','refund') NOT NULL,
+    amount      DECIMAL(10,2) NOT NULL,
+    status      ENUM('pending','completed','failed','canceled') NOT NULL DEFAULT 'pending',
+    description VARCHAR(255) NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_financial_company_status (company_id, status),
+    CONSTRAINT fk_financial_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 1. Adicionar a coluna de saldo na tabela de empresas (ou usuários)
-ALTER TABLE companies ADD COLUMN balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00;
-
--- 2. Criar uma tabela de histórico de transações (Essencial para auditoria, saques e depósitos)
-CREATE TABLE financial_transactions (
-     id INT AUTO_INCREMENT PRIMARY KEY,
-     company_id INT UNSIGNED NOT NULL, -- Mudado para INT UNSIGNED
-     type ENUM('deposit', 'withdrawal', 'sale', 'refund') NOT NULL,
-     amount DECIMAL(10, 2) NOT NULL,
-     status ENUM('pending', 'completed', 'failed', 'canceled') NOT NULL DEFAULT 'pending',
-     description VARCHAR(255) NULL,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-);
-
--- 25. Solicitações de saque do painel de estatísticas
+-- 27. SOLICITACOES DE SAQUE
 CREATE TABLE IF NOT EXISTS withdrawals (
     id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     company_id INT UNSIGNED NOT NULL,
@@ -622,17 +639,19 @@ CREATE TABLE IF NOT EXISTS withdrawals (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
--- RESUMO — v3.1
--- 25 tabelas: plans, addresses, companies, users,
+-- RESUMO — v4.0
+-- 27 tabelas: plans, addresses, companies, users,
 --   email_verifications, user_sessions, password_resets,
 --   blocked_email_domains, categories, listings,
 --   listing_images, favorites, negotiations, proposals,
 --   messages, carriers, freights, transactions,
 --   notifications, uploads, cnpj_validations,
---   audit_logs, listing_status_history, search_alerts, withdrawals
+--   audit_logs, listing_status_history, search_alerts,
+--   views_history, financial_transactions, withdrawals
 --
--- Fluxo de cadastro (v3.1):
+-- Fluxo de cadastro:
 --   Dados ficam em $_SESSION até confirmação do e-mail.
 --   Só após clicar no link o usuário é gravado no banco
---   via BackEnd/auth/verificar.php
+--   via AuthController::processVerificar().
 -- ============================================================
+

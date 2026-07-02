@@ -1,3 +1,12 @@
+<?php
+$totalEmpresas = count($empresas ?? []);
+$totalAtivas = count(array_filter($empresas ?? [], static fn(array $item): bool => $item['status'] === 'active'));
+$totalPendentes = count(array_filter($empresas ?? [], static fn(array $item): bool => $item['status'] === 'pending'));
+$totalSuspensas = count(array_filter($empresas ?? [], static fn(array $item): bool => $item['status'] === 'suspended'));
+$adminSuccess = $_SESSION['admin_success'] ?? null;
+$adminError = $_SESSION['admin_error'] ?? null;
+unset($_SESSION['admin_success'], $_SESSION['admin_error']);
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -28,17 +37,27 @@
         <h1 class="hero-title">Empresas cadastradas</h1>
         <p class="hero-subtitle">Gerencie o ciclo de vida das empresas da plataforma — <strong>aprove, recuse, analise ou desative</strong> cadastros com poucos cliques.</p>
         <div class="hero-meta">
-          <span class="hero-meta-item"><i data-lucide="check-circle-2"></i> 128 ativas</span>
-          <span class="hero-meta-item"><i data-lucide="clock"></i> 12 pendentes</span>
-          <span class="hero-meta-item"><i data-lucide="alert-triangle"></i> 3 em análise</span>
+          <span class="hero-meta-item"><i data-lucide="check-circle-2"></i> <?= $totalAtivas ?> ativas</span>
+          <span class="hero-meta-item"><i data-lucide="clock"></i> <?= $totalPendentes ?> pendentes</span>
+          <span class="hero-meta-item"><i data-lucide="alert-triangle"></i> <?= $totalSuspensas ?> suspensas</span>
         </div>
       </div>
       <div class="hero-right">
-        <div class="hero-badge-num">143</div>
+        <div class="hero-badge-num"><?= $totalEmpresas ?></div>
         <div class="hero-badge-label">Total</div>
         <div class="hero-badge-sub">Empresas no sistema</div>
       </div>
     </section>
+    <?php if ($adminSuccess): ?>
+      <div style="margin:0 0 18px;padding:14px 16px;border-radius:10px;background:#eaf8f0;color:#11663d;border:1px solid #b9e3cb;">
+        <?= htmlspecialchars($adminSuccess, ENT_QUOTES, 'UTF-8') ?>
+      </div>
+    <?php endif; ?>
+    <?php if ($adminError): ?>
+      <div style="margin:0 0 18px;padding:14px 16px;border-radius:10px;background:#fff1f0;color:#a61b1b;border:1px solid #f1b8b4;">
+        <?= htmlspecialchars($adminError, ENT_QUOTES, 'UTF-8') ?>
+      </div>
+    <?php endif; ?>
     <div class="card">
       <div class="card-header">
         <div>
@@ -152,37 +171,19 @@
                     <td>
                         <div class="action-buttons" style="justify-content:flex-end">
 
-                            <button
-                                class="btn-icon success"
-                                title="Aprovar"
-                                data-id="<?= $e['id'] ?>"
-                            >
-                                <i data-lucide="check"></i>
-                            </button>
-
-                            <button
-                                class="btn-icon danger"
-                                title="Recusar"
-                                data-id="<?= $e['id'] ?>"
-                            >
-                                <i data-lucide="x"></i>
-                            </button>
-
-                            <button
-                                class="btn-icon warning"
-                                title="Desativar"
-                                data-id="<?= $e['id'] ?>"
-                            >
-                                <i data-lucide="ban"></i>
-                            </button>
-
-                            <button
-                                class="btn-icon"
-                                title="Analisar"
-                                data-id="<?= $e['id'] ?>"
-                            >
-                                <i data-lucide="search"></i>
-                            </button>
+                            <?php if ($e['status'] === 'pending' && AdminAuth::can('company_approve')): ?>
+                              <form method="POST" action="/re.source/admin/empresas/aprovar" onsubmit="return confirm('Aprovar esta empresa e liberar o acesso completo?')">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="company_id" value="<?= (int) $e['id'] ?>">
+                                <button class="btn-icon success" type="submit" title="Aprovar empresa">
+                                  <i data-lucide="check"></i>
+                                </button>
+                              </form>
+                            <?php else: ?>
+                              <span title="Nenhuma ação pendente" style="color:#98a2b3;display:inline-flex;padding:8px;">
+                                <i data-lucide="check-circle-2"></i>
+                              </span>
+                            <?php endif; ?>
 
                         </div>
                     </td>

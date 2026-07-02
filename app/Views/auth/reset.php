@@ -163,6 +163,6 @@
     <a href="#" style="color:var(--green);">Política de Privacidade</a>
   </footer>
 
-  <script src="/re.source/public/js/reset.js"></script>
+  <script src="/re.source/public/js/reset.js?v=2"></script>
 </body>
 </html>

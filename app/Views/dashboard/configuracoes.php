@@ -144,6 +144,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     <div class="dashboard-content">
         
         <form action="/re.source/configuracoes/salvar" method="POST">
+            <?= csrf_field() ?>
             
             <div class="config-panel">
                 <div class="panel-header">
@@ -289,6 +290,7 @@ input:checked + .slider:before { transform: translateX(22px); }
                     <p>Ação irreversível. Apaga permanentemente seus anúncios ativos, histórico de propostas e relatórios fiscais.</p>
                 </div>
                 <form action="/re.source/conta/excluir" method="POST" onsubmit="return confirm('Tem certeza absoluta? Esta ação não pode ser desfeita.');">
+                    <?= csrf_field() ?>
                     <button type="submit" class="btn-danger">Excluir Conta</button>
                 </form>
             </div>
@@ -305,6 +307,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         <div class="modal-actions">
             <button type="button" class="btn-logout" onclick="toggleDeleteModal(false)">Cancelar</button>
             <form action="/re.source/conta/excluir" method="POST" style="display: inline;">
+                <?= csrf_field() ?>
                 <button type="submit" class="btn-danger">Sim, Excluir Tudo</button>
             </form>
         </div>

@@ -29,6 +29,11 @@ return [
         'action' => ['AuthController', 'pendente'],
     ],
 
+    '/aguardando-aprovacao' => [
+        'action'     => ['AuthController', 'aguardandoAprovacao'],
+        'middleware' => [['UserAuth', 'required']],
+    ],
+
     '/reset' => [
         'action' => ['AuthController', 'showReset'],
     ],
@@ -51,7 +56,7 @@ return [
     // ── Dashboard usuário comum ───────────────────────────
     '/base' => [
         'action'     => ['BaseController', 'index'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     // ── Busca ─────────────────────────────────────────────
@@ -67,37 +72,37 @@ return [
     // Lista os anúncios da própria empresa (era meusAnuncios.php)
     '/meus-anuncios' => [
         'action'     => ['ListingController', 'showMeus'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     // Form de criação de anúncio (era criarResiduo.php / novoAnuncio.php)
     '/anuncios/novo' => [
         'action'     => ['ListingController', 'showCreate'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     // Processa o POST de criação (era process create)
     '/anuncios/novo/processar' => [
         'action'     => ['ListingController', 'processCreate'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     // Form de edição de anúncio — usa ?id= (era editarResiduo.php)
     '/anuncios/editar' => [
         'action'     => ['ListingController', 'showEdit'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     // Processa o POST de edição
     '/anuncios/editar/processar' => [
         'action'     => ['ListingController', 'processEdit'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     // Exclusão de anúncio — usa ?id= (era deletar)
     '/anuncios/excluir' => [
         'action'     => ['ListingController', 'processDelete'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     // ── Conta / Configurações usuário ─────────────────────
@@ -128,37 +133,37 @@ return [
 
     '/estatisticas' => [
         'action'     => ['EstatisticasController', 'index'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     '/estatisticas/saque' => [
         'action'     => ['EstatisticasController', 'saque'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     '/estatisticas/processar-saque' => [
         'action'     => ['EstatisticasController', 'processarSaque'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     '/negociacoes' => [
         'action'     => ['BaseController', 'negociacoes'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     '/logistica' => [
         'action'     => ['BaseController', 'logistica'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     '/impacto' => [
         'action'     => ['BaseController', 'impacto'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     '/suporte' => [
         'action'     => ['BaseController', 'suporte'],
-        'middleware' => [['UserAuth', 'required']],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
     // ── Admin ─────────────────────────────────────────────
@@ -169,6 +174,11 @@ return [
 
     '/admin/empresas' => [
         'action'     => ['AdminController', 'empresas'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/empresas/aprovar' => [
+        'action'     => ['AdminController', 'aprovarEmpresa'],
         'middleware' => [['AdminAuth', 'required']],
     ],
 

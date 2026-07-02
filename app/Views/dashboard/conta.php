@@ -182,6 +182,7 @@ require_once __DIR__ . '/../components/header.php';
     <div class="dashboard-content">
 
         <form action="/re.source/conta/atualizar" method="POST" enctype="multipart/form-data">
+            <?= csrf_field() ?>
 
             <div class="account-panel">
                 <div class="panel-header">

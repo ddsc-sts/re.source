@@ -150,6 +150,12 @@ class BaseController
             exit();
         }
 
+        if (!csrf_validate()) {
+            $_SESSION['error'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
+            header('Location: /re.source/conta');
+            exit();
+        }
+
         $nome_fantasia    = filter_input(INPUT_POST, 'nome_fantasia', FILTER_SANITIZE_SPECIAL_CHARS);
         $razao_social     = filter_input(INPUT_POST, 'razao_social', FILTER_SANITIZE_SPECIAL_CHARS);
         $segment          = filter_input(INPUT_POST, 'segment', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -304,6 +310,12 @@ class BaseController
             exit();
         }
 
+        if (!csrf_validate()) {
+            $_SESSION['error'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
+            header('Location: /re.source/configuracoes');
+            exit();
+        }
+
         $theme = filter_input(INPUT_POST, 'theme', FILTER_SANITIZE_SPECIAL_CHARS) ?? 'system';
         $notify_proposals = isset($_POST['notify_proposals']) ? 1 : 0;
         $notify_chat      = isset($_POST['notify_chat']) ? 1 : 0;
@@ -330,6 +342,12 @@ class BaseController
 
         if (!$company_id || $_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: /re.source/configuracoes");
+            exit();
+        }
+
+        if (!csrf_validate()) {
+            $_SESSION['error'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
+            header('Location: /re.source/configuracoes');
             exit();
         }
 

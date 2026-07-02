@@ -64,6 +64,7 @@ require_once __DIR__ . '/../components/header.php';
         <?php endif; ?>
 
         <form action="/re.source/anuncios/editar/processar" method="POST" enctype="multipart/form-data" id="editListingForm">
+            <?= csrf_field() ?>
             <input type="hidden" name="listing_id" value="<?= (int) $id ?>">
             <div id="deletedImagesInputs"></div>
             <div class="form-grid">

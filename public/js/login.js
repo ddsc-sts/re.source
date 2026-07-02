@@ -96,6 +96,7 @@ document.getElementById('btnLogin').addEventListener('click', async (e) => {
     const fd = new FormData();
     fd.append('email', email);
     fd.append('password', senha);
+    fd.append('csrf_token', document.getElementById('loginCsrf')?.value ?? '');
 
     // 🚀 CORREÇÃO: URL ajustada para a pasta do XAMPP
     const res = await fetch('/re.source/process?action=login', {

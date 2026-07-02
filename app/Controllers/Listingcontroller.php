@@ -210,6 +210,12 @@ class ListingController
             exit;
         }
 
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || !csrf_validate()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Sessão expirada. Recarregue a página e tente novamente.']);
+            exit;
+        }
+
         global $pdo;
 
         $type           = filter_input(INPUT_POST, 'type', FILTER_DEFAULT);
@@ -305,6 +311,12 @@ class ListingController
         $companyId = self::companyId();
         if (!$companyId) {
             header('Location: /re.source/login');
+            exit;
+        }
+
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || !csrf_validate()) {
+            $_SESSION['error'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
+            header('Location: /re.source/meus-anuncios');
             exit;
         }
 
@@ -465,8 +477,14 @@ class ListingController
             exit;
         }
 
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || !csrf_validate()) {
+            $_SESSION['error'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
+            header('Location: /re.source/meus-anuncios');
+            exit;
+        }
+
         global $pdo;
-        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
         if ($id) {
             try {
