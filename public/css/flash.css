@@ -1,0 +1,8 @@
+.flash-container { position:fixed; top:1rem; right:1rem; z-index:1000000; display:grid; gap:.75rem; width:min(420px,calc(100vw - 2rem)); }
+.flash-message { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:.75rem; padding:.9rem 1rem; border:1px solid; border-radius:.65rem; background:#fff; box-shadow:0 12px 30px rgba(15,23,42,.16); font:500 .9rem/1.4 'Inter',sans-serif; }
+.flash-message svg { width:1.2rem; height:1.2rem; }
+.flash-success { color:#166534; border-color:#86efac; background:#f0fdf4; }
+.flash-error { color:#991b1b; border-color:#fca5a5; background:#fef2f2; }
+.flash-warning { color:#92400e; border-color:#fcd34d; background:#fffbeb; }
+.flash-info { color:#1e40af; border-color:#93c5fd; background:#eff6ff; }
+.flash-close { border:0; background:transparent; color:inherit; cursor:pointer; font-size:1.35rem; line-height:1; }

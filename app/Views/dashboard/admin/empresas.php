@@ -3,9 +3,6 @@ $totalEmpresas = count($empresas ?? []);
 $totalAtivas = count(array_filter($empresas ?? [], static fn(array $item): bool => $item['status'] === 'active'));
 $totalPendentes = count(array_filter($empresas ?? [], static fn(array $item): bool => $item['status'] === 'pending'));
 $totalSuspensas = count(array_filter($empresas ?? [], static fn(array $item): bool => $item['status'] === 'suspended'));
-$adminSuccess = $_SESSION['admin_success'] ?? null;
-$adminError = $_SESSION['admin_error'] ?? null;
-unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -21,8 +18,11 @@ unset($_SESSION['admin_success'], $_SESSION['admin_error']);
 <link rel="stylesheet" href="/re.source/public/css/admin-dashboard.css" />
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <link rel="stylesheet" href="/re.source/public/css/empresas.css" />
+<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
 </head>
 <body>
+
+<?php require __DIR__ . '/../../components/flash.php'; ?>
 
 <header class="site-header">
     <?php require_once __DIR__ . '/../../components/topbar.php'; ?>
@@ -48,16 +48,6 @@ unset($_SESSION['admin_success'], $_SESSION['admin_error']);
         <div class="hero-badge-sub">Empresas no sistema</div>
       </div>
     </section>
-    <?php if ($adminSuccess): ?>
-      <div style="margin:0 0 18px;padding:14px 16px;border-radius:10px;background:#eaf8f0;color:#11663d;border:1px solid #b9e3cb;">
-        <?= htmlspecialchars($adminSuccess, ENT_QUOTES, 'UTF-8') ?>
-      </div>
-    <?php endif; ?>
-    <?php if ($adminError): ?>
-      <div style="margin:0 0 18px;padding:14px 16px;border-radius:10px;background:#fff1f0;color:#a61b1b;border:1px solid #f1b8b4;">
-        <?= htmlspecialchars($adminError, ENT_QUOTES, 'UTF-8') ?>
-      </div>
-    <?php endif; ?>
     <div class="card">
       <div class="card-header">
         <div>

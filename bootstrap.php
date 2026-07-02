@@ -14,6 +14,12 @@ define('CONTROLLER_PATH', APP_PATH . '/Controllers');
 define('VIEW_PATH', APP_PATH . '/Views');
 define('PUBLIC_PATH', ROOT_PATH . '/public');
 
+$appBasePath = '/' . trim((string) env('APP_BASE_PATH', '/re.source'), '/');
+if ($appBasePath === '/') {
+    $appBasePath = '';
+}
+define('APP_BASE_PATH', $appBasePath);
+
 // Carrega a conexão com o banco de dados
 require_once CONFIG_PATH . '/conexao.php';
 
@@ -42,6 +48,38 @@ function csrf_validate(?string $token = null): bool {
     return $token !== ''
         && isset($_SESSION['_csrf_token'])
         && hash_equals((string) $_SESSION['_csrf_token'], $token);
+}
+
+/** Monta uma URL interna sem espalhar o subdiretorio da aplicacao pelo codigo. */
+function app_url(string $path = ''): string {
+    $path = '/' . ltrim($path, '/');
+    return APP_BASE_PATH . ($path === '/' ? '/' : $path);
+}
+
+/** Redireciona para uma rota interna e encerra a requisicao. */
+function redirect_to(string $path, int $status = 302): never {
+    header('Location: ' . app_url($path), true, $status);
+    exit;
+}
+
+/** Registra uma mensagem que sera exibida uma unica vez apos o redirect. */
+function flash(string $type, string $message): void {
+    $allowedTypes = ['success', 'error', 'warning', 'info'];
+    if (!in_array($type, $allowedTypes, true)) {
+        $type = 'info';
+    }
+
+    $_SESSION['_flash'][] = [
+        'type' => $type,
+        'message' => trim($message),
+    ];
+}
+
+/** Retira todas as mensagens flash da sessao. */
+function pull_flashes(): array {
+    $messages = $_SESSION['_flash'] ?? [];
+    unset($_SESSION['_flash']);
+    return is_array($messages) ? $messages : [];
 }
 
 // Função helper para carregar views

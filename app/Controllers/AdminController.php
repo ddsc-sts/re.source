@@ -558,16 +558,14 @@ class AdminController
         }
 
         if (!csrf_validate()) {
-            $_SESSION['admin_error'] = 'A sessão do formulário expirou. Tente novamente.';
-            header('Location: /re.source/admin/empresas');
-            exit;
+            flash('error', 'A sessão do formulário expirou. Tente novamente.');
+            redirect_to('/admin/empresas');
         }
 
         $companyId = filter_input(INPUT_POST, 'company_id', FILTER_VALIDATE_INT);
         if (!$companyId) {
-            $_SESSION['admin_error'] = 'Empresa inválida.';
-            header('Location: /re.source/admin/empresas');
-            exit;
+            flash('error', 'Empresa inválida.');
+            redirect_to('/admin/empresas');
         }
 
         global $pdo;
@@ -611,18 +609,20 @@ class AdminController
             ]);
 
             $pdo->commit();
-            $_SESSION['admin_success'] = 'Empresa aprovada e acesso completo liberado.';
+            flash('success', 'Empresa aprovada e acesso completo liberado.');
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
-            $_SESSION['admin_error'] = $e instanceof DomainException
-                ? $e->getMessage()
-                : 'Não foi possível aprovar a empresa.';
+            flash(
+                'error',
+                $e instanceof DomainException
+                    ? $e->getMessage()
+                    : 'Não foi possível aprovar a empresa.'
+            );
         }
 
-        header('Location: /re.source/admin/empresas');
-        exit;
+        redirect_to('/admin/empresas');
     }
 
 }

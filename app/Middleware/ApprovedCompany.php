@@ -11,8 +11,8 @@ class ApprovedCompany
 
         $companyId = (int) ($_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 0);
         if (!$companyId) {
-            header('Location: /re.source/login?aviso=' . urlencode('Faça login para continuar.'));
-            exit;
+            flash('warning', 'Faça login para continuar.');
+            redirect_to('/login');
         }
 
         global $pdo;
@@ -23,23 +23,25 @@ class ApprovedCompany
         if ($statusValue === false) {
             $_SESSION = [];
             session_destroy();
-            header('Location: /re.source/login?aviso=' . urlencode('Sua sessão não é mais válida. Faça login novamente.'));
-            exit;
+            session_start();
+            flash('error', 'Sua sessão não é mais válida. Faça login novamente.');
+            redirect_to('/login');
         }
 
         $status = (string) $statusValue;
         $_SESSION['user']['company_status'] = $status;
 
         if ($status === 'pending') {
-            header('Location: /re.source/aguardando-aprovacao?aviso=' . urlencode('Este recurso será liberado após a aprovação da empresa.'));
-            exit;
+            flash('warning', 'Este recurso será liberado após a aprovação da empresa.');
+            redirect_to('/aguardando-aprovacao');
         }
 
         if ($status !== 'active') {
             $_SESSION = [];
             session_destroy();
-            header('Location: /re.source/login?aviso=' . urlencode('Empresa suspensa ou inativa.'));
-            exit;
+            session_start();
+            flash('error', 'Empresa suspensa ou inativa.');
+            redirect_to('/login');
         }
     }
 }

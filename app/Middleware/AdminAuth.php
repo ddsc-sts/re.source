@@ -40,8 +40,8 @@ class AdminAuth
         $user = $_SESSION['user'] ?? null;
 
         if (!$user) {
-            header('Location: /re.source/login?aviso=' . urlencode('Faça login para acessar o painel.'));
-            exit;
+            flash('warning', 'Faça login para acessar o painel.');
+            redirect_to('/login');
         }
 
         if (!in_array($user['role'] ?? '', self::ALLOWED_ROLES, true)) {
@@ -49,7 +49,7 @@ class AdminAuth
             echo '<!DOCTYPE html><html lang="pt-BR"><body style="font-family:sans-serif;padding:2rem">
                     <h2>Acesso negado</h2>
                     <p>Você não tem permissão para acessar esta área.</p>
-                    <a href="/re.source/base">← Voltar à plataforma</a>
+                    <a href="' . htmlspecialchars(app_url('/base'), ENT_QUOTES, 'UTF-8') . '">← Voltar à plataforma</a>
                   </body></html>';
             exit;
         }

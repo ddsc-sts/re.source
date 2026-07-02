@@ -147,7 +147,32 @@ return [
     ],
 
     '/negociacoes' => [
-        'action'     => ['BaseController', 'negociacoes'],
+        'action'     => ['ChatController', 'index'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/conversas' => [
+        'action'     => ['ChatController', 'index'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/conversas/abrir' => [
+        'action'     => ['ChatController', 'show'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/conversas/iniciar' => [
+        'action'     => ['NegotiationController', 'start'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/conversas/enviar' => [
+        'action'     => ['ChatController', 'send'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/conversas/mensagens' => [
+        'action'     => ['ChatController', 'messages'],
         'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 

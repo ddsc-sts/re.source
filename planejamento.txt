@@ -1,0 +1,573 @@
+# RE.SOURCE — PLANO DE EMERGENCIA DO MVP
+
+Apresentacao academica: 6 dias de desenvolvimento
+Equipe: Leonardo, Daniel e Geder
+Dia 1: Leonardo trabalhando sozinho
+Dias 2 a 6: equipe completa
+
+Este documento e interno e nao deve ser publicado no repositorio.
+
+===============================================================================
+1. OBJETIVO DO MVP
+===============================================================================
+
+Entregar um fluxo unico, funcional e apresentavel:
+
+Cadastro
+-> confirmacao de e-mail
+-> login com empresa pendente
+-> navegacao limitada
+-> aprovacao pelo administrador
+-> dashboard liberado
+-> anuncio e chat
+-> proposta e acordo mutuo
+-> escolha de frete
+-> confirmacao de entrega por codigo
+-> liberacao de saldo
+-> solicitacao de saque PIX/TED
+-> aprovacao do saque pelo administrador
+
+Regra principal: os dados e as mudancas de status do fluxo devem ser reais e
+persistidos no banco. Somente integracoes externas ou infraestrutura complexa
+poderao ser simuladas.
+
+Antes de implementar qualquer simulacao, a equipe deve confirmar com o
+responsavel pelo projeto se sera usado mock ou integracao real.
+
+===============================================================================
+2. ESCOPO OBRIGATORIO
+===============================================================================
+
+2.1 Fluxo da empresa
+
+- Cadastro e confirmacao por e-mail.
+- Login para empresa pendente e aprovada.
+- Empresa pendente pode ver anuncios, conta e configuracoes.
+- Empresa pendente nao pode anunciar, conversar, negociar, contratar frete ou
+  solicitar saque.
+- Empresa aprovada acessa o dashboard completo.
+- Inicio de conversa a partir de um anuncio de outra empresa.
+- Chat persistido no banco.
+- Proposta com quantidade, valor, prazo e responsavel pelo frete.
+- Aceite mutuo do acordo.
+- Escolha de frete.
+- Acompanhamento simples da entrega.
+- Codigo de entrega de seis digitos, de uso unico.
+- Liberacao do saldo ao vendedor somente depois da entrega.
+- Estatisticas financeiras baseadas no banco.
+- Solicitacao de saque por PIX ou TED com status "em analise".
+
+2.2 Fluxo administrativo
+
+- Login e permissao de administrador.
+- Listagem e aprovacao de empresas pendentes.
+- Visualizacao das empresas, anuncios, negociacoes e entregas.
+- Visualizacao de metricas gerais.
+- Listagem, aprovacao e recusa de saques.
+- Registro minimo das acoes administrativas.
+
+2.3 Protecoes minimas
+
+- CSRF em acoes POST importantes.
+- Verificacao de propriedade de anuncio, conversa e negociacao.
+- Bloqueio de negociacao com o proprio anuncio.
+- Bloqueio de conversa duplicada para o mesmo anuncio e par de empresas.
+- Transacao de banco ao liberar ou reservar saldo.
+- Codigo de entrega armazenado como hash, com tentativas limitadas e uso unico.
+- Falha de e-mail nao pode desfazer uma operacao ja salva.
+
+===============================================================================
+3. REGRAS E ESTADOS DO MVP
+===============================================================================
+
+3.1 Status da empresa
+
+- pending: pode entrar, navegar, editar conta e configuracoes.
+- active: possui acesso completo ao fluxo da empresa.
+- suspended: login bloqueado.
+- inactive: conta desativada.
+
+3.2 Status da negociacao
+
+open
+-> proposal_sent
+-> buyer_accepted / seller_accepted
+-> accepted
+-> awaiting_freight
+-> shipping
+-> delivered
+-> concluded
+
+Cancelamento sera permitido somente antes da confirmacao da entrega.
+
+3.3 Regra financeira academica
+
+- O valor aceito no acordo sera o valor bruto da transacao.
+- Antes da entrega, o valor aparecera como saldo futuro.
+- Depois do codigo correto, o valor sera liberado ao vendedor.
+- Taxa da plataforma podera ser calculada internamente, sem cobranca real.
+- Saque pendente reserva o valor para impedir solicitacao duplicada.
+- Saque recusado devolve o valor ao saldo disponivel.
+- Saque aprovado registra a saida como concluida.
+
+===============================================================================
+4. RESPONSABILIDADES DA EQUIPE
+===============================================================================
+
+LEONARDO — Fluxo principal do site
+
+- Backend do cliente e regras de negocio centrais.
+- Banco, migrations e integridade das transacoes.
+- Autenticacao, status da empresa e permissoes da empresa.
+- Chat, negociacao, acordo, frete, entrega, saldo e saque.
+- Rotas e controllers do fluxo principal.
+- Frontend basico necessario para cada recurso funcionar.
+- Correcao dos bloqueadores de integracao.
+
+DANIEL — Administracao e acabamento visual
+
+- Backend administrativo.
+- Frontend completo da area administrativa.
+- Aprovacao de empresas e saques.
+- Metricas e visualizacao dos dados gerais.
+- Frontend final das telas criadas por Leonardo.
+- Padronizacao visual, responsividade, badges, modais, feedback e loading.
+- Remocao de botoes falsos e dados mockados das telas administrativas.
+
+GEDER — Revisao, integracao e apoio transversal
+
+- Revisao das regras e do codigo criado por Leonardo e Daniel.
+- Testes manuais de cada fluxo e registro dos defeitos.
+- Correcoes de frontend que nao conflitem com o trabalho de Daniel.
+- Correcao de textos, navegacao, responsividade e inconsistencias.
+- Testes de permissao, propriedade, sessoes e cenarios de erro.
+- Preparacao dos dados, roteiro, documentacao e ambiente da apresentacao.
+- Apoio onde houver atraso ou bloqueio, depois de alinhar a propriedade do
+  arquivo com Leonardo ou Daniel.
+
+===============================================================================
+5. REGRAS DE COLABORACAO
+===============================================================================
+
+- Leonardo sera o responsavel principal por routes/web.php e pelo schema.
+- Daniel comunicara as rotas administrativas necessarias antes da integracao.
+- Geder evitara alterar um arquivo enquanto ele estiver em edicao por outro
+  integrante.
+- Cada funcionalidade deve ser entregue em commits pequenos e identificaveis.
+- Sugestao de branches:
+  - feature/leonardo-fluxo-cliente
+  - feature/daniel-admin-ui
+  - review/geder-integracao
+- Integrar alteracoes duas vezes por dia: meio do dia e fim do dia.
+- Antes de integrar: executar PHP lint e o teste manual da funcionalidade.
+- Nao iniciar extras enquanto a meta obrigatoria do dia estiver quebrada.
+- A partir do fim do Dia 5, nenhuma mudanca estrutural entra sem consenso.
+
+===============================================================================
+6. CRONOGRAMA DE 6 DIAS
+===============================================================================
+
+-------------------------------------------------------------------------------
+DIA 1 — FUNDACAO, CADASTRO PENDENTE E PERMISSOES
+Responsavel: Leonardo
+-------------------------------------------------------------------------------
+
+Concluido:
+
+[x] Criacao de .env, .env.example e .gitignore.
+[x] Carregador de variaveis de ambiente.
+[x] Migracao da conexao e do SMTP para variaveis de ambiente.
+[x] Remocao das credenciais dos arquivos atuais.
+[x] Protecao HTTP dos arquivos e diretorios internos.
+[x] Migration de empresas pending e papeis administrativos.
+[x] Conta administrativa e contas de demonstracao.
+[x] Login e pagina da empresa aguardando aprovacao.
+[x] Middleware de empresa aprovada.
+[x] Aprovacao administrativa com CSRF e audit_log.
+[x] Bloqueio visual e de backend para empresa pendente.
+[x] CSRF em login, cadastro, conta, preferencias e anuncios.
+[x] Exclusao de anuncio convertida de GET para POST.
+[x] Validacao real do CNPJ no backend com cache.
+[x] Correcao das URLs do reset de senha.
+[x] Teste pending -> admin aprova -> acesso liberado.
+[x] Configuracao de MAIL_PASSWORD e teste real do envio de e-mail.
+[x] Unificacao do schema e dos inserts em arquivos SQL puros.
+[x] Configuracao do banco principal como resource.
+[x] Teste manual do fluxo completo do Dia 1.
+[x] Commit das alteracoes do Dia 1.
+
+Meta obrigatoria do Dia 1:
+
+Cadastro -> e-mail -> login pendente -> admin aprova -> acesso completo.
+
+Se sobrar tempo:
+
+[x] Criar componente padrao de flash messages.
+[x] Centralizar APP_BASE_PATH nas novas rotas.
+
+-------------------------------------------------------------------------------
+DIA 2 — CHAT FUNCIONAL E ADMIN DE EMPRESAS
+Responsaveis: Leonardo, Daniel e Geder
+-------------------------------------------------------------------------------
+
+Leonardo — backend e frontend funcional do cliente:
+
+[x] Criar ChatController e NegotiationController.
+[x] Criar rotas para iniciar conversa, listar conversas e enviar mensagens.
+[x] Usar as tabelas negotiations e messages existentes, ajustando o schema.
+[x] Validar empresa aprovada, propriedade e anuncio de outra empresa.
+[x] Impedir conversa duplicada.
+[x] Implementar polling HTTP simples para buscar novas mensagens.
+[x] Criar telas basicas de lista e conversa.
+
+Daniel — administracao e visual:
+
+[ ] Finalizar backend da aprovacao, suspensao e reativacao de empresas.
+[ ] Finalizar tela administrativa de empresas pendentes.
+[ ] Criar filtros por status e modal de confirmacao.
+[ ] Aplicar o visual final na tela pendente e no chat criado por Leonardo.
+[ ] Padronizar badges de empresa e estados de loading.
+
+Geder — revisao e integracao:
+
+[ ] Testar cadastro, login pendente, aprovacao e login aprovado.
+[ ] Testar acesso indevido de empresa pendente.
+[ ] Testar conversa consigo mesmo e conversa duplicada.
+[ ] Revisar responsividade e textos das telas do Dia 1.
+[ ] Registrar e corrigir defeitos pequenos sem conflitar com arquivos em uso.
+
+Meta obrigatoria do Dia 2:
+
+Duas empresas aprovadas conseguem abrir uma unica conversa e trocar mensagens
+persistidas no banco.
+
+Se sobrar tempo:
+
+[ ] Contador de mensagens nao lidas.
+[ ] Indicador visual de atualizacao do chat.
+
+Portao de decisao antes do desenvolvimento:
+
+[x] Confirmado e implementado polling HTTP a cada 3 segundos.
+
+-------------------------------------------------------------------------------
+DIA 3 — PROPOSTA, ACORDO MUTUO E NOTIFICACOES
+Responsaveis: Leonardo, Daniel e Geder
+-------------------------------------------------------------------------------
+
+Leonardo:
+
+[ ] Criar proposta vinculada a conversa e ao anuncio.
+[ ] Salvar quantidade, valor unitario, total, prazo e responsavel pelo frete.
+[ ] Implementar aceite independente de comprador e vendedor.
+[ ] Gerar protocolo unico quando os dois aceitarem.
+[ ] Atualizar negociacao e anuncio de forma transacional.
+[ ] Impedir edicao da proposta depois do acordo mutuo.
+[ ] Criar notificacoes internas.
+[ ] Criar chamadas para os e-mails do fluxo sem bloquear a operacao principal.
+[ ] Entregar frontend funcional de proposta e aceite.
+
+Daniel:
+
+[ ] Criar modal visual de proposta.
+[ ] Criar card de proposta dentro do chat.
+[ ] Criar estados visuais "aguardando comprador", "aguardando vendedor" e
+  "acordo confirmado".
+[ ] Finalizar o layout completo do chat em desktop e mobile.
+[ ] Iniciar painel administrativo de negociacoes.
+
+Geder:
+
+[ ] Testar proposta, recusa, aceite unilateral e aceite mutuo.
+[ ] Testar usuarios fora da negociacao e alteracao por ID.
+[ ] Revisar os calculos apresentados e os textos.
+[ ] Testar duas sessoes simultaneas em navegadores diferentes.
+[ ] Apoiar o integrante que estiver atrasado depois da revisao.
+
+Meta obrigatoria do Dia 3:
+
+Chat -> proposta -> aceite das duas empresas -> protocolo -> botao para frete.
+
+Se sobrar tempo:
+
+[ ] Recusa com motivo.
+[ ] Cancelamento antes do frete.
+[ ] E-mails de nova mensagem e acordo confirmado.
+
+-------------------------------------------------------------------------------
+DIA 4 — FRETE, RASTREAMENTO E CODIGO DE ENTREGA
+Responsaveis: Leonardo, Daniel e Geder
+-------------------------------------------------------------------------------
+
+Leonardo:
+
+[ ] Criar FreightController e rotas do frete.
+[ ] Criar opcoes de frete persistidas no banco.
+[ ] Salvar transportadora, modalidade, valor e prazo.
+[ ] Gerar ordem de entrega e codigo aleatorio de seis digitos.
+[ ] Armazenar somente o hash do codigo.
+[ ] Criar limite de tentativas, expiracao e uso unico.
+[ ] Criar pagina interna do entregador para confirmar o codigo.
+[ ] Ao confirmar: marcar entrega, concluir negociacao e registrar saldo.
+[ ] Garantir transacao atomica na liberacao financeira.
+[ ] Entregar frontend funcional das telas.
+
+Daniel:
+
+[ ] Criar cards completos das opcoes de frete.
+[ ] Criar resumo da negociacao e dos enderecos.
+[ ] Criar linha do tempo visual do rastreamento.
+[ ] Finalizar tela do codigo e Portal do Entregador.
+[ ] Criar visual administrativo de entregas e alteracao de status permitida.
+
+Geder:
+
+[ ] Revisar toda a maquina de estados.
+[ ] Testar codigo correto, incorreto, reutilizado e expirado.
+[ ] Testar acesso ao codigo por empresa errada.
+[ ] Testar atualizacao e responsividade das telas.
+[ ] Verificar se a entrega libera saldo apenas uma vez.
+
+Meta obrigatoria do Dia 4:
+
+Acordo -> escolha de frete -> envio -> codigo correto -> entrega -> saldo.
+
+Se sobrar tempo:
+
+[ ] Animacao de entrega concluida.
+[ ] Historico detalhado dos status do frete.
+[ ] Avisos por e-mail de coleta e entrega.
+
+Portoes de decisao antes do desenvolvimento:
+
+[ ] Confirmar frete simulado ou API real. Recomendacao: frete simulado.
+[ ] Confirmar Portal do Entregador interno ou perfil completo. Recomendacao:
+  portal interno.
+
+-------------------------------------------------------------------------------
+DIA 5 — SALDO, SAQUE E DASHBOARD ADMINISTRATIVO
+Responsaveis: Leonardo, Daniel e Geder
+-------------------------------------------------------------------------------
+
+Leonardo:
+
+[ ] Fazer estatisticas usarem transacoes reais do MVP.
+[ ] Separar saldo futuro, disponivel, reservado e sacado.
+[ ] Adaptar saque para PIX ou TED.
+[ ] Reservar saldo ao solicitar saque.
+[ ] Impedir saque acima do saldo e solicitacao duplicada.
+[ ] Criar servico de aprovacao e recusa para uso do admin.
+[ ] Na recusa, devolver o saldo reservado.
+[ ] Registrar historico financeiro.
+[ ] Entregar telas funcionais da empresa.
+
+Daniel:
+
+[ ] Criar backend administrativo de aprovacao e recusa de saques.
+[ ] Criar tela administrativa completa de saques.
+[ ] Finalizar dashboard admin com empresas, anuncios, negociacoes, entregas,
+  volume financeiro e saques pendentes.
+[ ] Remover atividades ficticias e botoes sem funcao.
+[ ] Finalizar cards, graficos e tabelas usando dados reais.
+[ ] Aplicar acabamento visual nas telas financeiras da empresa.
+
+Geder:
+
+[ ] Executar fluxo completo ate o saque.
+[ ] Testar saldo insuficiente, saque duplicado, aprovacao e recusa.
+[ ] Conferir valores do banco contra valores exibidos.
+[ ] Revisar navegacao, feedback, erros e responsividade.
+[ ] Revisar os alertas por e-mail e notificacoes internas.
+
+Meta obrigatoria do Dia 5:
+
+Entrega -> saldo disponivel -> saque em analise -> admin aprova ou recusa.
+
+Se sobrar tempo:
+
+[ ] Exportacao CSV simples das negociacoes ou saques.
+[ ] Historico administrativo de acoes.
+[ ] Graficos ESG com formula academica documentada.
+
+Portao de decisao antes do desenvolvimento:
+
+[ ] Confirmar saldo e saque simulados ou gateway real. Recomendacao: fluxo
+  financeiro interno e aprovacao manual.
+
+-------------------------------------------------------------------------------
+DIA 6 — INTEGRACAO, POLIMENTO, TESTES E APRESENTACAO
+Responsaveis: Leonardo, Daniel e Geder
+-------------------------------------------------------------------------------
+
+Leonardo:
+
+[ ] Congelar novas funcionalidades.
+[ ] Corrigir somente falhas criticas do backend e integracao.
+[ ] Criar script seguro para restaurar os dados da demonstracao.
+[ ] Validar migrations/schema em banco limpo.
+[ ] Garantir que falha de SMTP nao interrompa o fluxo.
+[ ] Preparar contas e dados finais sem credenciais no codigo.
+
+Daniel:
+
+[ ] Concluir o visual de todas as telas do roteiro.
+[ ] Padronizar badges, modais, loading, sucesso e erro.
+[ ] Corrigir responsividade nas resolucoes da apresentacao.
+[ ] Remover links quebrados e botoes sem acao do caminho demonstrado.
+[ ] Preparar dashboard e telas visualmente convincentes.
+
+Geder:
+
+[ ] Liderar o teste completo de regressao.
+[ ] Executar o roteiro tres vezes do banco restaurado.
+[ ] Preparar roteiro de apresentacao de 10 a 15 minutos.
+[ ] Preparar capturas de tela e gravacao de seguranca.
+[ ] Conferir ortografia, dados e estados exibidos.
+[ ] Organizar lista final de limitacoes e decisoes tecnicas.
+
+Meta obrigatoria do Dia 6:
+
+Executar sem quebra:
+
+Cadastro -> pendente -> aprovacao -> chat -> proposta -> acordo -> frete
+-> codigo -> saldo -> saque -> aprovacao administrativa.
+
+Extras permitidos somente se a meta estiver verde ate o meio do dia:
+
+[ ] Central de notificacoes com contador.
+[ ] CSV administrativo simples.
+[ ] Animacoes e microinteracoes.
+[ ] Metricas ESG estimadas.
+[ ] Melhorias extras de busca e filtros.
+
+===============================================================================
+7. ESTRATEGIA DE MOCKING — SUJEITA A CONFIRMACAO
+===============================================================================
+
+Recomendacoes para economizar tempo:
+
+- Chat: polling AJAX a cada 2 ou 3 segundos, sem WebSocket.
+- Frete: tres transportadoras e valores calculados internamente.
+- Rastreamento: linha do tempo salva no banco, sem GPS.
+- Entregador: portal interno para inserir o codigo.
+- Pagamento: valor interno da negociacao, sem gateway bancario.
+- Saque: solicitacao PIX/TED aprovada manualmente pelo admin.
+- CNPJ: API atual com fallback para cache/dados de demonstracao.
+- Mapa: origem e destino em texto, sem Google Maps.
+- ESG: formula academica documentada, sem certificacao externa.
+
+O que nao deve ser apenas visual ou estatico:
+
+- Cadastro, login e aprovacao.
+- Mensagens e proposta.
+- Aceite das duas empresas.
+- Status da negociacao e entrega.
+- Codigo de entrega.
+- Saldo, reserva e saque.
+- Acoes administrativas do roteiro.
+
+===============================================================================
+8. FUNCIONALIDADES CORTADAS ATE A APRESENTACAO
+===============================================================================
+
+- WebSocket.
+- Gateway de pagamento.
+- API real de transportadora.
+- GPS e mapa real.
+- Aplicativo ou perfil completo de entregador.
+- Upload de arquivos no chat.
+- Favoritos e alertas de busca.
+- Planos Premium.
+- Relatorios PDF.
+- Exportacao LGPD.
+- Paginacao sofisticada.
+- Testes de carga.
+- CDN e storage externo.
+- Tickets de suporte.
+- ESG avancado.
+
+===============================================================================
+9. CHECKLIST DE ACEITE DO MVP
+===============================================================================
+
+Uma funcionalidade so esta pronta quando:
+
+- A interface chama o backend real.
+- Os dados permanecem apos atualizar a pagina.
+- A regra de permissao e validada no servidor.
+- O erro esperado apresenta uma mensagem compreensivel.
+- O PHP lint passa nos arquivos alterados.
+- Outro integrante executou o teste manual.
+- A funcionalidade funciona a partir do banco restaurado.
+
+Checklist final:
+
+[x] Cadastro e e-mail
+[x] Login pendente
+[x] Aprovacao de empresa
+[x] Login aprovado
+[x] Chat entre empresas
+[ ] Proposta e acordo mutuo
+[ ] Frete escolhido
+[ ] Codigo de entrega
+[ ] Saldo liberado uma unica vez
+[ ] Saque PIX/TED
+[ ] Aprovacao/recusa do saque
+[ ] Metricas administrativas
+[x] Dados de demonstracao restauraveis
+[ ] Video/capturas de seguranca
+
+===============================================================================
+10. PREPARACAO PARA REPOSITORIO PUBLICO
+===============================================================================
+
+Esta etapa deve ser feita depois de um backup e, preferencialmente, depois da
+apresentacao para nao colocar o MVP em risco.
+
+Arquivos locais ignorados:
+
+- .env
+- caches, temporarios e novos uploads
+
+Planejamento.txt, melhorias.txt e contexto_projeto.txt passaram a ser
+versionados para permitir a colaboracao da equipe. Eles devem ser revisados e
+sanitizados antes de o repositorio se tornar publico.
+
+Plano de publicacao segura:
+
+[ ] Criar backup completo do repositorio e do banco.
+[ ] Criar uma tag/branch do estado apresentado.
+[ ] Rotacionar SMTP, contas demonstrativas e qualquer segredo antigo.
+[ ] Revisar e sanitizar os documentos internos antes da publicacao.
+[ ] Fazer uma varredura de segredos no conteudo e no historico.
+[ ] Reescrever o historico com git filter-repo para remover:
+   - senhas antigas;
+   - Docs/Dados antigo;
+   - configuracoes sensiveis;
+   - caches ou arquivos privados que tenham sido commitados.
+[ ] Revisar todos os commits reescritos em um clone separado.
+[ ] Confirmar que .env nao e rastreado e que .env.example nao possui segredos.
+[ ] Publicar em um repositorio remoto novo ou fazer force push somente depois
+   da aprovacao de toda a equipe.
+[ ] Revogar definitivamente todas as credenciais encontradas no historico.
+
+Nao executar reescrita do historico sem autorizacao explicita, backup e aviso
+aos tres integrantes, pois os hashes de todos os commits afetados mudarao.
+
+===============================================================================
+11. ROTEIRO RESUMIDO DA APRESENTACAO
+===============================================================================
+
+1. Cadastrar uma empresa e confirmar o e-mail.
+2. Entrar como empresa pendente e mostrar as limitacoes.
+3. Entrar como admin e aprovar a empresa.
+4. Atualizar a sessao e mostrar o dashboard liberado.
+5. Abrir anuncio de outra empresa e iniciar o chat.
+6. Enviar proposta e aceitar com as duas empresas.
+7. Escolher uma opcao de frete.
+8. Mostrar rastreamento e codigo do comprador.
+9. Confirmar o codigo no Portal do Entregador.
+10. Mostrar a liberacao do saldo e as estatisticas.
+11. Solicitar saque PIX/TED.
+12. Aprovar o saque no painel administrativo.
+13. Encerrar mostrando metricas e historico da transacao.

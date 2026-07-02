@@ -32,8 +32,8 @@ $routes = require __DIR__ . '/../routes/web.php';
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Remove o prefixo do subdiretório (XAMPP local: /re.source)
-$base = '/re.source';
-if (str_starts_with($uri, $base)) {
+$base = APP_BASE_PATH;
+if ($base !== '' && str_starts_with($uri, $base)) {
     $uri = substr($uri, strlen($base));
 }
 

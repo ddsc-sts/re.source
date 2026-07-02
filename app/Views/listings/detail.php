@@ -283,9 +283,27 @@ body {
                 <span class="txt-parcelas">A empresa está procurando este material.</span>
             <?php endif; ?>
 
-            <button class="btn-acao btn-chat" onclick="alert('Funcionalidade de chat interno em desenvolvimento!')">
-                <i data-lucide="message-circle"></i> Entrar em Contato
-            </button>
+            <?php
+            $viewerCompanyId = (int) ($_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 0);
+            $isOwnListing = $viewerCompanyId > 0 && $viewerCompanyId === (int) $anuncio['company_id'];
+            ?>
+            <?php if ($isOwnListing): ?>
+                <button class="btn-acao btn-chat" type="button" disabled title="Este anúncio pertence à sua empresa">
+                    <i data-lucide="message-circle"></i> Anúncio da sua empresa
+                </button>
+            <?php elseif ($viewerCompanyId > 0): ?>
+                <form method="POST" action="<?= htmlspecialchars(app_url('/conversas/iniciar'), ENT_QUOTES, 'UTF-8') ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="listing_id" value="<?= (int) $anuncio['id'] ?>">
+                    <button class="btn-acao btn-chat" type="submit">
+                        <i data-lucide="message-circle"></i> Entrar em Contato
+                    </button>
+                </form>
+            <?php else: ?>
+                <a class="btn-acao btn-chat" href="<?= htmlspecialchars(app_url('/login'), ENT_QUOTES, 'UTF-8') ?>" style="text-decoration:none;">
+                    <i data-lucide="log-in"></i> Entre para conversar
+                </a>
+            <?php endif; ?>
             
             <p class="disclaimer-contato">Ao clicar em entrar em contato, conectaremos você diretamente com <strong><?= htmlspecialchars($anuncio['company_name']) ?></strong>.</p>
         </div>

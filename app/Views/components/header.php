@@ -26,7 +26,7 @@ if ($headerCompanyId) {
     }
 }
 $headerIsPending = $headerCompanyStatus === 'pending';
-$headerHomeUrl = $headerIsPending ? '/re.source/aguardando-aprovacao' : '/re.source/base';
+$headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('/base');
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="<?php echo $theme; ?>">
@@ -36,6 +36,7 @@ $headerHomeUrl = $headerIsPending ? '/re.source/aguardando-aprovacao' : '/re.sou
   <title><?php echo isset($titulo_pagina) ? $titulo_pagina : 'Re.Source — Economia Circular'; ?></title>
   
   <link rel="stylesheet" href="/re.source/public/css/style.css" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <?php if (isset($css_especifico)): ?>
     <link rel="stylesheet" href="<?php echo $css_especifico; ?>" />
   <?php endif; ?>
@@ -45,6 +46,9 @@ $headerHomeUrl = $headerIsPending ? '/re.source/aguardando-aprovacao' : '/re.sou
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
+
+<script>window.APP_BASE_PATH = <?= json_encode(APP_BASE_PATH, JSON_UNESCAPED_SLASHES) ?>;</script>
+<?php require __DIR__ . '/flash.php'; ?>
 
 <header>
   <div class="header-top">
@@ -81,6 +85,7 @@ $headerHomeUrl = $headerIsPending ? '/re.source/aguardando-aprovacao' : '/re.sou
         <?php else: ?>
           <a href="/re.source/estatisticas" class="menu-btn">Estatísticas</a>
           <a href="/re.source/meus-anuncios" class="menu-btn">Meus Anúncios</a>
+          <a href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>" class="menu-btn">Conversas</a>
         <?php endif; ?>
         <a href="/re.source/conta" class="menu-btn">Detalhes da conta</a>
         <a href="/re.source/configuracoes" class="menu-btn">Configurações</a>

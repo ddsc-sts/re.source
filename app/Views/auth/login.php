@@ -9,8 +9,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <link rel="stylesheet" href="/re.source/public/css/login.css"/>
+  <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>"/>
 </head>
 <body>
+
+  <?php require __DIR__ . '/../components/flash.php'; ?>
 
   <header>
     <div class="header-top">

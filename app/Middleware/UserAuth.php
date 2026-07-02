@@ -15,8 +15,8 @@ class UserAuth
         // Mantém compatibilidade com sessões antigas, mas exige uma empresa válida.
         $companyId = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
         if (empty($companyId)) {
-            header('Location: /re.source/login?aviso=' . urlencode('Faça login para continuar.'));
-            exit;
+            flash('warning', 'Faça login para continuar.');
+            redirect_to('/login');
         }
     }
 }
