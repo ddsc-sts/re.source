@@ -154,20 +154,15 @@
 ────────────────────────────────────────────────────────────────────────────────
  PRIORIDADE ALTA
 ────────────────────────────────────────────────────────────────────────────────
- [ ] Criar app/Views/listings/create.php
-       A view de criação de anúncio ainda está sendo referenciada via
-       require_once em ListingController::showCreate() mas o arquivo
-       app/Views/listings/create.php pode não existir — verificar.
+ [✅] app/Views/listings/create.php verificada e presente.
 
- [ ] Criar app/Views/listings/edit.php
-       Mesma situação da create.php — verificar se o arquivo existe.
+ [✅] app/Views/listings/edit.php verificada e presente.
 
- [ ] Criar app/Views/listings/index.php (meus anúncios)
-       O método showMeus() chama este arquivo.
+ [✅] app/Views/listings/index.php verificada e presente.
 
- [ ] Criar app/Views/dashboard/admin/ (area admin completa)
-       Verificar se todos os sub-templates do admin (empresas, anúncios,
-       negociações, etc.) já existem em app/Views/dashboard/admin/.
+ [✅] Templates de app/Views/dashboard/admin/ verificados e presentes.
+      A gestão de empresas possui aprovação, correção cadastral, rejeição,
+      suspensão, reativação, filtros, auditoria e notificações internas.
 
  [ ] Implementar páginas "Em desenvolvimento":
        BaseController::negociacoes() → só faz echo, sem view real.
@@ -178,24 +173,25 @@
 ────────────────────────────────────────────────────────────────────────────────
  PRIORIDADE MÉDIA
 ────────────────────────────────────────────────────────────────────────────────
- [ ] Criar página de reset de senha completa
-       AuthController::showReset() existe, mas verificar se a view existe
-       e se o fluxo de e-mail de redefinição está implementado.
+ [✅] Página e fluxo de reset de senha verificados; envio de e-mail testado.
 
  [ ] Adicionar rota para app/Views/listings/detail.php exibir anúncios
        da seção "Anúncios relevantes" (relevantAds) — a variável é passada
        pelo controller mas a view ainda não exibe esse bloco.
 
- [ ] Unificar sistema de notificações de sessão ($_SESSION['success'],
-       $_SESSION['error']) em um componente reutilizável de flash message.
+ [✅] Sistema de mensagens de sessão unificado no componente flash.php.
 
 ────────────────────────────────────────────────────────────────────────────────
  PRIORIDADE BAIXA / FUTURO
 ────────────────────────────────────────────────────────────────────────────────
- [ ] Implementar chat interno entre empresas (botão "Entrar em Contato"
-       atualmente exibe alert() de desenvolvimento).
+ [✅] Chat interno persistido com autorização, CSRF, polling HTTP,
+      contador de não lidas, pop-up global, indicador de atualização e
+      lista de conversas atualizada automaticamente.
 
- [ ] Sistema de negociações real (proposta, aceite, recusa).
+ [✅] Sistema de negociações real com proposta, aceite mútuo, protocolo,
+      recusa fundamentada e cancelamento antes do frete.
+ [✅] Painel administrativo de negociações conectado aos dados reais, com
+      métricas, filtros, busca e modal de detalhes somente leitura.
 
  [ ] Módulo de logística (rastreamento, frete, etc.).
 
@@ -203,14 +199,15 @@
 
  [ ] Sistema de suporte com tickets.
 
- [ ] Notificações por e-mail (propostas, chat, aprovação de conta).
+ [✅] Alertas por e-mail para mensagens, propostas e acordo confirmado.
+      Alertas administrativos de conta continuam registrados internamente.
 
  [ ] Paginação na busca e em listagens do admin.
 
  [ ] Implementar upload de imagens via AJAX no form de criação/edição
        de anúncio sem reload de página.
 
- [ ] Adicionar proteção CSRF nos formulários POST críticos.
+ [✅] Proteção CSRF adicionada aos formulários POST críticos do MVP atual.
 
  [ ] Implementar rate limiting no endpoint /process para prevenir brute force.
 

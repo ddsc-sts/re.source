@@ -226,3 +226,69 @@ HTML;
 
     return $ok !== false && $errno === 0;
 }
+
+/** Envia alertas transacionais do marketplace sem credenciais fixas no codigo. */
+function enviarEmailFluxo(
+    string $para,
+    string $nomeDestinatario,
+    string $assunto,
+    string $titulo,
+    string $texto,
+    ?string $link = null
+): bool {
+    $host = (string) env('MAIL_HOST', 'smtp.gmail.com');
+    $port = (int) env('MAIL_PORT', 587);
+    $user = (string) env('MAIL_USERNAME', '');
+    $pass = (string) env('MAIL_PASSWORD', '');
+    $remetente = (string) env('MAIL_FROM_ADDRESS', $user);
+    $nomeRemetente = (string) env('MAIL_FROM_NAME', 'Re.Source');
+    $verifyTls = (bool) env('MAIL_VERIFY_TLS', true);
+
+    if ($para === '' || $user === '' || $pass === '' || $remetente === '') {
+        return false;
+    }
+
+    $safeName = htmlspecialchars($nomeDestinatario, ENT_QUOTES, 'UTF-8');
+    $safeTitle = htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8');
+    $safeText = nl2br(htmlspecialchars($texto, ENT_QUOTES, 'UTF-8'));
+    $safeLink = $link ? htmlspecialchars($link, ENT_QUOTES, 'UTF-8') : null;
+    $button = $safeLink
+        ? '<p style="margin:28px 0 0"><a href="' . $safeLink . '" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#157347;color:#fff;text-decoration:none;font-weight:700">Abrir na Re.Source</a></p>'
+        : '';
+
+    $html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"></head>'
+        . '<body style="margin:0;padding:36px;background:#f2f7f4;font-family:Arial,sans-serif;color:#263238">'
+        . '<div style="max-width:560px;margin:auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.08)">'
+        . '<div style="padding:24px 32px;background:#157347;color:#fff;font-size:22px;font-weight:800">Re.Source</div>'
+        . '<div style="padding:32px"><p style="margin:0 0 10px">Olá, ' . $safeName . '!</p>'
+        . '<h1 style="margin:0 0 14px;font-size:22px">' . $safeTitle . '</h1>'
+        . '<p style="margin:0;color:#56645d;line-height:1.6">' . $safeText . '</p>' . $button . '</div></div></body></html>';
+
+    $boundary = md5(uniqid('', true));
+    $encodedSubject = '=?UTF-8?B?' . base64_encode($assunto) . '?=';
+    $encodedSender = '=?UTF-8?B?' . base64_encode($nomeRemetente) . '?=';
+    $headers = "From: {$encodedSender} <{$remetente}>\r\n"
+        . "To: <{$para}>\r\nSubject: {$encodedSubject}\r\nMIME-Version: 1.0\r\n"
+        . "Content-Type: multipart/alternative; boundary=\"{$boundary}\"\r\nDate: " . date('r') . "\r\n";
+    $body = "--{$boundary}\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n{$texto}\r\n"
+        . "--{$boundary}\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n{$html}\r\n--{$boundary}--\r\n";
+
+    $tmp = tmpfile();
+    if (!$tmp) return false;
+    fwrite($tmp, $headers . "\r\n" . $body);
+    fseek($tmp, 0);
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => "smtp://{$host}:{$port}", CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_USE_SSL => CURLUSESSL_ALL, CURLOPT_USERNAME => $user,
+        CURLOPT_PASSWORD => $pass, CURLOPT_MAIL_FROM => "<{$remetente}>",
+        CURLOPT_MAIL_RCPT => ["<{$para}>"], CURLOPT_READDATA => $tmp,
+        CURLOPT_UPLOAD => true, CURLOPT_SSL_VERIFYPEER => $verifyTls,
+        CURLOPT_SSL_VERIFYHOST => $verifyTls ? 2 : 0,
+    ]);
+    $result = curl_exec($ch);
+    $error = curl_errno($ch);
+    curl_close($ch);
+    fclose($tmp);
+    return $result !== false && $error === 0;
+}

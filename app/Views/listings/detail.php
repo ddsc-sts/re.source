@@ -291,6 +291,9 @@ body {
                 <button class="btn-acao btn-chat" type="button" disabled title="Este anúncio pertence à sua empresa">
                     <i data-lucide="message-circle"></i> Anúncio da sua empresa
                 </button>
+                <p role="status" style="margin:10px 0 0;color:#9a6700;font-size:.82rem;line-height:1.45;">
+                    Você não pode iniciar uma conversa sobre o próprio anúncio. Use “Meus Anúncios” para editar ou acompanhar esta publicação.
+                </p>
             <?php elseif ($viewerCompanyId > 0): ?>
                 <form method="POST" action="<?= htmlspecialchars(app_url('/conversas/iniciar'), ENT_QUOTES, 'UTF-8') ?>">
                     <?= csrf_field() ?>

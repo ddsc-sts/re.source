@@ -8,6 +8,8 @@ $theme = 'light';
 $headerCompanyName = 'Minha Conta';
 $headerCompanyId = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
 $headerCompanyStatus = $_SESSION['user']['company_status'] ?? null;
+$headerUnreadMessages = 0;
+$headerLatestUnreadId = 0;
 
 if ($headerCompanyId) {
     $stmt = $pdo->prepare("SELECT theme, nome_fantasia, status FROM companies WHERE id = ?");
@@ -24,8 +26,24 @@ if ($headerCompanyId) {
         $headerCompanyStatus = $headerCompany['status'];
         $_SESSION['user']['company_status'] = $headerCompanyStatus;
     }
+
+    if ($headerCompanyStatus === 'active') {
+        $stmtUnread = $pdo->prepare(
+            'SELECT COUNT(*) AS unread_count, COALESCE(MAX(m.id), 0) AS latest_message_id
+             FROM messages m
+             INNER JOIN negotiations n ON n.id = m.negotiation_id
+             INNER JOIN users sender ON sender.id = m.sender_user_id
+             WHERE m.read_at IS NULL
+               AND sender.company_id <> ?
+               AND (n.buyer_company_id = ? OR n.seller_company_id = ?)'
+        );
+        $stmtUnread->execute([$headerCompanyId, $headerCompanyId, $headerCompanyId]);
+        $headerUnreadOverview = $stmtUnread->fetch(PDO::FETCH_ASSOC) ?: [];
+        $headerUnreadMessages = (int) ($headerUnreadOverview['unread_count'] ?? 0);
+        $headerLatestUnreadId = (int) ($headerUnreadOverview['latest_message_id'] ?? 0);
+    }
 }
-$headerIsPending = $headerCompanyStatus === 'pending';
+$headerIsPending = in_array($headerCompanyStatus, ['pending', 'changes_requested'], true);
 $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('/base');
 ?>
 <!DOCTYPE html>
@@ -77,7 +95,9 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
         <div class="dropdown-label">
           <?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?>
           <?php if ($headerIsPending): ?>
-            <span style="display:block;margin-top:5px;color:#9a6700;font-size:.7rem;font-weight:700;">AGUARDANDO APROVAÇÃO</span>
+            <span style="display:block;margin-top:5px;color:#9a6700;font-size:.7rem;font-weight:700;">
+              <?= $headerCompanyStatus === 'changes_requested' ? 'CORREÇÃO SOLICITADA' : 'AGUARDANDO APROVAÇÃO' ?>
+            </span>
           <?php endif; ?>
         </div>
         <?php if ($headerIsPending): ?>
@@ -85,7 +105,16 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
         <?php else: ?>
           <a href="/re.source/estatisticas" class="menu-btn">Estatísticas</a>
           <a href="/re.source/meus-anuncios" class="menu-btn">Meus Anúncios</a>
-          <a href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>" class="menu-btn">Conversas</a>
+          <a href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>" class="menu-btn">
+            Conversas
+            <span
+              id="headerUnreadBadge"
+              data-unread-url="<?= htmlspecialchars(app_url('/conversas/nao-lidas'), ENT_QUOTES, 'UTF-8') ?>"
+              data-latest-message-id="<?= $headerLatestUnreadId ?>"
+              aria-label="<?= $headerUnreadMessages ?> mensagens não lidas"
+              style="<?= $headerUnreadMessages > 0 ? 'display:inline-grid' : 'display:none' ?>;place-items:center;min-width:20px;height:20px;margin-left:6px;padding:0 6px;border-radius:999px;background:#dc2626;color:#fff;font-size:.68rem;font-weight:800;"
+            ><?= $headerUnreadMessages > 99 ? '99+' : $headerUnreadMessages ?></span>
+          </a>
         <?php endif; ?>
         <a href="/re.source/conta" class="menu-btn">Detalhes da conta</a>
         <a href="/re.source/configuracoes" class="menu-btn">Configurações</a>
@@ -137,6 +166,10 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
     </div>
   </div>
 </header>
+
+<?php if (!$headerIsPending && $headerCompanyStatus === 'active'): ?>
+  <script src="<?= htmlspecialchars(app_url('/public/js/header-unread.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<?php endif; ?>
 
 <script>
 function selectCategory(categoryName, categoryId) {

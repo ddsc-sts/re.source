@@ -33,11 +33,36 @@ class ChatController
         return $negotiation ?: null;
     }
 
-    public static function index(): void
+    private static function markReceivedAsRead(PDO $pdo, int $negotiationId, int $companyId): void
     {
-        global $pdo;
-        $companyId = self::companyId();
+        $stmt = $pdo->prepare(
+            'UPDATE messages m
+             INNER JOIN users sender ON sender.id = m.sender_user_id
+             SET m.read_at = CURRENT_TIMESTAMP
+             WHERE m.negotiation_id = ?
+               AND m.read_at IS NULL
+               AND sender.company_id <> ?'
+        );
+        $stmt->execute([$negotiationId, $companyId]);
+    }
 
+    private static function unreadTotal(PDO $pdo, int $companyId): int
+    {
+        $stmt = $pdo->prepare(
+            'SELECT COUNT(*)
+             FROM messages m
+             INNER JOIN negotiations n ON n.id = m.negotiation_id
+             INNER JOIN users sender ON sender.id = m.sender_user_id
+             WHERE m.read_at IS NULL
+               AND sender.company_id <> ?
+               AND (n.buyer_company_id = ? OR n.seller_company_id = ?)'
+        );
+        $stmt->execute([$companyId, $companyId, $companyId]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    private static function conversations(PDO $pdo, int $companyId): array
+    {
         $stmt = $pdo->prepare(
             "SELECT n.id, n.status, n.created_at, n.updated_at,
                     l.id AS listing_id, l.title AS listing_title,
@@ -46,7 +71,12 @@ class ChatController
                     (SELECT m.content FROM messages m
                      WHERE m.negotiation_id = n.id ORDER BY m.id DESC LIMIT 1) AS last_message,
                     (SELECT m.created_at FROM messages m
-                     WHERE m.negotiation_id = n.id ORDER BY m.id DESC LIMIT 1) AS last_message_at
+                     WHERE m.negotiation_id = n.id ORDER BY m.id DESC LIMIT 1) AS last_message_at,
+                    (SELECT COUNT(*) FROM messages unread
+                     INNER JOIN users unread_sender ON unread_sender.id = unread.sender_user_id
+                     WHERE unread.negotiation_id = n.id
+                       AND unread.read_at IS NULL
+                       AND unread_sender.company_id <> ?) AS unread_count
              FROM negotiations n
              INNER JOIN listings l ON l.id = n.listing_id
              INNER JOIN companies buyer ON buyer.id = n.buyer_company_id
@@ -54,11 +84,75 @@ class ChatController
              WHERE n.buyer_company_id = ? OR n.seller_company_id = ?
              ORDER BY COALESCE(last_message_at, n.updated_at) DESC"
         );
+        $stmt->execute([$companyId, $companyId, $companyId, $companyId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private static function latestUnread(PDO $pdo, int $companyId): ?array
+    {
+        $stmt = $pdo->prepare(
+            'SELECT m.id, m.negotiation_id, m.content, m.created_at,
+                    sender.name AS sender_name,
+                    sender_company.nome_fantasia AS sender_company_name,
+                    l.title AS listing_title
+             FROM messages m
+             INNER JOIN users sender ON sender.id = m.sender_user_id
+             INNER JOIN companies sender_company ON sender_company.id = sender.company_id
+             INNER JOIN negotiations n ON n.id = m.negotiation_id
+             INNER JOIN listings l ON l.id = n.listing_id
+             WHERE m.read_at IS NULL
+               AND sender.company_id <> ?
+               AND (n.buyer_company_id = ? OR n.seller_company_id = ?)
+             ORDER BY m.id DESC
+             LIMIT 1'
+        );
         $stmt->execute([$companyId, $companyId, $companyId]);
+        $message = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $message ?: null;
+    }
+
+    private static function latestProposal(PDO $pdo, int $negotiationId): ?array
+    {
+        $stmt = $pdo->prepare('SELECT * FROM proposals WHERE negotiation_id = ? ORDER BY id DESC LIMIT 1');
+        $stmt->execute([$negotiationId]);
+        $proposal = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $proposal ?: null;
+    }
+
+    private static function sendNewMessageEmail(PDO $pdo, int $companyId, string $preview, int $negotiationId): void
+    {
+        try {
+            $stmt = $pdo->prepare(
+                "SELECT u.email, u.name FROM users u
+                 INNER JOIN companies c ON c.id = u.company_id
+                 WHERE u.company_id = ? AND u.is_active = 1 AND u.deleted_at IS NULL
+                   AND c.notify_chat = 1
+                 ORDER BY (u.role = 'admin_company') DESC, u.id ASC LIMIT 1"
+            );
+            $stmt->execute([$companyId]);
+            $target = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$target) return;
+            require_once CONFIG_PATH . '/mailer.php';
+            $baseUrl = rtrim((string) env('APP_URL', 'http://localhost/re.source'), '/');
+            enviarEmailFluxo(
+                (string) $target['email'], (string) $target['name'],
+                'Nova mensagem — Re.Source', 'Você recebeu uma nova mensagem',
+                mb_substr($preview, 0, 300),
+                $baseUrl . '/conversas/abrir?id=' . $negotiationId
+            );
+        } catch (Throwable $error) {
+            error_log('Falha no e-mail de nova mensagem: ' . $error->getMessage());
+        }
+    }
+
+    public static function index(): void
+    {
+        global $pdo;
+        $companyId = self::companyId();
 
         view('chat/index', [
             'titulo_pagina' => 'Conversas — Re.Source',
-            'conversations' => $stmt->fetchAll(PDO::FETCH_ASSOC),
+            'conversations' => self::conversations($pdo, $companyId),
         ]);
     }
 
@@ -79,6 +173,8 @@ class ChatController
             redirect_to('/conversas');
         }
 
+        self::markReceivedAsRead($pdo, (int) $negotiationId, $companyId);
+
         $stmt = $pdo->prepare(
             "SELECT recent.id, recent.sender_user_id, recent.content, recent.created_at,
                     u.name AS sender_name, u.company_id AS sender_company_id
@@ -98,12 +194,16 @@ class ChatController
             ? $negotiation['seller_name']
             : $negotiation['buyer_name'];
 
+        $proposal = self::latestProposal($pdo, (int) $negotiationId);
+
         view('chat/show', [
             'titulo_pagina' => 'Conversa — Re.Source',
             'negotiation' => $negotiation,
             'messages' => $stmt->fetchAll(PDO::FETCH_ASSOC),
             'companyId' => $companyId,
             'otherCompanyName' => $otherCompanyName,
+            'proposal' => $proposal,
+            'isBuyer' => (int) $negotiation['buyer_company_id'] === $companyId,
         ]);
     }
 
@@ -131,7 +231,8 @@ class ChatController
         global $pdo;
         $companyId = self::companyId();
         $userId = self::userId();
-        if (!$userId || !self::negotiation($pdo, (int) $negotiationId, $companyId)) {
+        $negotiation = $userId ? self::negotiation($pdo, (int) $negotiationId, $companyId) : null;
+        if (!$userId || !$negotiation) {
             self::jsonError('Você não possui acesso a esta conversa.', 403);
         }
 
@@ -154,6 +255,22 @@ class ChatController
 
         $stmt = $pdo->prepare('SELECT created_at FROM messages WHERE id = ?');
         $stmt->execute([$messageId]);
+        $createdAt = $stmt->fetchColumn();
+
+        $otherCompanyId = (int) $negotiation['buyer_company_id'] === $companyId
+            ? (int) $negotiation['seller_company_id']
+            : (int) $negotiation['buyer_company_id'];
+        $stmtNotification = $pdo->prepare(
+            "INSERT INTO notifications (company_id, type, title, body, data_json)
+             VALUES (?, 'new_message', 'Nova mensagem', ?, ?)"
+        );
+        $stmtNotification->execute([
+            $otherCompanyId,
+            mb_substr($content, 0, 300),
+            json_encode(['negotiation_id' => (int) $negotiationId], JSON_UNESCAPED_UNICODE),
+        ]);
+
+        self::sendNewMessageEmail($pdo, $otherCompanyId, $content, (int) $negotiationId);
 
         self::json([
             'success' => true,
@@ -163,7 +280,7 @@ class ChatController
                 'sender_company_id' => $companyId,
                 'sender_name' => $user['name'],
                 'content' => $content,
-                'created_at' => $stmt->fetchColumn(),
+                'created_at' => $createdAt,
             ],
         ]);
     }
@@ -186,6 +303,9 @@ class ChatController
             self::jsonError('Você não possui acesso a esta conversa.', 403);
         }
 
+        $companyId = self::companyId();
+        self::markReceivedAsRead($pdo, (int) $negotiationId, $companyId);
+
         $stmt = $pdo->prepare(
             "SELECT m.id, m.sender_user_id, m.content, m.created_at,
                     u.name AS sender_name, u.company_id AS sender_company_id
@@ -197,6 +317,43 @@ class ChatController
         );
         $stmt->execute([$negotiationId, $afterId]);
         self::json(['success' => true, 'messages' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+    }
+
+    public static function unreadCount(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+            self::jsonError('Método não permitido.', 405);
+        }
+
+        global $pdo;
+        $companyId = self::companyId();
+        if (!$companyId) {
+            self::jsonError('Empresa inválida.', 403);
+        }
+
+        self::json([
+            'success' => true,
+            'unread_count' => self::unreadTotal($pdo, $companyId),
+            'latest_message' => self::latestUnread($pdo, $companyId),
+        ]);
+    }
+
+    public static function conversationList(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+            self::jsonError('Método não permitido.', 405);
+        }
+
+        global $pdo;
+        $companyId = self::companyId();
+        if (!$companyId) {
+            self::jsonError('Empresa inválida.', 403);
+        }
+
+        self::json([
+            'success' => true,
+            'conversations' => self::conversations($pdo, $companyId),
+        ]);
     }
 
     private static function jsonError(string $message, int $status): never

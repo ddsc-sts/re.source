@@ -31,8 +31,13 @@ class ApprovedCompany
         $status = (string) $statusValue;
         $_SESSION['user']['company_status'] = $status;
 
-        if ($status === 'pending') {
-            flash('warning', 'Este recurso será liberado após a aprovação da empresa.');
+        if (in_array($status, ['pending', 'changes_requested'], true)) {
+            flash(
+                'warning',
+                $status === 'changes_requested'
+                    ? 'Revise os dados solicitados e reenvie o cadastro para análise.'
+                    : 'Este recurso será liberado após a aprovação da empresa.'
+            );
             redirect_to('/aguardando-aprovacao');
         }
 

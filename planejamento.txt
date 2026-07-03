@@ -222,19 +222,19 @@ Leonardo — backend e frontend funcional do cliente:
 
 Daniel — administracao e visual:
 
-[ ] Finalizar backend da aprovacao, suspensao e reativacao de empresas.
-[ ] Finalizar tela administrativa de empresas pendentes.
-[ ] Criar filtros por status e modal de confirmacao.
+[x] Finalizar backend da aprovacao, suspensao e reativacao de empresas.
+[x] Finalizar tela administrativa de empresas pendentes.
+[x] Criar filtros por status e modal de confirmacao.
 [ ] Aplicar o visual final na tela pendente e no chat criado por Leonardo.
 [ ] Padronizar badges de empresa e estados de loading.
 
 Geder — revisao e integracao:
 
-[ ] Testar cadastro, login pendente, aprovacao e login aprovado.
-[ ] Testar acesso indevido de empresa pendente.
-[ ] Testar conversa consigo mesmo e conversa duplicada.
-[ ] Revisar responsividade e textos das telas do Dia 1.
-[ ] Registrar e corrigir defeitos pequenos sem conflitar com arquivos em uso.
+[x] Testar cadastro, login pendente, aprovacao e login aprovado.
+[x] Testar acesso indevido de empresa pendente.
+[x] Testar conversa consigo mesmo e conversa duplicada.
+[x] Revisar responsividade e textos das telas do Dia 1.
+[x] Registrar e corrigir defeitos pequenos sem conflitar com arquivos em uso.
 
 Meta obrigatoria do Dia 2:
 
@@ -243,8 +243,10 @@ persistidas no banco.
 
 Se sobrar tempo:
 
-[ ] Contador de mensagens nao lidas.
-[ ] Indicador visual de atualizacao do chat.
+[x] Contador de mensagens nao lidas.
+[x] Indicador visual de atualizacao do chat.
+[x] Pop-up interno ao receber nova mensagem.
+[x] Atualizacao automatica da lista de conversas.
 
 Portao de decisao antes do desenvolvimento:
 
@@ -257,32 +259,32 @@ Responsaveis: Leonardo, Daniel e Geder
 
 Leonardo:
 
-[ ] Criar proposta vinculada a conversa e ao anuncio.
-[ ] Salvar quantidade, valor unitario, total, prazo e responsavel pelo frete.
-[ ] Implementar aceite independente de comprador e vendedor.
-[ ] Gerar protocolo unico quando os dois aceitarem.
-[ ] Atualizar negociacao e anuncio de forma transacional.
-[ ] Impedir edicao da proposta depois do acordo mutuo.
-[ ] Criar notificacoes internas.
-[ ] Criar chamadas para os e-mails do fluxo sem bloquear a operacao principal.
-[ ] Entregar frontend funcional de proposta e aceite.
+[x] Criar proposta vinculada a conversa e ao anuncio.
+[x] Salvar quantidade, valor unitario, total, prazo e responsavel pelo frete.
+[x] Implementar aceite independente de comprador e vendedor.
+[x] Gerar protocolo unico quando os dois aceitarem.
+[x] Atualizar negociacao e anuncio de forma transacional.
+[x] Impedir edicao da proposta depois do acordo mutuo.
+[x] Criar notificacoes internas.
+[x] Criar chamadas para os e-mails do fluxo sem bloquear a operacao principal.
+[x] Entregar frontend funcional de proposta e aceite.
 
 Daniel:
 
 [ ] Criar modal visual de proposta.
-[ ] Criar card de proposta dentro do chat.
-[ ] Criar estados visuais "aguardando comprador", "aguardando vendedor" e
+[] Criar card de proposta dentro do chat.
+[] Criar estados visuais "aguardando comprador", "aguardando vendedor" e
   "acordo confirmado".
 [ ] Finalizar o layout completo do chat em desktop e mobile.
-[ ] Iniciar painel administrativo de negociacoes.
+[x] Iniciar painel administrativo de negociacoes.
 
 Geder:
 
-[ ] Testar proposta, recusa, aceite unilateral e aceite mutuo.
-[ ] Testar usuarios fora da negociacao e alteracao por ID.
-[ ] Revisar os calculos apresentados e os textos.
-[ ] Testar duas sessoes simultaneas em navegadores diferentes.
-[ ] Apoiar o integrante que estiver atrasado depois da revisao.
+[x] Testar proposta, recusa, aceite unilateral e aceite mutuo.
+[x] Testar usuarios fora da negociacao e alteracao por ID.
+[x] Revisar os calculos apresentados e os textos.
+[x] Testar duas sessoes simultaneas em navegadores diferentes.
+[x] Apoiar o integrante que estiver atrasado depois da revisao.
 
 Meta obrigatoria do Dia 3:
 
@@ -290,9 +292,9 @@ Chat -> proposta -> aceite das duas empresas -> protocolo -> botao para frete.
 
 Se sobrar tempo:
 
-[ ] Recusa com motivo.
-[ ] Cancelamento antes do frete.
-[ ] E-mails de nova mensagem e acordo confirmado.
+[x] Recusa com motivo.
+[x] Cancelamento antes do frete.
+[x] E-mails de nova mensagem e acordo confirmado.
 
 -------------------------------------------------------------------------------
 DIA 4 — FRETE, RASTREAMENTO E CODIGO DE ENTREGA

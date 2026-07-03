@@ -209,17 +209,48 @@ Leonardo:
 
 Daniel:
 
-[ ] Finalizar suspensao e reativacao administrativa de empresas.
-[ ] Finalizar tela administrativa de empresas pendentes.
-[ ] Criar filtros, confirmacoes e acabamento visual.
+[x] Finalizar aprovacao, suspensao e reativacao administrativa de empresas.
+[x] Finalizar tela administrativa de empresas pendentes, incluindo solicitacao
+    de correcao, reenvio para analise e rejeicao fundamentada.
+[x] Criar filtros, confirmacoes, auditoria e notificacoes internas.
 [ ] Aplicar visual final na tela pendente e no chat.
+
+Extras do chat concluidos:
+
+[x] Contador de mensagens nao lidas por conversa e no cabecalho.
+[x] Indicador visual de atualizacao automatica do chat.
+[x] Pop-up global de nova mensagem com atalho para a conversa.
+[x] Lista de conversas atualizada automaticamente a cada 3 segundos.
+
+Banco atualizado:
+
+[x] Migration 20260702_002_company_review_workflow.sql criada e aplicada.
+[x] Todas as migrations refletidas no re.sourcebanco.sql.
+[x] Schema completo validado em banco temporario limpo com 27 tabelas.
+
+Dia 3 adiantado:
+
+[x] Proposta com quantidade, valor, prazo, total e responsavel pelo frete.
+[x] Aceite independente de comprador e vendedor.
+[x] Acordo mutuo com protocolo unico e bloqueio de edicao.
+[x] Recusa e cancelamento com motivo.
+[x] Notificacoes internas e e-mails de nova mensagem/proposta/acordo.
+[x] Teste transacional de calculo, autorizacao e maquina de estados aprovado.
+[x] Painel admin de negociacoes com metricas, busca, filtros e detalhes reais.
+[x] Roteiro manual completo criado em roteiro_teste_dia3.txt.
 
 Geder:
 
-[ ] Repetir os testes completos do Dia 1.
-[ ] Testar acessos indevidos de empresa pendente.
-[ ] Testar conversa consigo mesma e conversa duplicada.
-[ ] Revisar responsividade, textos e integracao.
+[x] Repetir os testes completos do Dia 1.
+[x] Testar acessos indevidos de empresa pendente.
+[x] Testar conversa consigo mesma e conversa duplicada.
+[x] Revisar responsividade, textos e integracao.
+
+Resultado da regressao manual:
+
+- Fluxos obrigatorios aprovados.
+- Anuncio proprio bloqueado com orientacao visivel ao usuario.
+- Contador global de conversas atualizado automaticamente a cada 3 segundos.
 
 Decisao do chat:
 

@@ -367,10 +367,40 @@ class AdminController
         global $pdo;
 
         $user = AdminAuth::user();
-
         $metrics = self::getMetrics($pdo);
 
-        $stmt = $pdo->query("
+        $allowedStatuses = [
+            'open', 'proposal_sent', 'buyer_accepted', 'seller_accepted', 'accepted',
+            'awaiting_freight', 'shipping', 'delivered', 'concluded', 'cancelled',
+        ];
+        $statusFilter = trim((string) ($_GET['status'] ?? ''));
+        if (!in_array($statusFilter, $allowedStatuses, true)) {
+            $statusFilter = '';
+        }
+        $search = trim((string) ($_GET['q'] ?? ''));
+        $where = [];
+        $params = [];
+        if ($statusFilter !== '') {
+            $where[] = 'n.status = ?';
+            $params[] = $statusFilter;
+        }
+        if ($search !== '') {
+            $where[] = '(comprador.razao_social LIKE ? OR vendedor.razao_social LIKE ? OR l.title LIKE ? OR n.protocol_number LIKE ?)';
+            $term = '%' . $search . '%';
+            array_push($params, $term, $term, $term, $term);
+        }
+        $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $negotiationMetrics = $pdo->query(
+            "SELECT COUNT(*) AS total,
+                    SUM(status IN ('open','proposal_sent','buyer_accepted','seller_accepted')) AS em_andamento,
+                    SUM(status IN ('accepted','awaiting_freight','shipping','delivered','concluded')) AS acordos,
+                    SUM(status = 'cancelled') AS canceladas,
+                    COALESCE(SUM(CASE WHEN status IN ('accepted','awaiting_freight','shipping','delivered','concluded') THEN proposed_total ELSE 0 END), 0) AS volume
+             FROM negotiations"
+        )->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        $stmt = $pdo->prepare("
             SELECT
                 n.id,
                 n.protocol_number,
@@ -379,11 +409,29 @@ class AdminController
                 n.proposed_total,
                 n.status,
                 n.created_at,
+                n.updated_at,
+                n.agreement_at,
+                n.cancel_reason,
 
                 comprador.razao_social AS comprador,
+                comprador.nome_fantasia AS comprador_fantasia,
                 vendedor.razao_social AS vendedor,
+                vendedor.nome_fantasia AS vendedor_fantasia,
 
-                l.title AS anuncio
+                l.title AS anuncio,
+                l.unit,
+                p.id AS proposal_id,
+                p.quantity,
+                p.unit_price,
+                p.total_price,
+                p.delivery_deadline,
+                p.responsible_for_freight,
+                p.notes,
+                p.status AS proposal_status,
+                p.buyer_accepted_at,
+                p.seller_accepted_at,
+                p.refusal_reason,
+                p.cancel_reason AS proposal_cancel_reason
 
             FROM negotiations n
 
@@ -396,12 +444,22 @@ class AdminController
             LEFT JOIN listings l
                 ON n.listing_id = l.id
 
-            ORDER BY n.created_at DESC
+            LEFT JOIN proposals p
+                ON p.id = (
+                    SELECT p2.id FROM proposals p2
+                    WHERE p2.negotiation_id = n.id
+                    ORDER BY p2.id DESC LIMIT 1
+                )
+
+            {$whereSql}
+            ORDER BY COALESCE(n.agreement_at, n.updated_at, n.created_at) DESC
         ");
 
-    $negociacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute($params);
 
-    require_once __DIR__ . '/../Views/dashboard/admin/negociacoes.php';
+        $negociacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        require_once __DIR__ . '/../Views/dashboard/admin/negociacoes.php';
     }
 
     public static function logistica(): void
@@ -515,7 +573,36 @@ class AdminController
         $user = AdminAuth::user();
         $metrics = self::getMetrics($pdo);
 
-        $stmt = $pdo->query("
+        $companyStatusCounts = array_fill_keys(
+            ['pending', 'changes_requested', 'active', 'suspended', 'rejected', 'inactive'],
+            0
+        );
+        foreach ($pdo->query('SELECT status, COUNT(*) AS total FROM companies GROUP BY status') as $row) {
+            $companyStatusCounts[$row['status']] = (int) $row['total'];
+        }
+
+        $allowedStatuses = ['pending', 'changes_requested', 'active', 'suspended', 'rejected', 'inactive'];
+        $statusFilter = trim((string) ($_GET['status'] ?? ''));
+        if (!in_array($statusFilter, $allowedStatuses, true)) {
+            $statusFilter = '';
+        }
+        $search = trim((string) ($_GET['q'] ?? ''));
+        $where = [];
+        $params = [];
+
+        if ($statusFilter !== '') {
+            $where[] = 'c.status = ?';
+            $params[] = $statusFilter;
+        }
+        if ($search !== '') {
+            $where[] = '(c.razao_social LIKE ? OR c.nome_fantasia LIKE ? OR c.cnpj LIKE ? OR c.email LIKE ?)';
+            $term = '%' . $search . '%';
+            array_push($params, $term, $term, $term, $term);
+        }
+
+        $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $stmt = $pdo->prepare("
             SELECT
                 c.id,
                 c.nome_fantasia,
@@ -527,6 +614,8 @@ class AdminController
                 c.responsible_name,
                 c.segment,
                 c.status,
+                c.review_notes,
+                c.reviewed_at,
                 c.created_at,
 
                 a.city,
@@ -537,8 +626,11 @@ class AdminController
             LEFT JOIN addresses a
                 ON c.address_id = a.id
 
+            {$whereSql}
             ORDER BY c.created_at DESC
         ");
+
+        $stmt->execute($params);
 
         $empresas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -547,24 +639,120 @@ class AdminController
 
     public static function aprovarEmpresa(): void
     {
+        self::processCompanyAction('approve');
+    }
+
+    public static function solicitarCorrecaoEmpresa(): void
+    {
+        self::processCompanyAction('request_changes');
+    }
+
+    public static function rejeitarEmpresa(): void
+    {
+        self::processCompanyAction('reject');
+    }
+
+    public static function suspenderEmpresa(): void
+    {
+        self::processCompanyAction('suspend');
+    }
+
+    public static function reativarEmpresa(): void
+    {
+        self::processCompanyAction('reactivate');
+    }
+
+    private static function processCompanyAction(string $action): never
+    {
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
             http_response_code(405);
             exit('Método não permitido.');
         }
 
-        if (!AdminAuth::can('company_approve')) {
-            http_response_code(403);
-            exit('Você não possui permissão para aprovar empresas.');
-        }
+        $definitions = [
+            'approve' => [
+                'permission' => 'company_approve',
+                'allowed' => ['pending'],
+                'target' => 'active',
+                'audit' => 'COMPANY_APPROVED',
+                'severity' => 'info',
+                'notification' => 'account_approved',
+                'title' => 'Empresa aprovada',
+                'message' => 'Empresa aprovada e acesso completo liberado.',
+                'requires_reason' => false,
+            ],
+            'request_changes' => [
+                'permission' => 'company_approve',
+                'allowed' => ['pending'],
+                'target' => 'changes_requested',
+                'audit' => 'COMPANY_CHANGES_REQUESTED',
+                'severity' => 'warning',
+                'notification' => 'account_changes_requested',
+                'title' => 'Correções solicitadas no cadastro',
+                'message' => 'A solicitação de correção foi enviada para a empresa.',
+                'requires_reason' => true,
+            ],
+            'reject' => [
+                'permission' => 'company_approve',
+                'allowed' => ['pending', 'changes_requested'],
+                'target' => 'rejected',
+                'audit' => 'COMPANY_REJECTED',
+                'severity' => 'warning',
+                'notification' => 'account_rejected',
+                'title' => 'Cadastro rejeitado',
+                'message' => 'Cadastro rejeitado e acesso bloqueado.',
+                'requires_reason' => true,
+            ],
+            'suspend' => [
+                'permission' => 'company_suspend',
+                'allowed' => ['active'],
+                'target' => 'suspended',
+                'audit' => 'COMPANY_SUSPENDED',
+                'severity' => 'warning',
+                'notification' => 'account_suspended',
+                'title' => 'Empresa suspensa',
+                'message' => 'Empresa suspensa e acesso operacional bloqueado.',
+                'requires_reason' => true,
+            ],
+            'reactivate' => [
+                'permission' => 'company_suspend',
+                'allowed' => ['suspended'],
+                'target' => 'active',
+                'audit' => 'COMPANY_REACTIVATED',
+                'severity' => 'info',
+                'notification' => 'account_reactivated',
+                'title' => 'Empresa reativada',
+                'message' => 'Empresa reativada e acesso restaurado.',
+                'requires_reason' => false,
+            ],
+        ];
 
+        $definition = $definitions[$action] ?? null;
+        if (!$definition) {
+            http_response_code(400);
+            exit('Ação administrativa inválida.');
+        }
+        if (!AdminAuth::can($definition['permission'])) {
+            http_response_code(403);
+            exit('Você não possui permissão para executar esta ação.');
+        }
         if (!csrf_validate()) {
             flash('error', 'A sessão do formulário expirou. Tente novamente.');
             redirect_to('/admin/empresas');
         }
 
         $companyId = filter_input(INPUT_POST, 'company_id', FILTER_VALIDATE_INT);
+        $reason = trim((string) ($_POST['reason'] ?? ''));
         if (!$companyId) {
             flash('error', 'Empresa inválida.');
+            redirect_to('/admin/empresas');
+        }
+        if ($definition['requires_reason'] && mb_strlen($reason) < 10) {
+            flash('error', 'Informe um motivo com pelo menos 10 caracteres.');
+            redirect_to('/admin/empresas');
+        }
+        if (mb_strlen($reason) > 1000) {
+            flash('error', 'O motivo deve ter no máximo 1.000 caracteres.');
             redirect_to('/admin/empresas');
         }
 
@@ -573,53 +761,81 @@ class AdminController
 
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare('SELECT status FROM companies WHERE id = ? LIMIT 1 FOR UPDATE');
+            $stmt = $pdo->prepare('SELECT status, review_notes FROM companies WHERE id = ? LIMIT 1 FOR UPDATE');
             $stmt->execute([$companyId]);
-            $oldStatus = $stmt->fetchColumn();
-
-            if ($oldStatus === false) {
+            $company = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$company) {
                 throw new DomainException('Empresa não encontrada.');
             }
-
-            if ($oldStatus !== 'pending') {
-                throw new DomainException('A empresa não está aguardando aprovação.');
+            if (!in_array($company['status'], $definition['allowed'], true)) {
+                throw new DomainException('O status atual da empresa não permite esta ação.');
             }
 
-            $stmt = $pdo->prepare(
-                "UPDATE companies
-                 SET status = 'active', approved_at = NOW(), approved_by_user_id = ?
-                 WHERE id = ? AND status = 'pending'"
-            );
-            $stmt->execute([(int) $adminUser['id'], $companyId]);
+            $target = $definition['target'];
+            $adminId = (int) $adminUser['id'];
+            $reviewNote = $reason !== '' ? $reason : null;
 
+            if ($action === 'approve') {
+                $sql = "UPDATE companies SET status = 'active', approved_at = NOW(),
+                        approved_by_user_id = ?, review_notes = NULL, reviewed_at = NOW(),
+                        reviewed_by_user_id = ?, suspended_at = NULL WHERE id = ?";
+                $values = [$adminId, $adminId, $companyId];
+            } elseif ($action === 'reactivate') {
+                $sql = "UPDATE companies SET status = 'active', suspended_at = NULL,
+                        review_notes = NULL, reviewed_at = NOW(), reviewed_by_user_id = ? WHERE id = ?";
+                $values = [$adminId, $companyId];
+            } elseif ($action === 'suspend') {
+                $sql = "UPDATE companies SET status = 'suspended', suspended_at = NOW(),
+                        review_notes = ?, reviewed_at = NOW(), reviewed_by_user_id = ? WHERE id = ?";
+                $values = [$reviewNote, $adminId, $companyId];
+            } else {
+                $sql = 'UPDATE companies SET status = ?, review_notes = ?, reviewed_at = NOW(), reviewed_by_user_id = ? WHERE id = ?';
+                $values = [$target, $reviewNote, $adminId, $companyId];
+            }
+            $pdo->prepare($sql)->execute($values);
+
+            $oldValues = ['status' => $company['status'], 'review_notes' => $company['review_notes']];
+            $newValues = ['status' => $target, 'review_notes' => $reviewNote];
             $stmt = $pdo->prepare(
-                "INSERT INTO audit_logs
+                'INSERT INTO audit_logs
                     (user_id, company_id, action, severity, entity_type, entity_id,
                      old_values_json, new_values_json, ip_address, user_agent)
-                 VALUES (?, ?, 'COMPANY_APPROVED', 'info', 'company', ?, ?, ?, ?, ?)"
+                 VALUES (?, ?, ?, ?, \'company\', ?, ?, ?, ?, ?)'
             );
             $stmt->execute([
-                (int) $adminUser['id'],
+                $adminId,
                 $companyId,
+                $definition['audit'],
+                $definition['severity'],
                 $companyId,
-                json_encode(['status' => $oldStatus], JSON_UNESCAPED_UNICODE),
-                json_encode(['status' => 'active'], JSON_UNESCAPED_UNICODE),
+                json_encode($oldValues, JSON_UNESCAPED_UNICODE),
+                json_encode($newValues, JSON_UNESCAPED_UNICODE),
                 $_SERVER['REMOTE_ADDR'] ?? null,
                 $_SERVER['HTTP_USER_AGENT'] ?? null,
             ]);
 
+            $notificationBody = $reason !== ''
+                ? $definition['title'] . ': ' . $reason
+                : $definition['message'];
+            $stmt = $pdo->prepare(
+                'INSERT INTO notifications (company_id, type, title, body, data_json)
+                 VALUES (?, ?, ?, ?, ?)'
+            );
+            $stmt->execute([
+                $companyId,
+                $definition['notification'],
+                $definition['title'],
+                $notificationBody,
+                json_encode(['status' => $target], JSON_UNESCAPED_UNICODE),
+            ]);
+
             $pdo->commit();
-            flash('success', 'Empresa aprovada e acesso completo liberado.');
+            flash('success', $definition['message']);
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
-            flash(
-                'error',
-                $e instanceof DomainException
-                    ? $e->getMessage()
-                    : 'Não foi possível aprovar a empresa.'
-            );
+            flash('error', $e instanceof DomainException ? $e->getMessage() : 'Não foi possível atualizar a empresa.');
         }
 
         redirect_to('/admin/empresas');

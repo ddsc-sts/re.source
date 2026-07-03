@@ -7,9 +7,18 @@
   const input = document.getElementById('messageContent');
   const button = document.getElementById('sendMessageButton');
   const errorBox = document.getElementById('messageFormError');
+  const syncStatus = document.getElementById('chatSyncStatus');
+  const syncText = document.getElementById('chatSyncText');
   const negotiationId = Number(room.dataset.negotiationId);
   const companyId = Number(room.dataset.companyId);
   let polling = false;
+
+  function setSyncStatus(state, message) {
+    if (!syncStatus || !syncText) return;
+    syncStatus.classList.remove('is-online', 'is-syncing', 'is-error');
+    syncStatus.classList.add(`is-${state}`);
+    syncText.textContent = message;
+  }
 
   const lastMessageId = () => {
     const messages = list.querySelectorAll('[data-message-id]');
@@ -46,6 +55,7 @@
   async function pollMessages() {
     if (polling || document.hidden) return;
     polling = true;
+    setSyncStatus('syncing', 'Atualizando mensagens...');
     try {
       const url = new URL(room.dataset.messagesUrl, window.location.origin);
       url.searchParams.set('negotiation_id', negotiationId);
@@ -56,9 +66,29 @@
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || 'Falha ao atualizar mensagens.');
-      data.messages.forEach(appendMessage);
+      let negotiationStateChanged = false;
+      data.messages.forEach((message) => {
+        appendMessage(message);
+        if (Number(message.sender_company_id) !== companyId && /^(📄|👍|✅|❌|🚫)/u.test(String(message.content))) {
+          negotiationStateChanged = true;
+        }
+        if (Number(message.sender_company_id) !== companyId && typeof window.showMessagePopup === 'function') {
+          window.showMessagePopup({
+            ...message,
+            negotiation_id: negotiationId,
+            sender_company_name: room.dataset.otherCompanyName,
+            listing_title: room.dataset.listingTitle
+          });
+        }
+      });
+      setSyncStatus('online', `Atualizado às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`);
+      if (negotiationStateChanged) {
+        setSyncStatus('syncing', 'Atualizando o estado da proposta...');
+        setTimeout(() => window.location.reload(), 700);
+      }
     } catch (error) {
       errorBox.textContent = error.message;
+      setSyncStatus('error', 'Falha ao atualizar — nova tentativa em 3s');
     } finally {
       polling = false;
     }
@@ -94,6 +124,7 @@
   });
 
   list.scrollTop = list.scrollHeight;
+  setSyncStatus('online', 'Atualização automática ativa');
   setInterval(pollMessages, 3000);
   document.addEventListener('visibilitychange', pollMessages);
 }());

@@ -94,7 +94,10 @@ class AuthController
         global $pdo;
 
         $companyId = (int) ($_SESSION['user']['company_id'] ?? 0);
-        $stmt = $pdo->prepare('SELECT razao_social, nome_fantasia, status FROM companies WHERE id = ? LIMIT 1');
+        $stmt = $pdo->prepare(
+            'SELECT razao_social, nome_fantasia, status, review_notes, reviewed_at
+             FROM companies WHERE id = ? LIMIT 1'
+        );
         $stmt->execute([$companyId]);
         $company = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -104,16 +107,73 @@ class AuthController
 
         if ($company['status'] === 'active') {
             $_SESSION['user']['company_status'] = 'active';
-            header('Location: /re.source/base');
-            exit;
+            redirect_to('/base');
         }
 
-        if ($company['status'] !== 'pending') {
+        if (!in_array($company['status'], ['pending', 'changes_requested'], true)) {
             self::logout();
         }
 
-        $_SESSION['user']['company_status'] = 'pending';
+        $_SESSION['user']['company_status'] = $company['status'];
         require_once __DIR__ . '/../Views/auth/aguardando_aprovacao.php';
+    }
+
+    public static function reenviarAnalise(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+            http_response_code(405);
+            exit('Método não permitido.');
+        }
+        if (!csrf_validate()) {
+            flash('error', 'A sessão do formulário expirou. Tente novamente.');
+            redirect_to('/aguardando-aprovacao');
+        }
+
+        $companyId = (int) ($_SESSION['user']['company_id'] ?? 0);
+        if (!$companyId) {
+            redirect_to('/login');
+        }
+
+        global $pdo;
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare(
+                "UPDATE companies
+                 SET status = 'pending', review_notes = NULL, reviewed_at = NULL,
+                     reviewed_by_user_id = NULL
+                 WHERE id = ? AND status = 'changes_requested'"
+            );
+            $stmt->execute([$companyId]);
+            if ($stmt->rowCount() !== 1) {
+                throw new DomainException('O cadastro não está aguardando correções.');
+            }
+
+            $stmt = $pdo->prepare(
+                "INSERT INTO audit_logs
+                    (user_id, company_id, action, severity, entity_type, entity_id,
+                     old_values_json, new_values_json, ip_address, user_agent)
+                 VALUES (?, ?, 'COMPANY_RESUBMITTED', 'info', 'company', ?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                (int) ($_SESSION['user']['id'] ?? 0),
+                $companyId,
+                $companyId,
+                json_encode(['status' => 'changes_requested'], JSON_UNESCAPED_UNICODE),
+                json_encode(['status' => 'pending'], JSON_UNESCAPED_UNICODE),
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            ]);
+            $pdo->commit();
+            $_SESSION['user']['company_status'] = 'pending';
+            flash('success', 'Cadastro reenviado para análise.');
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            flash('error', $e instanceof DomainException ? $e->getMessage() : 'Não foi possível reenviar o cadastro.');
+        }
+
+        redirect_to('/aguardando-aprovacao');
     }
 
     // ══════════════════════════════════════════
@@ -176,9 +236,14 @@ class AuthController
                 exit;
             }
 
-            if (in_array($user['company_status'], ['suspended', 'inactive'], true)) {
+            if (in_array($user['company_status'], ['suspended', 'inactive', 'rejected'], true)) {
                 ob_clean();
-                echo json_encode(['success' => false, 'message' => 'Empresa suspensa ou inativa. Entre em contato com o suporte.']);
+                $blockedMessage = match ($user['company_status']) {
+                    'rejected' => 'O cadastro da empresa foi rejeitado. Entre em contato com o suporte.',
+                    'suspended' => 'Empresa suspensa. Entre em contato com o suporte.',
+                    default => 'Empresa inativa. Entre em contato com o suporte.',
+                };
+                echo json_encode(['success' => false, 'message' => $blockedMessage]);
                 exit;
             }
 
@@ -227,7 +292,7 @@ class AuthController
 
             if (in_array($user['role'], ['admin', 'staff'], true)) {
                 $redirect = '/re.source/admin';
-            } elseif ($user['company_status'] === 'pending') {
+            } elseif (in_array($user['company_status'], ['pending', 'changes_requested'], true)) {
                 $redirect = '/re.source/aguardando-aprovacao';
             } else {
                 $redirect = '/re.source/base';

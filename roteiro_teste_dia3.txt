@@ -1,0 +1,115 @@
+# RE.SOURCE — ROTEIRO MANUAL DE TESTE DO DIA 3
+
+Objetivo: validar proposta, aceite mutuo, notificacoes, cancelamento e painel admin.
+
+Preparacao:
+
+[ ] Apache e MariaDB ativos.
+[ ] Migration 20260702_003_proposals_and_mutual_agreement.sql aplicada.
+[ ] Duas empresas ativas com usuarios diferentes.
+[ ] Uma empresa possui anuncio ativo.
+[ ] Navegador normal logado na Empresa A.
+[ ] Janela anonima ou segundo navegador logado na Empresa B.
+[ ] Uma terceira empresa disponivel para teste de acesso indevido.
+
+===============================================================================
+1. CRIACAO DA PROPOSTA
+===============================================================================
+
+[ ] Empresa A abre o anuncio da Empresa B e entra na conversa.
+[ ] Abrir "Criar nova proposta".
+[ ] Informar quantidade 10, valor unitario 25,50 e prazo futuro.
+[ ] Escolher o responsavel pelo frete e adicionar uma observacao.
+[ ] Enviar a proposta.
+[ ] Confirmar que o total exibido e R$ 255,00.
+[ ] Confirmar que o anuncio/negociacao fica com status de proposta enviada.
+[ ] Empresa B recebe mensagem, pop-up e atualizacao automatica do card.
+[ ] Confirmar recebimento do e-mail de nova proposta.
+
+Resultado esperado: dados persistidos e iguais nos dois navegadores.
+
+===============================================================================
+2. EDICAO E VALIDACOES
+===============================================================================
+
+[ ] Empresa A edita a proposta antes do acordo.
+[ ] Alterar quantidade ou valor e confirmar que o total e recalculado no backend.
+[ ] Tentar quantidade zero ou prazo passado e confirmar a mensagem de erro.
+[ ] Empresa B nao consegue substituir a proposta enviada pela Empresa A.
+[ ] Atualizar as paginas e confirmar que os dados continuam salvos.
+
+===============================================================================
+3. ACEITE UNILATERAL E MUTUO
+===============================================================================
+
+[ ] Empresa A aceita a proposta.
+[ ] Confirmar estado "Comprador aceitou" ou "Vendedor aceitou".
+[ ] Confirmar que ainda nao existe protocolo de acordo.
+[ ] Empresa B visualiza automaticamente o aceite da Empresa A.
+[ ] Empresa B aceita a proposta.
+[ ] Confirmar estado "Acordo confirmado" nos dois navegadores.
+[ ] Confirmar geracao de protocolo no formato RES-data-id-codigo.
+[ ] Confirmar que o botao "Continuar para o frete" aparece.
+[ ] Confirmar que a proposta nao pode mais ser editada.
+[ ] Confirmar recebimento do e-mail de acordo pelas duas empresas.
+
+===============================================================================
+4. RECUSA COM MOTIVO
+===============================================================================
+
+Usar outra conversa ou cancelar/restaurar os dados de demonstracao.
+
+[ ] Criar uma nova proposta.
+[ ] Tentar recusar com menos de 10 caracteres.
+[ ] Confirmar que o backend rejeita o motivo curto.
+[ ] Recusar novamente com um motivo valido.
+[ ] Confirmar que o motivo aparece no card e como evento do chat.
+[ ] Confirmar que a conversa fica aberta para uma nova proposta.
+
+===============================================================================
+5. CANCELAMENTO
+===============================================================================
+
+[ ] Cancelar uma negociacao antes da escolha do frete.
+[ ] Informar um motivo entre 10 e 1.000 caracteres.
+[ ] Confirmar o status "Cancelada" nos dois navegadores.
+[ ] Confirmar que o motivo fica salvo.
+[ ] Confirmar que nao e mais possivel aceitar ou editar a proposta cancelada.
+
+===============================================================================
+6. PERMISSOES E SEGURANCA
+===============================================================================
+
+[ ] Copiar a URL da conversa e tentar abrir com a terceira empresa.
+[ ] Confirmar bloqueio de acesso.
+[ ] Alterar manualmente negotiation_id em um formulario e confirmar bloqueio.
+[ ] Tentar repetir o aceite da mesma empresa e confirmar que nao duplica.
+[ ] Atualizar a pagina depois do acordo e confirmar um unico protocolo.
+
+===============================================================================
+7. PAINEL ADMINISTRATIVO
+===============================================================================
+
+[ ] Acessar http://localhost/re.source/admin/negociacoes.
+[ ] Confirmar que os numeros do topo usam dados reais.
+[ ] Buscar pelo nome da empresa, anuncio e protocolo.
+[ ] Filtrar cada status disponivel.
+[ ] Abrir o modal de detalhes de uma negociacao.
+[ ] Conferir comprador, vendedor, quantidade, valores, prazo e frete.
+[ ] Conferir os aceites independentes e o protocolo.
+[ ] Conferir motivo de recusa ou cancelamento quando existir.
+[ ] Confirmar que nao existem botoes falsos de aprovar ou cancelar pelo admin.
+
+===============================================================================
+8. CRITERIO DE APROVACAO
+===============================================================================
+
+O Dia 3 esta aprovado quando:
+
+[ ] Os dois navegadores completam o acordo sem editar o banco manualmente.
+[ ] O protocolo aparece somente depois dos dois aceites.
+[ ] Recusa e cancelamento exigem motivo.
+[ ] Uma terceira empresa nao acessa nem altera a negociacao.
+[ ] O painel administrativo reflete os mesmos dados do chat.
+[ ] Falha de e-mail nao desfaz a proposta ou o acordo salvo.
+

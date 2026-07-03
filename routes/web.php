@@ -34,6 +34,11 @@ return [
         'middleware' => [['UserAuth', 'required']],
     ],
 
+    '/cadastro/reenviar-analise' => [
+        'action'     => ['AuthController', 'reenviarAnalise'],
+        'middleware' => [['UserAuth', 'required']],
+    ],
+
     '/reset' => [
         'action' => ['AuthController', 'showReset'],
     ],
@@ -176,6 +181,36 @@ return [
         'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
+    '/conversas/nao-lidas' => [
+        'action'     => ['ChatController', 'unreadCount'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/conversas/lista' => [
+        'action'     => ['ChatController', 'conversationList'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/negociacoes/proposta' => [
+        'action'     => ['ProposalController', 'save'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/negociacoes/proposta/aceitar' => [
+        'action'     => ['ProposalController', 'accept'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/negociacoes/proposta/recusar' => [
+        'action'     => ['ProposalController', 'refuse'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/negociacoes/cancelar' => [
+        'action'     => ['ProposalController', 'cancel'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
     '/logistica' => [
         'action'     => ['BaseController', 'logistica'],
         'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
@@ -204,6 +239,26 @@ return [
 
     '/admin/empresas/aprovar' => [
         'action'     => ['AdminController', 'aprovarEmpresa'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/empresas/solicitar-correcao' => [
+        'action'     => ['AdminController', 'solicitarCorrecaoEmpresa'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/empresas/rejeitar' => [
+        'action'     => ['AdminController', 'rejeitarEmpresa'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/empresas/suspender' => [
+        'action'     => ['AdminController', 'suspenderEmpresa'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/empresas/reativar' => [
+        'action'     => ['AdminController', 'reativarEmpresa'],
         'middleware' => [['AdminAuth', 'required']],
     ],
 
