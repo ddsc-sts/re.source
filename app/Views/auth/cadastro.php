@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <link rel="stylesheet" href="/re.source/public/css/cadastro.css">
 </head>
@@ -16,7 +16,14 @@
   <header class="site-header">
     <div class="header-inner">
       <a href="/re.source/" class="logo-mark">
-        <span>re<span class="dot">.</span>source</span>
+        <svg width="30" height="30" viewBox="0 0 38 38" fill="none">
+          <rect x="2" y="2" width="13" height="13" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+          <rect x="2" y="23" width="13" height="13" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
+          <path d="M19 8.5 C27 8.5 27 19 27 19 C27 19 27 29.5 19 29.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="19" cy="8.5" r="2.5" fill="currentColor"/>
+          <circle cx="19" cy="29.5" r="2.5" fill="currentColor"/>
+        </svg>
+        <span>Re<span class="dot">.</span>Source</span>
       </a>
       <nav class="header-nav">
         <a href="/re.source/">← Voltar ao site</a>
@@ -28,13 +35,13 @@
   <main class="register-main">
 
     <aside class="register-aside">
-      <div class="aside-orb aside-orb-1"></div>
-      <div class="aside-orb aside-orb-2"></div>
+      <img class="aside-photo" src="https://images.unsplash.com/photo-1615797534094-7fde0a4861f3?w=900&q=80&auto=format&fit=crop" alt="" />
+      <div class="aside-scrim"></div>
 
       <div class="aside-content">
         <div class="aside-badge">
           <span class="aside-dot"></span>
-          Plataforma ESG Certificada
+          Somente empresas verificadas
         </div>
 
         <h2 class="aside-title">
@@ -92,6 +99,8 @@
     </aside>
 
     <section class="register-panel">
+      <div class="register-panel-bg-lines"></div>
+
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill"></div>
       </div>

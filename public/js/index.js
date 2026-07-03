@@ -1,46 +1,81 @@
-    // Lucide icons
-    lucide.createIcons();
+/* ══════════════════════════════════════════════
+   RE.SOURCE — LANDING PAGE (INDEX) — interações
+   ══════════════════════════════════════════════ */
 
-    // Navbar scroll
-    const header = document.getElementById('siteHeader');
-    window.addEventListener('scroll', () => {
-      header.classList.toggle('scrolled', window.scrollY > 30);
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* ícones lucide */
+  if (window.lucide) lucide.createIcons();
+
+  /* ── menu mobile ── */
+  const navToggle = document.getElementById('navToggle');
+  const mobileNav = document.getElementById('mobileNav');
+  const siteHeader = document.getElementById('siteHeader');
+
+  if (navToggle && mobileNav) {
+    navToggle.addEventListener('click', () => {
+      mobileNav.classList.toggle('open');
+      const icon = mobileNav.classList.contains('open') ? 'x' : 'menu';
+      navToggle.innerHTML = `<i data-lucide="${icon}"></i>`;
+      if (window.lucide) lucide.createIcons();
     });
 
-    // Mobile nav
-    const toggle = document.getElementById('navToggle');
-    const mNav   = document.getElementById('mobileNav');
-    toggle.addEventListener('click', () => {
-      const open = mNav.classList.toggle('open');
-      toggle.innerHTML = open
-        ? '<i data-lucide="x"></i>'
-        : '<i data-lucide="menu"></i>';
-      lucide.createIcons();
-    });
-    mNav.querySelectorAll('a').forEach(a => {
+    mobileNav.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', () => {
-        mNav.classList.remove('open');
-        toggle.innerHTML = '<i data-lucide="menu"></i>';
-        lucide.createIcons();
+        mobileNav.classList.remove('open');
+        navToggle.innerHTML = `<i data-lucide="menu"></i>`;
+        if (window.lucide) lucide.createIcons();
       });
     });
+  }
 
-    // Reveal on scroll
-    const revealEls = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
-    revealEls.forEach(el => io.observe(el));
+  /* ── header: sombra ao rolar ── */
+  const onScroll = () => {
+    if (siteHeader) {
+      siteHeader.classList.toggle('scrolled', window.scrollY > 12);
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-    // ESG bars animation
-    const fills = document.querySelectorAll('.esg-fill');
-    const barIO = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          const w = e.target.getAttribute('data-w');
-          e.target.style.width = w + '%';
-          barIO.unobserve(e.target);
+  /* ── reveal on scroll ── */
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+
+        /* aciona as barras do widget ESG quando revelado */
+        entry.target.querySelectorAll('.esg-fill').forEach(bar => {
+          const w = bar.getAttribute('data-w');
+          if (w) requestAnimationFrame(() => { bar.style.width = w + '%'; });
+        });
+
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  /* ── destaque do item ativo na nav ── */
+  const sections = ['como-funciona', 'categorias', 'impacto', 'seguranca']
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+  const navLinks = document.querySelectorAll('.main-nav a');
+
+  if (sections.length && navLinks.length) {
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => {
+            link.classList.toggle('active', link.dataset.section === entry.target.id);
+          });
         }
       });
-    }, { threshold: 0.5 });
-    fills.forEach(f => { f.style.width = '0'; barIO.observe(f); });
+    }, { threshold: 0.4, rootMargin: '-15% 0px -55% 0px' });
+
+    sections.forEach(sec => sectionObserver.observe(sec));
+  }
+
+});

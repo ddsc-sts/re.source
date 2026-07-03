@@ -31,7 +31,6 @@ document.getElementById('chkLembrar').addEventListener('change', function () {
 // ── Helpers ──
 function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 
-// Ajustado para garantir o preventDefault na tecla Enter também
 function setError(id, msg) {
   const el = document.getElementById(id);
   if (el) { el.textContent = msg; el.style.display = msg ? 'flex' : 'none'; }
@@ -56,7 +55,6 @@ function hideAlert() {
 
 // ── LOGIN: Submit real ──
 document.getElementById('btnLogin').addEventListener('click', async (e) => {
-  // 🚀 CORREÇÃO: Impede o navegador de tentar disparar o formulário nativo do HTML
   e.preventDefault();
 
   const email = document.getElementById('loginEmail').value.trim();
@@ -98,7 +96,6 @@ document.getElementById('btnLogin').addEventListener('click', async (e) => {
     fd.append('password', senha);
     fd.append('csrf_token', document.getElementById('loginCsrf')?.value ?? '');
 
-    // 🚀 CORREÇÃO: URL ajustada para a pasta do XAMPP
     const res = await fetch('/re.source/process?action=login', {
       method: 'POST',
       body:   fd,
@@ -181,7 +178,6 @@ async function sendRecoverEmail(email) {
     const fd = new FormData();
     fd.append('email', email);
 
-    // 🚀 CORREÇÃO: URL ajustada para a pasta do XAMPP
     const res  = await fetch('/re.source/process?action=recover', { method: 'POST', body: fd });
     const text = await res.text();
     let data;

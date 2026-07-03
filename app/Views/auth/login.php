@@ -6,7 +6,7 @@
   <title>Entrar — Re.Source</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <link rel="stylesheet" href="/re.source/public/css/login.css"/>
   <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>"/>
@@ -15,88 +15,52 @@
 
   <?php require __DIR__ . '/../components/flash.php'; ?>
 
-  <header>
-    <div class="header-top">
-      <div class="header-top-inner">
-        <a href="/re.source/" class="logo">
-          <span><img src="/re.source/public/img/logos/logo.png" alt="Re.Source" /></span>
-        </a>
-      </div>
+  <!-- ══ HEADER (overlay transparente sobre a foto e o painel) ══ -->
+  <header class="login-header">
+    <a href="/re.source/" class="login-logo">
+      <img src="/re.source/public/img/logos/logo.png" alt="Re.Source" />
+      <span>Re<span class="dot">.</span>Source</span>
+    </a>
+    <div class="login-header-ctas">
+      <a href="/re.source/login" class="link-login active">Entrar</a>
+      <a href="/re.source/cadastro" class="btn-cta-nav">Cadastrar minha empresa</a>
     </div>
   </header>
 
-  <main class="register-main">
+  <main class="login-main">
 
-    <aside class="register-aside">
-      <div class="aside-content">
-        <div class="aside-badge">
-          <span class="esg-dot"></span>
-          <span>Plataforma ESG Certificada</span>
-        </div>
-        <h2 class="aside-title">Bem-vindo de volta à economia circular.</h2>
-        <p class="aside-desc">
-          Mais de 12 000 empresas já transformam descarte em oportunidade. Acesse sua conta e continue gerando impacto.
+    <!-- ══ ASIDE — foto industrial + headline ══ -->
+    <aside class="login-aside">
+      <img class="login-aside-photo" src="https://images.unsplash.com/photo-1615797534094-7fde0a4861f3?w=1200&q=80&auto=format&fit=crop" alt="" />
+      <div class="login-aside-scrim"></div>
+      <div class="login-aside-content">
+        <h1 class="login-aside-heading">
+          Conectando<br>
+          indústrias,<br>
+          gerando valor<span class="accent-sq"></span>
+        </h1>
+        <p class="login-aside-sub">
+          Plataforma B2B de economia circular para empresas. Sem ruído. Só negócio sustentável.
         </p>
-        <ul class="aside-benefits">
-          <li>
-            <span class="benefit-icon"><i data-lucide="leaf"></i></span>
-            <div>
-              <strong>Acesso instantâneo</strong>
-              <span>Seus anúncios e conexões onde você parou</span>
-            </div>
-          </li>
-          <li>
-            <span class="benefit-icon"><i data-lucide="shield-check"></i></span>
-            <div>
-              <strong>Sessão segura</strong>
-              <span>Autenticação protegida com token criptografado</span>
-            </div>
-          </li>
-          <li>
-            <span class="benefit-icon"><i data-lucide="trending-up"></i></span>
-            <div>
-              <strong>Dashboard ESG atualizado</strong>
-              <span>Métricas de impacto em tempo real</span>
-            </div>
-          </li>
-        </ul>
-        <blockquote class="aside-quote">
-          <p>"Entramos na plataforma e em 2 dias já fechamos nossa primeira parceria de reciclagem."</p>
-          <cite>— Carlos Menezes, CEO · EcoFibras Brasil</cite>
-        </blockquote>
-        <div class="aside-stats">
-          <div class="aside-stat">
-            <span class="aside-stat-val">12k+</span>
-            <span class="aside-stat-label">Empresas</span>
-          </div>
-          <div class="aside-stat">
-            <span class="aside-stat-val">98t</span>
-            <span class="aside-stat-label">Resíduos / mês</span>
-          </div>
-          <div class="aside-stat">
-            <span class="aside-stat-val">R$2M</span>
-            <span class="aside-stat-label">Economizados</span>
-          </div>
-        </div>
       </div>
-      <div class="aside-orb aside-orb-1"></div>
-      <div class="aside-orb aside-orb-2"></div>
     </aside>
 
-    <section class="register-panel">
-      <div class="register-card">
+    <!-- ══ PANEL — formulário ══ -->
+    <section class="login-panel">
+      <div class="login-panel-bg-lines"></div>
+
+      <div class="login-card">
 
         <!-- TELA 1: LOGIN -->
         <div id="screenLogin" class="auth-screen active">
           <div class="card-header">
-            <h1 class="card-title">Acessar minha conta</h1>
-            <p class="card-sub">Entre com seu e-mail e senha cadastrados</p>
+            <h1 class="card-title">Acesse sua conta</h1>
+            <p class="card-sub">Bem-vindo de volta à sua rede industrial.</p>
           </div>
 
           <!-- Alerta geral -->
           <div class="alert-box alert-danger" id="loginAlert" style="display:none;margin-bottom:1rem;"></div>
 
-          <!-- 🚀 CORREÇÃO: Alterado de <div> para <form> para resolver o aviso do [DOM] -->
           <form class="form-body" id="formLogin">
             <input type="hidden" id="loginCsrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-field">
@@ -194,12 +158,18 @@
         </div>
 
       </div>
+
+      <!-- floater badge -->
+      <div class="login-floater">
+        <i data-lucide="shield-check" style="width:16px;height:16px;color:#157347"></i>
+        <span>Somente empresas verificadas</span>
+      </div>
     </section>
   </main>
 
-  <footer style="text-align:center;padding:1.5rem;font-size:0.8rem;color:#6C757D;background:var(--white);border-top:1px solid var(--border-color);">
+  <footer class="login-footer">
     © 2026 Re.Source · Todos os direitos reservados ·
-    <a href="#" style="color:var(--green);">Política de Privacidade</a>
+    <a href="#">Política de Privacidade</a>
   </footer>
 
   <!-- 🚀 CORREÇÃO: Adicionado o '?v=2' para forçar o navegador a carregar o seu JavaScript novo sem usar o cache -->
