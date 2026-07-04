@@ -22,6 +22,7 @@ $admin_email     = $admin['email']             ?? 'seu e-mail';
 $titulo_pagina = $titulo_pagina ?? 'Configurações da Conta — Re.Source';
 require_once __DIR__ . '/../components/header.php';
 ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 
 <style>
 .dashboard-layout {
@@ -32,16 +33,6 @@ require_once __DIR__ . '/../components/header.php';
     grid-template-columns: 260px 1fr;
     gap: 2rem;
     align-items: start;
-}
-.dashboard-sidebar {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-    padding: 1.5rem 1rem;
-    position: sticky;
-    top: 100px;
-    height: calc(100vh - 120px);
-    overflow-y: auto;
 }
 .dashboard-content {
     display: flex;
@@ -117,22 +108,6 @@ require_once __DIR__ . '/../components/header.php';
     cursor: pointer;
 }
 .btn-save:hover { background: #0f5132; }
-.sidebar-user { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-.sidebar-avatar {
-    width: 64px; height: 64px;
-    background: var(--bg);
-    border-radius: 50%;
-    margin: 0 auto 0.75rem;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--green);
-    overflow: hidden;
-    border: 2px solid var(--border-color);
-}
-.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
-.sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.9rem; font-weight: 500; color: var(--muted); transition: all 0.2s; }
-.sidebar-link:hover { background: var(--bg); color: var(--dark); }
-.sidebar-link.active { background: rgba(21, 115, 71, 0.1); color: var(--green); font-weight: 600; }
 .security-row { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem; margin-bottom: 1rem; }
 .security-info h3 { font-size: 1rem; color: var(--dark); margin-bottom: 0.25rem; }
 .security-info p { font-size: 0.85rem; color: var(--muted); }
@@ -157,27 +132,7 @@ require_once __DIR__ . '/../components/header.php';
 
 <main class="dashboard-layout">
 
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-user">
-            <div class="sidebar-avatar">
-                <?php if (!empty($logo_url)): ?>
-                    <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da empresa">
-                <?php else: ?>
-                    <i data-lucide="building-2" style="width:32px;height:32px;"></i>
-                <?php endif; ?>
-            </div>
-            <h3><?= htmlspecialchars($nome_exibicao) ?></h3>
-            <p>Conta B2B Verificada</p>
-        </div>
-
-        <nav class="sidebar-nav">
-            <a href="/re.source/estatisticas" class="sidebar-link"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
-            <a href="/re.source/meus-anuncios" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
-            <a href="/re.source/conta" class="sidebar-link active"><i data-lucide="user"></i> Detalhes da Conta</a>
-            <a href="/re.source/configuracoes" class="sidebar-link"><i data-lucide="settings"></i> Configurações</a>
-            <a href="/re.source/logout" class="sidebar-link"><i data-lucide="log-out"></i> Sair</a>
-        </nav>
-    </aside>
+    <?php $sidebarActive = 'account'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
 
     <div class="dashboard-content">
 

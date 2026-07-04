@@ -1,7 +1,10 @@
 <?php require __DIR__ . '/../components/header.php'; ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/chat.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-<main class="chat-page">
+<main class="dashboard-shell">
+  <?php $sidebarActive = 'conversations'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
+  <div class="chat-page">
   <div class="chat-page-heading">
     <div>
       <span class="chat-eyebrow">Negociações</span>
@@ -49,6 +52,7 @@
       <?php endforeach; ?>
     <?php endif; ?>
   </section>
+  </div>
 </main>
 
 <script src="<?= htmlspecialchars(app_url('/public/js/conversations.js'), ENT_QUOTES, 'UTF-8') ?>"></script>

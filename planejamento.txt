@@ -272,8 +272,8 @@ Leonardo:
 Daniel:
 
 [ ] Criar modal visual de proposta.
-[] Criar card de proposta dentro do chat.
-[] Criar estados visuais "aguardando comprador", "aguardando vendedor" e
+[x] Criar card de proposta dentro do chat.
+[x] Criar estados visuais "aguardando comprador", "aguardando vendedor" e
   "acordo confirmado".
 [ ] Finalizar o layout completo do chat em desktop e mobile.
 [x] Iniciar painel administrativo de negociacoes.
@@ -296,6 +296,14 @@ Se sobrar tempo:
 [x] Cancelamento antes do frete.
 [x] E-mails de nova mensagem e acordo confirmado.
 
+Avancos visuais antecipados pelo Daniel em 03/07:
+
+[x] Redesign da landing page.
+[x] Redesign da tela de login.
+[x] Redesign da tela de cadastro.
+[x] Atualizacao dos estilos responsivos dessas tres telas.
+[x] Reforco do SMTP com timeout, tratamento de tmpfile e logs de erro.
+
 -------------------------------------------------------------------------------
 DIA 4 — FRETE, RASTREAMENTO E CODIGO DE ENTREGA
 Responsaveis: Leonardo, Daniel e Geder
@@ -303,24 +311,24 @@ Responsaveis: Leonardo, Daniel e Geder
 
 Leonardo:
 
-[ ] Criar FreightController e rotas do frete.
-[ ] Criar opcoes de frete persistidas no banco.
-[ ] Salvar transportadora, modalidade, valor e prazo.
-[ ] Gerar ordem de entrega e codigo aleatorio de seis digitos.
-[ ] Armazenar somente o hash do codigo.
-[ ] Criar limite de tentativas, expiracao e uso unico.
-[ ] Criar pagina interna do entregador para confirmar o codigo.
-[ ] Ao confirmar: marcar entrega, concluir negociacao e registrar saldo.
-[ ] Garantir transacao atomica na liberacao financeira.
-[ ] Entregar frontend funcional das telas.
+[x] Criar FreightController e rotas do frete.
+[x] Criar opcoes de frete persistidas no banco.
+[x] Salvar transportadora, modalidade, valor e prazo.
+[x] Gerar ordem de entrega e codigo aleatorio de seis digitos.
+[x] Armazenar somente o hash do codigo.
+[x] Criar limite de tentativas, expiracao e uso unico.
+[x] Criar pagina interna do entregador para confirmar o codigo.
+[x] Ao confirmar: marcar entrega, concluir negociacao e registrar saldo.
+[x] Garantir transacao atomica na liberacao financeira.
+[x] Entregar frontend funcional das telas.
 
 Daniel:
 
-[ ] Criar cards completos das opcoes de frete.
-[ ] Criar resumo da negociacao e dos enderecos.
-[ ] Criar linha do tempo visual do rastreamento.
-[ ] Finalizar tela do codigo e Portal do Entregador.
-[ ] Criar visual administrativo de entregas e alteracao de status permitida.
+[x] Criar cards completos das opcoes de frete.
+[x] Criar resumo da negociacao e dos enderecos.
+[x] Criar linha do tempo visual do rastreamento.
+[x] Finalizar tela do codigo e Portal do Entregador.
+[x] Criar visual administrativo de entregas e confirmacao por codigo.
 
 Geder:
 
@@ -336,15 +344,39 @@ Acordo -> escolha de frete -> envio -> codigo correto -> entrega -> saldo.
 
 Se sobrar tempo:
 
-[ ] Animacao de entrega concluida.
-[ ] Historico detalhado dos status do frete.
-[ ] Avisos por e-mail de coleta e entrega.
+[x] Animacao de entrega concluida.
+[x] Historico detalhado dos status do frete.
+[x] Avisos por e-mail de coleta e entrega.
+[x] Adicionar "Minhas entregas" ao menu principal da empresa.
+[x] Adicionar a sidebar do dashboard nas telas de conversas e entregas.
 
 Portoes de decisao antes do desenvolvimento:
 
-[ ] Confirmar frete simulado ou API real. Recomendacao: frete simulado.
-[ ] Confirmar Portal do Entregador interno ou perfil completo. Recomendacao:
-  portal interno.
+[x] Confirmado frete simulado para proteger o prazo da apresentacao.
+[x] Confirmado Portal do Entregador interno, sem criar perfil completo.
+
+Correcao e integracao realizadas em 04/07:
+
+- O prototipo recebido foi refeito para usar o schema, as sessoes e as regras
+  reais do projeto.
+- Foram registradas as rotas de cotacao, contratacao, rastreamento, codigo,
+  historico e validacao da entrega.
+- O frete possui tres opcoes simuladas persistidas no banco e rastreamento.
+- O codigo usa hash, validade de 24 horas, cinco tentativas e uso unico.
+- A confirmacao atualiza frete, negociacao, anuncio, saldo e movimentacao
+  financeira dentro da mesma transacao.
+- A migration foi corrigida e incorporada ao re.sourcebanco.sql.
+- As telas de escolha, acompanhamento, historico e portal interno foram
+  substituidas por versoes funcionais e responsivas.
+- A integracao Melhor Envio ficou isolada como melhoria opcional, sem bloquear
+  o MVP simulado.
+
+Validacao tecnica em 04/07:
+
+[x] Todos os arquivos PHP passaram no lint de sintaxe.
+[x] O diff passou na verificacao de espacos e conflitos textuais.
+[x] Executar as migrations do frete no banco resource.
+[ ] Finalizar o teste manual do fluxo ponta a ponta com duas empresas.
 
 -------------------------------------------------------------------------------
 DIA 5 — SALDO, SAQUE E DASHBOARD ADMINISTRATIVO
@@ -441,6 +473,8 @@ Extras permitidos somente se a meta estiver verde ate o meio do dia:
 [ ] Animacoes e microinteracoes.
 [ ] Metricas ESG estimadas.
 [ ] Melhorias extras de busca e filtros.
+[ ] Integrar cotacao real com o Melhor Envio Sandbox no lugar das opcoes
+  simuladas, sem alterar o restante do fluxo.
 
 ===============================================================================
 7. ESTRATEGIA DE MOCKING — SUJEITA A CONFIRMACAO
@@ -509,7 +543,7 @@ Checklist final:
 [x] Aprovacao de empresa
 [x] Login aprovado
 [x] Chat entre empresas
-[ ] Proposta e acordo mutuo
+[x] Proposta e acordo mutuo
 [ ] Frete escolhido
 [ ] Codigo de entrega
 [ ] Saldo liberado uma unica vez

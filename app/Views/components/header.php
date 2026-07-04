@@ -12,7 +12,7 @@ $headerUnreadMessages = 0;
 $headerLatestUnreadId = 0;
 
 if ($headerCompanyId) {
-    $stmt = $pdo->prepare("SELECT theme, nome_fantasia, status FROM companies WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT theme, nome_fantasia, status, logo_url FROM companies WHERE id = ?");
     $stmt->execute([$headerCompanyId]);
     $headerCompany = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -105,6 +105,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
         <?php else: ?>
           <a href="/re.source/estatisticas" class="menu-btn">Estatísticas</a>
           <a href="/re.source/meus-anuncios" class="menu-btn">Meus Anúncios</a>
+          <a href="<?= htmlspecialchars(app_url('/entregas'), ENT_QUOTES, 'UTF-8') ?>" class="menu-btn">Minhas entregas</a>
           <a href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>" class="menu-btn">
             Conversas
             <span

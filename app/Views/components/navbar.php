@@ -34,6 +34,13 @@ $rota = strtok($_SERVER['REQUEST_URI'], '?'); // ex: /re.source/admin
       <i data-lucide="truck"></i>
       Logística
   </a>
+  <?php if (AdminAuth::can('view_financial')): ?>
+  <a href="/re.source/admin/saques"
+    class="nav-item <?= $rota === '/re.source/admin/saques' ? 'active' : '' ?>">
+      <i data-lucide="wallet-cards"></i>Saques
+      <?php if (($metrics['saques_pendentes'] ?? 0) > 0): ?><span class="badge"><?= (int) $metrics['saques_pendentes'] ?></span><?php endif; ?>
+  </a>
+  <?php endif; ?>
   <a href="/re.source/admin/impacto"
     class="nav-item <?= $rota === '/re.source/admin/impacto' ? 'active' : '' ?>">
       <i data-lucide="leaf"></i>

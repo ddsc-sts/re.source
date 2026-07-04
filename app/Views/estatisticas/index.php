@@ -3,6 +3,7 @@ $nome_exibicao = $nome_empresa;
 $titulo_pagina = $titulo_pagina ?? 'Estatísticas do Painel — Re.Source';
 require_once __DIR__ . '/../components/header.php';
 ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 
 <style>
 /* Layout Base Unificado */
@@ -15,34 +16,6 @@ require_once __DIR__ . '/../components/header.php';
     gap: 2rem;
     align-items: start;
 }
-.dashboard-sidebar {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-    padding: 1.5rem 1rem;
-    position: sticky;
-    top: 100px;
-    height: calc(100vh - 120px);
-    overflow-y: auto;
-}
-
-.sidebar-user { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-.sidebar-avatar {
-    width: 64px; height: 64px;
-    background: var(--bg);
-    border-radius: 50%;
-    margin: 0 auto 0.75rem;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--green);
-    overflow: hidden;
-    border: 2px solid var(--border-color);
-}
-.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
-.sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.9rem; font-weight: 500; color: var(--muted); transition: all 0.2s; }
-.sidebar-link:hover { background: var(--bg); color: var(--dark); }
-.sidebar-link.active { background: rgba(21, 115, 71, 0.1); color: var(--green); font-weight: 600; }
-
 .dashboard-content { display: flex; flex-direction: column; gap: 1.5rem; position: sticky; top: 100px; height: calc(100vh - 120px); overflow-y: auto; padding-right: 10px; }
 .dash-header { display: flex; justify-content: space-between; align-items: center; }
 .dash-title { font-family: var(--font-main); font-size: 1.75rem; font-weight: 700; color: var(--dark); }
@@ -90,27 +63,7 @@ require_once __DIR__ . '/../components/header.php';
 </style>
 
 <main class="dashboard-layout">
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-user">
-            <div class="sidebar-avatar">
-                <?php if (!empty($logo_url)): ?>
-                    <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da empresa">
-                <?php else: ?>
-                    <i data-lucide="building-2" style="width:32px;height:32px;"></i>
-                <?php endif; ?>
-            </div>
-            <h3><?= htmlspecialchars($nome_exibicao) ?></h3>
-            <p>Conta B2B Verificada</p>
-        </div>
-
-        <nav class="sidebar-nav">
-            <a href="/re.source/estatisticas" class="sidebar-link active"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
-            <a href="/re.source/meus-anuncios" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
-            <a href="/re.source/conta" class="sidebar-link"><i data-lucide="user"></i> Detalhes da Conta</a>
-            <a href="/re.source/configuracoes" class="sidebar-link"><i data-lucide="settings"></i> Configurações</a>
-            <a href="/re.source/logout" class="sidebar-link"><i data-lucide="log-out"></i> Sair</a>
-        </nav>
-    </aside>
+    <?php $sidebarActive = 'statistics'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
 
     <div class="dashboard-content">
         
@@ -141,6 +94,24 @@ require_once __DIR__ . '/../components/header.php';
                 <?php else: ?>
                     <button class="btn-sacar" disabled>Saldo Insuficiente</button>
                 <?php endif; ?>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header"><span class="dash-card-title">Saldo Futuro</span><div class="dash-card-icon icon-blue"><i data-lucide="clock-3"></i></div></div>
+                <div class="dash-card-value">R$ <?= number_format($saldo_futuro, 2, ',', '.'); ?></div>
+                <div style="font-size:.75rem;color:var(--muted)">Vendas acordadas ainda não entregues</div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header"><span class="dash-card-title">Reservado</span><div class="dash-card-icon icon-blue"><i data-lucide="lock-keyhole"></i></div></div>
+                <div class="dash-card-value">R$ <?= number_format($saldo_reservado, 2, ',', '.'); ?></div>
+                <div style="font-size:.75rem;color:var(--muted)">Saques aguardando análise</div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header"><span class="dash-card-title">Total Sacado</span><div class="dash-card-icon icon-green"><i data-lucide="circle-check"></i></div></div>
+                <div class="dash-card-value">R$ <?= number_format($saldo_sacado, 2, ',', '.'); ?></div>
+                <div style="font-size:.75rem;color:var(--muted)">Solicitações aprovadas</div>
             </div>
 
             <div class="dash-card">
@@ -221,7 +192,7 @@ require_once __DIR__ . '/../components/header.php';
                         <thead>
                             <tr>
                                 <th>Data</th>
-                                <th>Chave PIX</th>
+                                <th>Destino</th>
                                 <th>Valor</th>
                                 <th>Status</th>
                             </tr>
@@ -244,8 +215,8 @@ require_once __DIR__ . '/../components/header.php';
                                 ?>
                                 <tr>
                                     <td><?= date('d/m/Y', strtotime($saque['created_at'])); ?></td>
-                                    <td style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="<?= htmlspecialchars($saque['pix_key']); ?>">
-                                        <?= htmlspecialchars($saque['pix_key']); ?>
+                                    <td style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="<?= htmlspecialchars($saque['destination']); ?>">
+                                        <?= strtoupper(htmlspecialchars($saque['method'])) ?> · <?= htmlspecialchars($saque['destination']); ?>
                                     </td>
                                     <td style="font-weight: 600;">R$ <?= number_format($saque['amount'], 2, ',', '.'); ?></td>
                                     <td><span class="status-badge <?= $badgeSaque; ?>"><?= $labelSaque; ?></span></td>

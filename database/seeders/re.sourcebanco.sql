@@ -408,30 +408,93 @@ CREATE TABLE IF NOT EXISTS carriers (
 
 
 -- ============================================================
--- 17. FRETES
+-- 17. COTACOES DE FRETE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS freight_quotes (
+    id              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    negotiation_id  INT UNSIGNED NOT NULL,
+    provider_name   VARCHAR(150) NOT NULL,
+    service_name    VARCHAR(100) NOT NULL,
+    modality        ENUM('rodoviario','expresso','dedicado','outro') NOT NULL,
+    price           DECIMAL(10,2) NOT NULL,
+    delivery_days   SMALLINT UNSIGNED NOT NULL,
+    status          ENUM('active','selected','expired') NOT NULL DEFAULT 'active',
+    expires_at      DATETIME NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_fq_negotiation_status (negotiation_id, status),
+    CONSTRAINT fk_fq_negotiation FOREIGN KEY (negotiation_id) REFERENCES negotiations (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- 18. FRETES
 -- ============================================================
 CREATE TABLE IF NOT EXISTS freights (
     id                      INT UNSIGNED  NOT NULL AUTO_INCREMENT,
     negotiation_id          INT UNSIGNED  NOT NULL,
     carrier_id              INT UNSIGNED      NULL,
+    carrier_company_name    VARCHAR(150)      NULL,
+    service_name            VARCHAR(100)      NULL,
     origin_address_id       INT UNSIGNED      NULL,
     destination_address_id  INT UNSIGNED      NULL,
     modality                ENUM('rodoviario','expresso','dedicado','outro') NULL,
     quote_value             DECIMAL(10,2)     NULL,
     platform_fee            DECIMAL(10,2)     NULL,
     total_value             DECIMAL(10,2)     NULL,
+    delivery_days           SMALLINT UNSIGNED NULL,
+    estimated_pickup        DATETIME          NULL,
+    estimated_delivery      DATETIME          NULL,
     tracking_code           VARCHAR(100)      NULL,
     tracking_url            VARCHAR(500)      NULL,
-    status                  ENUM('quoted','contracted','in_transit','delivered','cancelled') NOT NULL DEFAULT 'quoted',
+    status                  ENUM('quoted','contracted','preparing','in_transit','out_for_delivery','delivered','concluded','cancelled') NOT NULL DEFAULT 'quoted',
     contracted_at           TIMESTAMP         NULL,
+    picked_up_at            DATETIME          NULL,
+    delivered_at            DATETIME          NULL,
+    delivery_code_hash      VARCHAR(255)      NULL,
+    delivery_code_expires_at DATETIME         NULL,
+    delivery_code_attempts  SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    delivery_code_used_at   DATETIME          NULL,
+    validated_at            DATETIME          NULL,
+    api_payload             JSON              NULL,
     created_at              TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at              TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
+    UNIQUE INDEX idx_freight_negotiation_unique (negotiation_id),
     INDEX idx_freight_negotiation (negotiation_id),
+    INDEX idx_freight_status (status),
+    INDEX idx_freight_tracking (tracking_code),
     CONSTRAINT fk_freight_negotiation  FOREIGN KEY (negotiation_id)         REFERENCES negotiations (id),
     CONSTRAINT fk_freight_carrier      FOREIGN KEY (carrier_id)             REFERENCES carriers (id) ON DELETE SET NULL,
     CONSTRAINT fk_freight_origin       FOREIGN KEY (origin_address_id)      REFERENCES addresses (id) ON DELETE SET NULL,
     CONSTRAINT fk_freight_destination  FOREIGN KEY (destination_address_id) REFERENCES addresses (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS delivery_attempts (
+    id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    freight_id   INT UNSIGNED NOT NULL,
+    company_id   INT UNSIGNED NULL,
+    user_id      INT UNSIGNED NULL,
+    ip_address   VARCHAR(45) NULL,
+    success      TINYINT(1) NOT NULL DEFAULT 0,
+    attempted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_attempts_freight (freight_id, attempted_at),
+    CONSTRAINT fk_attempt_freight FOREIGN KEY (freight_id) REFERENCES freights (id) ON DELETE CASCADE,
+    CONSTRAINT fk_attempt_company FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE SET NULL,
+    CONSTRAINT fk_attempt_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS freight_status_history (
+    id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    freight_id    INT UNSIGNED NOT NULL,
+    status        ENUM('quoted','contracted','preparing','in_transit','out_for_delivery','delivered','concluded','cancelled') NOT NULL,
+    description   VARCHAR(255) NOT NULL,
+    created_by_user_id INT UNSIGNED NULL,
+    created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_freight_history (freight_id, created_at),
+    CONSTRAINT fk_freight_history_freight FOREIGN KEY (freight_id) REFERENCES freights(id) ON DELETE CASCADE,
+    CONSTRAINT fk_freight_history_user FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -479,6 +542,9 @@ CREATE TABLE IF NOT EXISTS notifications (
                     'listing_expired',
                     'freight_status_updated',
                     'payment_due',
+                    'withdrawal_requested',
+                    'withdrawal_approved',
+                    'withdrawal_rejected',
                     'account_approved',
                     'account_changes_requested',
                     'account_rejected',
@@ -622,14 +688,20 @@ CREATE TABLE IF NOT EXISTS views_history (
 CREATE TABLE IF NOT EXISTS financial_transactions (
     id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     company_id  INT UNSIGNED NOT NULL,
+    negotiation_id INT UNSIGNED NULL,
+    withdrawal_id INT UNSIGNED NULL,
     type        ENUM('deposit','withdrawal','sale','refund') NOT NULL,
     amount      DECIMAL(10,2) NOT NULL,
     status      ENUM('pending','completed','failed','canceled') NOT NULL DEFAULT 'pending',
     description VARCHAR(255) NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     INDEX idx_financial_company_status (company_id, status),
-    CONSTRAINT fk_financial_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    UNIQUE INDEX idx_financial_negotiation_type (negotiation_id, type),
+    UNIQUE INDEX idx_financial_withdrawal (withdrawal_id),
+    CONSTRAINT fk_financial_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    CONSTRAINT fk_financial_negotiation FOREIGN KEY (negotiation_id) REFERENCES negotiations(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 27. SOLICITACOES DE SAQUE
@@ -637,32 +709,54 @@ CREATE TABLE IF NOT EXISTS withdrawals (
     id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     company_id INT UNSIGNED NOT NULL,
     amount     DECIMAL(10,2) NOT NULL,
-    pix_key    VARCHAR(255) NOT NULL,
+    method     ENUM('pix','ted') NOT NULL DEFAULT 'pix',
+    pix_key    VARCHAR(255) NULL,
     pix_key_type VARCHAR(20) NULL,
+    bank_code VARCHAR(10) NULL,
+    bank_name VARCHAR(100) NULL,
+    agency VARCHAR(20) NULL,
+    account_number VARCHAR(30) NULL,
+    account_digit VARCHAR(10) NULL,
+    account_type ENUM('checking','savings') NULL,
     account_holder_name VARCHAR(150) NULL,
     account_holder_document VARCHAR(20) NULL,
     request_note VARCHAR(500) NULL,
+    request_token CHAR(64) NOT NULL,
+    balance_before DECIMAL(10,2) NOT NULL DEFAULT 0,
+    balance_after DECIMAL(10,2) NOT NULL DEFAULT 0,
+    reserved_at TIMESTAMP NULL,
     terms_accepted_at TIMESTAMP NULL,
     reviewed_at TIMESTAMP NULL,
+    reviewed_by_user_id INT UNSIGNED NULL,
     rejection_reason VARCHAR(500) NULL,
+    admin_note VARCHAR(500) NULL,
     status     ENUM('pending', 'completed', 'rejected') NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     INDEX idx_withdrawals_company_status (company_id, status),
+    UNIQUE INDEX idx_withdrawals_request_token (request_token),
     CONSTRAINT fk_withdrawals_company FOREIGN KEY (company_id)
-        REFERENCES companies (id) ON DELETE CASCADE
+        REFERENCES companies (id) ON DELETE CASCADE,
+    CONSTRAINT fk_withdrawals_reviewer FOREIGN KEY (reviewed_by_user_id)
+        REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE financial_transactions
+    ADD CONSTRAINT fk_financial_withdrawal FOREIGN KEY (withdrawal_id)
+        REFERENCES withdrawals(id) ON DELETE SET NULL;
 
 
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
 -- RESUMO — v4.0
--- 27 tabelas: plans, addresses, companies, users,
+-- 30 tabelas: plans, addresses, companies, users,
 --   email_verifications, user_sessions, password_resets,
 --   blocked_email_domains, categories, listings,
 --   listing_images, favorites, negotiations, proposals,
---   messages, carriers, freights, transactions,
+--   messages, carriers, freight_quotes, freights, delivery_attempts,
+--   freight_status_history, transactions,
 --   notifications, uploads, cnpj_validations,
 --   audit_logs, listing_status_history, search_alerts,
 --   views_history, financial_transactions, withdrawals

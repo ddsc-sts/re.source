@@ -116,6 +116,20 @@ function renderDelta(?array $delta): string {
         <div class="metric-footer">vs mês anterior</div>
       </div>
 
+      <a class="metric-card" href="<?= htmlspecialchars(app_url('/admin/saques'), ENT_QUOTES, 'UTF-8') ?>" style="text-decoration:none;color:inherit">
+        <div class="metric-top"><div class="metric-icon orange"><i data-lucide="wallet-cards"></i></div></div>
+        <div class="metric-label">Saques Pendentes</div>
+        <div class="metric-value"><?= (int) ($metrics['saques_pendentes'] ?? 0) ?></div>
+        <div class="metric-footer">R$ <?= number_format((float)($metrics['saques_valor_pendente'] ?? 0),2,',','.') ?> reservados</div>
+      </a>
+
+      <a class="metric-card" href="<?= htmlspecialchars(app_url('/admin/logistica'), ENT_QUOTES, 'UTF-8') ?>" style="text-decoration:none;color:inherit">
+        <div class="metric-top"><div class="metric-icon teal"><i data-lucide="truck"></i></div></div>
+        <div class="metric-label">Entregas Ativas</div>
+        <div class="metric-value"><?= (int) ($metrics['entregas_ativas'] ?? 0) ?></div>
+        <div class="metric-footer">Fretes em andamento</div>
+      </a>
+
       <div class="metric-card">
         <div class="metric-top">
           <div class="metric-icon blue"><i data-lucide="tag"></i></div>
@@ -151,7 +165,7 @@ function renderDelta(?array $delta): string {
           <div class="metric-icon green"><i data-lucide="leaf"></i></div>
           <?= renderDelta($metrics['delta_co2'] ?? null) ?>
         </div>
-        <div class="metric-label">CO₂ Evitado</div>
+        <div class="metric-label">CO₂ Evitado (estimado)</div>
         <div class="metric-value"><?= $metrics['co2_evitado'] ?></div>
         <div class="metric-footer">vs mês anterior</div>
       </div>
@@ -178,7 +192,7 @@ function renderDelta(?array $delta): string {
             <div class="card-title">Empresas recentes</div>
             <div class="card-sub">Últimos cadastros B2B na plataforma</div>
           </div>
-          <a href="#" class="card-link">Ver todas</a>
+          <a href="<?= htmlspecialchars(app_url('/admin/empresas'), ENT_QUOTES, 'UTF-8') ?>" class="card-link">Ver todas</a>
         </div>
         <table class="companies-table">
           <thead>
@@ -221,18 +235,7 @@ function renderDelta(?array $delta): string {
               <td><?= htmlspecialchars($c['volume']  ?? '—') ?></td>
               <td><span class="status-badge <?= $statusKey ?>"><?= $statusLbl ?></span></td>
               <td>
-                <div class="table-actions">
-                  <?php if (AdminAuth::can('company_approve')): ?>
-                  <button class="table-action-btn" title="Verificar"><i data-lucide="shield-check"></i></button>
-                  <?php endif; ?>
-                  <button class="table-action-btn" title="Ver detalhes"><i data-lucide="eye"></i></button>
-                  <?php if (AdminAuth::can('company_suspend')): ?>
-                  <button class="table-action-btn" title="Suspender"><i data-lucide="ban"></i></button>
-                  <?php endif; ?>
-                  <?php if (AdminAuth::can('company_delete')): ?>
-                  <button class="table-action-btn" title="Excluir"><i data-lucide="trash-2"></i></button>
-                  <?php endif; ?>
-                </div>
+                <div class="table-actions"><a class="table-action-btn" href="<?= htmlspecialchars(app_url('/admin/empresas'), ENT_QUOTES, 'UTF-8') ?>" title="Abrir gestão de empresas"><i data-lucide="eye"></i></a></div>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -248,7 +251,7 @@ function renderDelta(?array $delta): string {
             <div class="card-title">Atividades recentes</div>
             <div class="card-sub">Eventos da plataforma</div>
           </div>
-          <a href="#" class="card-link">Ver tudo</a>
+          <a href="<?= htmlspecialchars(app_url('/admin/saques'), ENT_QUOTES, 'UTF-8') ?>" class="card-link">Ver financeiro</a>
         </div>
         <div class="activity-list">
           <?php if (empty($recentActivity)): ?>
@@ -381,21 +384,18 @@ function renderDelta(?array $delta): string {
       <div class="quick-actions-grid">
         <?php
         $actions = [];
-        if (AdminAuth::can('company_approve'))
-            $actions[] = ['icon' => 'shield-check',  'label' => 'Verificar Empresa'];
-        $actions[] = ['icon' => 'check-square',       'label' => 'Aprovar Anúncio'];
-        $actions[] = ['icon' => 'truck',              'label' => 'Agendar Coleta'];
-        $actions[] = ['icon' => 'file-bar-chart',     'label' => 'Gerar Relatório ESG'];
-        if (AdminAuth::can('support_manage')) {
-            $actions[] = ['icon' => 'send',           'label' => 'Enviar Comunicado'];
-            $actions[] = ['icon' => 'life-buoy',      'label' => 'Abrir Chamado'];
-        }
+        if (AdminAuth::can('company_approve')) $actions[] = ['icon'=>'shield-check','label'=>'Verificar Empresa','url'=>'/admin/empresas'];
+        $actions[] = ['icon'=>'check-square','label'=>'Revisar Anúncios','url'=>'/admin/anuncios'];
+        $actions[] = ['icon'=>'truck','label'=>'Acompanhar Entregas','url'=>'/admin/logistica'];
+        if (AdminAuth::can('view_financial')) $actions[] = ['icon'=>'wallet-cards','label'=>'Aprovar Saques','url'=>'/admin/saques'];
+        $actions[] = ['icon'=>'file-bar-chart','label'=>'Ver Impacto ESG','url'=>'/admin/impacto'];
+        if (AdminAuth::can('support_manage')) $actions[] = ['icon'=>'life-buoy','label'=>'Ver Suporte','url'=>'/admin/suporte'];
         foreach ($actions as $a):
         ?>
-        <button class="quick-action">
+        <a class="quick-action" href="<?= htmlspecialchars(app_url($a['url']), ENT_QUOTES, 'UTF-8') ?>">
           <div class="quick-action-icon"><i data-lucide="<?= $a['icon'] ?>"></i></div>
           <span class="quick-action-label"><?= $a['label'] ?></span>
-        </button>
+        </a>
         <?php endforeach; ?>
       </div>
     </div>

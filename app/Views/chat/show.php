@@ -1,7 +1,10 @@
 <?php require __DIR__ . '/../components/header.php'; ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/chat.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-<main class="chat-page chat-room-page">
+<main class="dashboard-shell">
+  <?php $sidebarActive = 'conversations'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
+  <div class="chat-page chat-room-page">
   <div class="chat-room-header">
     <a class="chat-back" href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>" aria-label="Voltar às conversas"><i data-lucide="arrow-left"></i></a>
     <div>
@@ -88,7 +91,7 @@
       <div class="agreement-confirmed">
         <i data-lucide="badge-check"></i>
         <div><strong>Acordo mútuo confirmado</strong><span>Protocolo <?= htmlspecialchars($negotiation['protocol_number'], ENT_QUOTES, 'UTF-8') ?></span></div>
-        <a href="<?= htmlspecialchars(app_url('/logistica?negociacao=' . (int) $negotiation['id']), ENT_QUOTES, 'UTF-8') ?>">Continuar para o frete</a>
+        <a href="<?= htmlspecialchars(app_url('/frete?negociacao=' . (int) $negotiation['id']), ENT_QUOTES, 'UTF-8') ?>">Continuar para o frete</a>
       </div>
     <?php elseif ($canEditProposal): ?>
       <details class="proposal-editor" <?= !$proposalPending ? 'open' : '' ?>>
@@ -150,6 +153,7 @@
       <div class="message-form-error" id="messageFormError" role="alert"></div>
     </form>
   </section>
+  </div>
 </main>
 
 <script src="<?= htmlspecialchars(app_url('/public/js/chat.js'), ENT_QUOTES, 'UTF-8') ?>"></script>

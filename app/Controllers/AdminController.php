@@ -31,6 +31,9 @@ class AdminController
             $pendentes = (int)$pdo->query("SELECT COUNT(*) FROM listings WHERE status = 'draft' AND deleted_at IS NULL")->fetchColumn();
             $negs      = (int)$pdo->query("SELECT COUNT(*) FROM negotiations WHERE status = 'concluded'")->fetchColumn();
             $chamados  = (int)$pdo->query("SELECT COUNT(*) FROM negotiations WHERE status = 'open'")->fetchColumn();
+            $saquesPendentes = (int)$pdo->query("SELECT COUNT(*) FROM withdrawals WHERE status = 'pending'")->fetchColumn();
+            $valorPendente = (float)$pdo->query("SELECT COALESCE(SUM(amount),0) FROM withdrawals WHERE status = 'pending'")->fetchColumn();
+            $entregasAtivas = (int)$pdo->query("SELECT COUNT(*) FROM freights WHERE status IN ('contracted','preparing','in_transit','out_for_delivery')")->fetchColumn();
 
             $gmv = (float)$pdo->query("
                 SELECT COALESCE(SUM(proposed_total), 0) FROM negotiations
@@ -39,9 +42,10 @@ class AdminController
             ")->fetchColumn();
 
             $co2kg = (float)$pdo->query("
-                SELECT COALESCE(SUM(proposed_quantity), 0) * 2.5 FROM negotiations
-                WHERE status = 'concluded'
-                  AND MONTH(concluded_at) = MONTH(NOW()) AND YEAR(concluded_at) = YEAR(NOW())
+                SELECT COALESCE(SUM(CASE WHEN l.unit='ton' THEN n.proposed_quantity*1000 ELSE n.proposed_quantity END), 0) * 2.5
+                FROM negotiations n INNER JOIN listings l ON l.id=n.listing_id
+                WHERE n.status = 'concluded'
+                  AND MONTH(n.concluded_at) = MONTH(NOW()) AND YEAR(n.concluded_at) = YEAR(NOW())
             ")->fetchColumn();
 
             // Mês anterior — para calcular deltas
@@ -49,7 +53,7 @@ class AdminController
             $anun_prev = (int)$pdo->query("SELECT COUNT(*) FROM listings  WHERE status = 'active' AND deleted_at IS NULL AND MONTH(created_at) = MONTH(NOW() - INTERVAL 1 MONTH) AND YEAR(created_at) = YEAR(NOW() - INTERVAL 1 MONTH)")->fetchColumn();
             $neg_prev  = (int)$pdo->query("SELECT COUNT(*) FROM negotiations WHERE status = 'concluded' AND MONTH(concluded_at) = MONTH(NOW() - INTERVAL 1 MONTH) AND YEAR(concluded_at) = YEAR(NOW() - INTERVAL 1 MONTH)")->fetchColumn();
             $gmv_prev  = (float)$pdo->query("SELECT COALESCE(SUM(proposed_total),0) FROM negotiations WHERE status='concluded' AND MONTH(concluded_at)=MONTH(NOW()-INTERVAL 1 MONTH) AND YEAR(concluded_at)=YEAR(NOW()-INTERVAL 1 MONTH)")->fetchColumn();
-            $co2_prev  = (float)$pdo->query("SELECT COALESCE(SUM(proposed_quantity),0)*2.5 FROM negotiations WHERE status='concluded' AND MONTH(concluded_at)=MONTH(NOW()-INTERVAL 1 MONTH) AND YEAR(concluded_at)=YEAR(NOW()-INTERVAL 1 MONTH)")->fetchColumn();
+            $co2_prev  = (float)$pdo->query("SELECT COALESCE(SUM(CASE WHEN l.unit='ton' THEN n.proposed_quantity*1000 ELSE n.proposed_quantity END),0)*2.5 FROM negotiations n INNER JOIN listings l ON l.id=n.listing_id WHERE n.status='concluded' AND MONTH(n.concluded_at)=MONTH(NOW()-INTERVAL 1 MONTH) AND YEAR(n.concluded_at)=YEAR(NOW()-INTERVAL 1 MONTH)")->fetchColumn();
             $cham_prev = (int)$pdo->query("SELECT COUNT(*) FROM negotiations WHERE status='open' AND MONTH(created_at)=MONTH(NOW()-INTERVAL 1 MONTH) AND YEAR(created_at)=YEAR(NOW()-INTERVAL 1 MONTH)")->fetchColumn();
 
             return [
@@ -60,6 +64,9 @@ class AdminController
                 'co2_evitado'          => number_format($co2kg / 1000, 1, ',', '.') . ' t',
                 'chamados_abertos'     => $chamados,
                 'anuncios_pendentes'   => $pendentes,
+                'saques_pendentes'     => $saquesPendentes,
+                'saques_valor_pendente'=> $valorPendente,
+                'entregas_ativas'      => $entregasAtivas,
                 // Deltas calculados
                 'delta_empresas'  => self::delta($empresas,  $emp_prev),
                 'delta_anuncios'  => self::delta($anuncios,  $anun_prev),
@@ -75,6 +82,7 @@ class AdminController
                 'negociacoes_fechadas' => '—', 'gmv_mes'              => '—',
                 'co2_evitado'          => '—', 'chamados_abertos'     => 0,
                 'anuncios_pendentes'   => 0,
+                'saques_pendentes' => 0, 'saques_valor_pendente' => 0, 'entregas_ativas' => 0,
                 'delta_empresas'  => null, 'delta_anuncios' => null,
                 'delta_negs'      => null, 'delta_gmv'      => null,
                 'delta_co2'       => null, 'delta_chamados' => null,

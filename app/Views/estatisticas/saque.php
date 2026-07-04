@@ -6,9 +6,10 @@ $companyName = $company['nome_fantasia'] ?: ($company['razao_social'] ?? 'Sua em
 $document = preg_replace('/\D/', '', (string) ($company['cnpj'] ?? ''));
 require_once __DIR__ . '/../components/header.php';
 ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 
 <style>
-.withdraw-page { max-width: 1180px; margin: 2.5rem auto 4rem; padding: 0 1.5rem; }
+.withdraw-page { width:100%; min-width:0; }
 .withdraw-back { display: inline-flex; align-items: center; gap: .4rem; margin-bottom: 1.25rem; color: var(--muted); text-decoration: none; font-weight: 600; }
 .withdraw-back:hover { color: var(--green); }
 .withdraw-heading { margin-bottom: 1.75rem; position: static; }
@@ -45,15 +46,18 @@ require_once __DIR__ . '/../components/header.php';
 .history-row:last-child { border-bottom: 0; }
 .history-row strong { color: var(--dark); }
 .status-pending { color: #b45309; }
+.payment-options{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}.payment-option{display:flex;align-items:center;gap:.55rem;padding:.9rem;border:1px solid var(--border-color);border-radius:.65rem;cursor:pointer}.payment-option:has(input:checked){border-color:var(--green);background:rgba(21,115,71,.07);color:var(--green);font-weight:700}.method-fields[hidden]{display:none}
 @media (max-width: 850px) { .withdraw-layout { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .field.full { grid-column: auto; } .withdraw-card { padding: 1.2rem; } .withdraw-actions { flex-direction: column-reverse; } .btn-cancel, .btn-submit { text-align: center; } }
 </style>
 
-<main class="withdraw-page">
+<main class="dashboard-shell">
+  <?php $sidebarActive = 'statistics'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
+  <div class="withdraw-page">
     <a href="/re.source/estatisticas" class="withdraw-back"><i data-lucide="arrow-left"></i> Voltar ao painel</a>
     <header class="withdraw-heading">
         <h1>Solicitar retirada</h1>
-        <p>Informe os dados do titular e da chave PIX. A solicitação será enviada para análise antes de qualquer transferência.</p>
+        <p>Escolha PIX ou TED. A solicitação será reservada no saldo e enviada para aprovação manual.</p>
     </header>
 
     <div class="withdraw-layout">
@@ -69,6 +73,7 @@ require_once __DIR__ . '/../components/header.php';
 
             <form action="/re.source/estatisticas/processar-saque" method="POST" id="withdrawForm">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="request_token" value="<?= htmlspecialchars($requestToken, ENT_QUOTES, 'UTF-8') ?>">
 
                 <h2 class="form-section-title">Dados da retirada</h2>
                 <div class="form-grid">
@@ -77,9 +82,16 @@ require_once __DIR__ . '/../components/header.php';
                         <input type="number" id="valor_saque" name="valor_saque" min="10" max="<?= htmlspecialchars((string) $availableBalance) ?>" step="0.01" value="<?= htmlspecialchars((string) ($old['valor_saque'] ?? '')) ?>" required>
                         <small>Valor mínimo de R$ 10,00.</small>
                     </div>
+                </div>
+                <div class="payment-options">
+                    <label class="payment-option"><input type="radio" name="method" value="pix" <?= ($old['method'] ?? 'pix') === 'pix' ? 'checked' : '' ?>> PIX</label>
+                    <label class="payment-option"><input type="radio" name="method" value="ted" <?= ($old['method'] ?? '') === 'ted' ? 'checked' : '' ?>> TED</label>
+                </div>
+                <div class="method-fields" id="pixFields">
+                  <div class="form-grid">
                     <div class="field">
                         <label for="pix_key_type">Tipo da chave PIX</label>
-                        <select id="pix_key_type" name="pix_key_type" required>
+                        <select id="pix_key_type" name="pix_key_type">
                             <option value="">Selecione</option>
                             <?php foreach (['cnpj' => 'CNPJ', 'cpf' => 'CPF', 'email' => 'E-mail', 'phone' => 'Celular', 'random' => 'Chave aleatória'] as $value => $label): ?>
                                 <option value="<?= $value ?>" <?= ($old['pix_key_type'] ?? '') === $value ? 'selected' : '' ?>><?= $label ?></option>
@@ -88,9 +100,21 @@ require_once __DIR__ . '/../components/header.php';
                     </div>
                     <div class="field full">
                         <label for="chave_pix">Chave PIX</label>
-                        <input type="text" id="chave_pix" name="chave_pix" maxlength="255" value="<?= htmlspecialchars((string) ($old['chave_pix'] ?? '')) ?>" autocomplete="off" required>
+                        <input type="text" id="chave_pix" name="chave_pix" maxlength="255" value="<?= htmlspecialchars((string) ($old['chave_pix'] ?? '')) ?>" autocomplete="off">
                         <small id="pixKeyHint">Selecione o tipo da chave para aplicar a formatação correta.</small>
                     </div>
+                  </div>
+                </div>
+
+                <div class="method-fields" id="tedFields" hidden>
+                  <div class="form-grid">
+                    <div class="field"><label for="bank_code">Código do banco</label><input id="bank_code" name="bank_code" maxlength="10" value="<?= htmlspecialchars((string)($old['bank_code'] ?? '')) ?>" placeholder="Ex.: 001"></div>
+                    <div class="field"><label for="bank_name">Banco</label><input id="bank_name" name="bank_name" maxlength="100" value="<?= htmlspecialchars((string)($old['bank_name'] ?? '')) ?>" placeholder="Nome do banco"></div>
+                    <div class="field"><label for="agency">Agência</label><input id="agency" name="agency" maxlength="20" value="<?= htmlspecialchars((string)($old['agency'] ?? '')) ?>"></div>
+                    <div class="field"><label for="account_number">Conta</label><input id="account_number" name="account_number" maxlength="30" value="<?= htmlspecialchars((string)($old['account_number'] ?? '')) ?>"></div>
+                    <div class="field"><label for="account_digit">Dígito</label><input id="account_digit" name="account_digit" maxlength="10" value="<?= htmlspecialchars((string)($old['account_digit'] ?? '')) ?>"></div>
+                    <div class="field"><label for="account_type">Tipo de conta</label><select id="account_type" name="account_type"><option value="">Selecione</option><option value="checking" <?= ($old['account_type'] ?? '') === 'checking' ? 'selected' : '' ?>>Conta corrente</option><option value="savings" <?= ($old['account_type'] ?? '') === 'savings' ? 'selected' : '' ?>>Poupança</option></select></div>
+                  </div>
                 </div>
 
                 <h2 class="form-section-title">Titular da conta</h2>
@@ -149,6 +173,7 @@ require_once __DIR__ . '/../components/header.php';
             <?php endif; ?>
         </aside>
     </div>
+  </div>
 </main>
 
 <script>
@@ -156,6 +181,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const typeSelect = document.getElementById('pix_key_type');
     const keyInput = document.getElementById('chave_pix');
     const hint = document.getElementById('pixKeyHint');
+    const methodInputs = document.querySelectorAll('input[name="method"]');
+    const pixFields = document.getElementById('pixFields');
+    const tedFields = document.getElementById('tedFields');
+
+    function updateMethod() {
+        const method = document.querySelector('input[name="method"]:checked')?.value || 'pix';
+        pixFields.hidden = method !== 'pix';
+        tedFields.hidden = method !== 'ted';
+        pixFields.querySelectorAll('input,select').forEach(el => el.required = method === 'pix');
+        tedFields.querySelectorAll('input,select').forEach(el => el.required = method === 'ted');
+    }
+    methodInputs.forEach(input => input.addEventListener('change', updateMethod));
+    updateMethod();
 
     const settings = {
         cpf: { maxLength: 14, inputMode: 'numeric', placeholder: '000.000.000-00', hint: 'Digite os 11 números do CPF.' },

@@ -212,7 +212,37 @@ return [
     ],
 
     '/logistica' => [
-        'action'     => ['BaseController', 'logistica'],
+        'action'     => ['DeliveryController', 'history'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/entregas' => [
+        'action'     => ['DeliveryController', 'history'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/frete' => [
+        'action'     => ['FreightController', 'quote'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/frete/contratar' => [
+        'action'     => ['FreightController', 'contract'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/frete/acompanhar' => [
+        'action'     => ['FreightController', 'show'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/frete/iniciar' => [
+        'action'     => ['FreightController', 'startShipping'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/frete/codigo' => [
+        'action'     => ['FreightController', 'generateDeliveryCode'],
         'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
@@ -278,7 +308,37 @@ return [
     ],
 
     '/admin/logistica' => [
-        'action'     => ['AdminController', 'logistica'],
+        'action'     => ['DeliveryController', 'portal'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/saques' => [
+        'action'     => ['AdminFinanceController', 'index'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/saques/aprovar' => [
+        'action'     => ['AdminFinanceController', 'approve'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/saques/recusar' => [
+        'action'     => ['AdminFinanceController', 'reject'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/saques/exportar' => [
+        'action'     => ['AdminFinanceController', 'exportCsv'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/entregador' => [
+        'action'     => ['DeliveryController', 'portal'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/entregador/validar' => [
+        'action'     => ['DeliveryController', 'validate'],
         'middleware' => [['AdminAuth', 'required']],
     ],
 

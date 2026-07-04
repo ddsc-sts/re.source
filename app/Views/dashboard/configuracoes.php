@@ -2,6 +2,7 @@
 $titulo_pagina = $titulo_pagina ?? 'Configurações do Sistema — Re.Source';
 require_once __DIR__ . '/../components/header.php';
 ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 
 <style>
 .dashboard-layout {
@@ -12,17 +13,6 @@ require_once __DIR__ . '/../components/header.php';
     grid-template-columns: 260px 1fr;
     gap: 2rem;
     align-items: start;
-}
-
-.dashboard-sidebar {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-    padding: 1.5rem 1rem;
-    position: sticky;
-    top: 100px;
-    height: calc(100vh - 120px);
-    overflow-y: auto;
 }
 
 .dashboard-content {
@@ -94,14 +84,6 @@ input:checked + .slider:before { transform: translateX(22px); }
 .btn-logout { background: transparent; border: 1px solid #d1d5db; color: #ef4444; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
 .btn-logout:hover { background: #f3f4f6; color: var(--dark); }
 
-.sidebar-user { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-.sidebar-avatar { width: 64px; height: 64px; background: var(--bg); border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; color: var(--green); overflow: hidden; }
-.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
-.sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.9rem; font-weight: 500; color: var(--muted); transition: all 0.2s; }
-.sidebar-link:hover { background: var(--bg); color: var(--dark); }
-.sidebar-link.active { background: rgba(21, 115, 71, 0.1); color: var(--green); font-weight: 600; }
-
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
 .crit-modal { background: white; padding: 2.5rem; border-radius: var(--radius); width: 100%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
@@ -119,27 +101,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 <main class="dashboard-layout">
     
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-user">
-            <div class="sidebar-avatar" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                <?php if (!empty($logo_url)): ?>
-                    <img src="<?= htmlspecialchars($logo_url) ?>" alt="Logo da Empresa" style="width: 100%; height: 100%; object-fit: cover;">
-                <?php else: ?>
-                    <i data-lucide="building-2"></i>
-                <?php endif; ?>
-            </div>
-            <h3><?= htmlspecialchars($nome_empresa) ?></h3>
-            <p>Painel de Controle</p>
-        </div>
-
-        <nav class="sidebar-nav">
-            <a href="/re.source/estatisticas" class="sidebar-link"><i data-lucide="bar-chart-2"></i> Painel e Estatísticas</a>
-            <a href="/re.source/meus-anuncios" class="sidebar-link"><i data-lucide="package"></i> Meus Anúncios</a>
-            <a href="/re.source/conta" class="sidebar-link"><i data-lucide="user"></i> Detalhes da Conta</a>
-            <a href="/re.source/configuracoes" class="sidebar-link active"><i data-lucide="settings"></i> Configurações</a>
-            <a href="/re.source/logout" class="sidebar-link"><i data-lucide="log-out"></i> Sair</a>
-        </nav>
-    </aside>
+    <?php $sidebarActive = 'settings'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
 
     <div class="dashboard-content">
         
