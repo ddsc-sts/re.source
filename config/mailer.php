@@ -82,6 +82,10 @@ HTML;
     $mensagem = $cabecalhos . "\r\n" . $corpo;
 
     $tmp = tmpfile();
+    if ($tmp === false) {
+        error_log('enviarEmailCodigo: falha ao criar arquivo temporario (tmpfile).');
+        return false;
+    }
     fwrite($tmp, $mensagem);
     fseek($tmp, 0);
 
@@ -97,16 +101,31 @@ HTML;
         CURLOPT_READDATA       => $tmp,
         CURLOPT_UPLOAD         => true,
         CURLOPT_VERBOSE        => false,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 20,
         CURLOPT_SSL_VERIFYPEER => $verifyTls,
         CURLOPT_SSL_VERIFYHOST => $verifyTls ? 2 : 0,
     ]);
 
     $ok    = curl_exec($ch);
     $errno = curl_errno($ch);
+    $erro  = curl_error($ch);
+    $info  = curl_getinfo($ch);
     curl_close($ch);
     fclose($tmp);
 
-    return $ok !== false && $errno === 0;
+    if ($errno !== 0 || $ok === false) {
+        error_log(sprintf(
+            'enviarEmailCodigo: falha ao enviar para %s | curl_errno=%d | curl_error=%s | http/smtp_code=%s',
+            $para,
+            $errno,
+            $erro,
+            $info['http_code'] ?? 'n/a'
+        ));
+        return false;
+    }
+
+    return true;
 }
 
 function enviarEmailRecuperacao(string $para, string $nomeDestinatario, string $link): bool {
@@ -200,6 +219,10 @@ HTML;
     $mensagem = $cabecalhos . "\r\n" . $corpo;
 
     $tmp = tmpfile();
+    if ($tmp === false) {
+        error_log('enviarEmailRecuperacao: falha ao criar arquivo temporario (tmpfile).');
+        return false;
+    }
     fwrite($tmp, $mensagem);
     fseek($tmp, 0);
 
@@ -215,16 +238,31 @@ HTML;
         CURLOPT_READDATA       => $tmp,
         CURLOPT_UPLOAD         => true,
         CURLOPT_VERBOSE        => false,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 20,
         CURLOPT_SSL_VERIFYPEER => $verifyTls,
         CURLOPT_SSL_VERIFYHOST => $verifyTls ? 2 : 0,
     ]);
 
     $ok    = curl_exec($ch);
     $errno = curl_errno($ch);
+    $erro  = curl_error($ch);
+    $info  = curl_getinfo($ch);
     curl_close($ch);
     fclose($tmp);
 
-    return $ok !== false && $errno === 0;
+    if ($errno !== 0 || $ok === false) {
+        error_log(sprintf(
+            'enviarEmailRecuperacao: falha ao enviar para %s | curl_errno=%d | curl_error=%s | http/smtp_code=%s',
+            $para,
+            $errno,
+            $erro,
+            $info['http_code'] ?? 'n/a'
+        ));
+        return false;
+    }
+
+    return true;
 }
 
 /** Envia alertas transacionais do marketplace sem credenciais fixas no codigo. */
@@ -245,6 +283,7 @@ function enviarEmailFluxo(
     $verifyTls = (bool) env('MAIL_VERIFY_TLS', true);
 
     if ($para === '' || $user === '' || $pass === '' || $remetente === '') {
+        error_log('enviarEmailFluxo: destinatario vazio ou SMTP nao configurado (MAIL_*).');
         return false;
     }
 
@@ -274,21 +313,40 @@ function enviarEmailFluxo(
         . "--{$boundary}\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n{$html}\r\n--{$boundary}--\r\n";
 
     $tmp = tmpfile();
-    if (!$tmp) return false;
+    if ($tmp === false) {
+        error_log('enviarEmailFluxo: falha ao criar arquivo temporario (tmpfile).');
+        return false;
+    }
     fwrite($tmp, $headers . "\r\n" . $body);
     fseek($tmp, 0);
+
     $ch = curl_init();
     curl_setopt_array($ch, [
         CURLOPT_URL => "smtp://{$host}:{$port}", CURLOPT_RETURNTRANSFER => true,
         CURLOPT_USE_SSL => CURLUSESSL_ALL, CURLOPT_USERNAME => $user,
         CURLOPT_PASSWORD => $pass, CURLOPT_MAIL_FROM => "<{$remetente}>",
         CURLOPT_MAIL_RCPT => ["<{$para}>"], CURLOPT_READDATA => $tmp,
-        CURLOPT_UPLOAD => true, CURLOPT_SSL_VERIFYPEER => $verifyTls,
+        CURLOPT_UPLOAD => true, CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 20,
+        CURLOPT_SSL_VERIFYPEER => $verifyTls,
         CURLOPT_SSL_VERIFYHOST => $verifyTls ? 2 : 0,
     ]);
     $result = curl_exec($ch);
-    $error = curl_errno($ch);
+    $errno  = curl_errno($ch);
+    $erro   = curl_error($ch);
+    $info   = curl_getinfo($ch);
     curl_close($ch);
     fclose($tmp);
-    return $result !== false && $error === 0;
+
+    if ($errno !== 0 || $result === false) {
+        error_log(sprintf(
+            'enviarEmailFluxo: falha ao enviar para %s | curl_errno=%d | curl_error=%s | http/smtp_code=%s',
+            $para,
+            $errno,
+            $erro,
+            $info['http_code'] ?? 'n/a'
+        ));
+        return false;
+    }
+
+    return true;
 }
