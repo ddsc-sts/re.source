@@ -385,33 +385,35 @@ Responsaveis: Leonardo, Daniel e Geder
 
 Leonardo:
 
-[ ] Fazer estatisticas usarem transacoes reais do MVP.
-[ ] Separar saldo futuro, disponivel, reservado e sacado.
-[ ] Adaptar saque para PIX ou TED.
-[ ] Reservar saldo ao solicitar saque.
-[ ] Impedir saque acima do saldo e solicitacao duplicada.
-[ ] Criar servico de aprovacao e recusa para uso do admin.
-[ ] Na recusa, devolver o saldo reservado.
-[ ] Registrar historico financeiro.
-[ ] Entregar telas funcionais da empresa.
+[x] Fazer estatisticas usarem transacoes reais do MVP.
+[x] Separar saldo futuro, disponivel, reservado e sacado.
+[x] Adaptar saque para PIX ou TED.
+[x] Reservar saldo ao solicitar saque.
+[x] Impedir saque acima do saldo e solicitacao duplicada.
+[x] Criar servico de aprovacao e recusa para uso do admin.
+[x] Na recusa, devolver o saldo reservado.
+[x] Registrar historico financeiro.
+[x] Entregar telas funcionais da empresa.
 
 Daniel:
 
-[ ] Criar backend administrativo de aprovacao e recusa de saques.
-[ ] Criar tela administrativa completa de saques.
-[ ] Finalizar dashboard admin com empresas, anuncios, negociacoes, entregas,
+[x] Criar backend administrativo de aprovacao e recusa de saques.
+[x] Criar tela administrativa completa de saques.
+[x] Finalizar dashboard admin com empresas, anuncios, negociacoes, entregas,
   volume financeiro e saques pendentes.
-[ ] Remover atividades ficticias e botoes sem funcao.
-[ ] Finalizar cards, graficos e tabelas usando dados reais.
-[ ] Aplicar acabamento visual nas telas financeiras da empresa.
+[x] Remover atividades ficticias e botoes sem funcao.
+[x] Finalizar cards, graficos e tabelas usando dados reais.
+[x] Aplicar acabamento visual nas telas financeiras da empresa.
 
 Geder:
 
-[ ] Executar fluxo completo ate o saque.
-[ ] Testar saldo insuficiente, saque duplicado, aprovacao e recusa.
-[ ] Conferir valores do banco contra valores exibidos.
-[ ] Revisar navegacao, feedback, erros e responsividade.
-[ ] Revisar os alertas por e-mail e notificacoes internas.
+[x] Executar fluxo financeiro isolado desde o saldo creditado ate o saque.
+[x] Testar reserva, aprovacao, recusa e segunda analise bloqueada.
+[x] Conferir valores do banco contra os saldos calculados.
+[x] Revisar navegacao, feedback, erros e breakpoints responsivos no codigo.
+[x] Revisar alertas por e-mail e testar notificacoes internas.
+[ ] Confirmar visualmente em navegador e o recebimento SMTP com contas reais
+  durante o teste manual da equipe.
 
 Meta obrigatoria do Dia 5:
 
@@ -419,14 +421,24 @@ Entrega -> saldo disponivel -> saque em analise -> admin aprova ou recusa.
 
 Se sobrar tempo:
 
-[ ] Exportacao CSV simples das negociacoes ou saques.
-[ ] Historico administrativo de acoes.
-[ ] Graficos ESG com formula academica documentada.
+[x] Exportacao CSV simples dos saques.
+[x] Historico administrativo de acoes.
+[x] Graficos ESG com formula academica documentada.
 
 Portao de decisao antes do desenvolvimento:
 
-[ ] Confirmar saldo e saque simulados ou gateway real. Recomendacao: fluxo
-  financeiro interno e aprovacao manual.
+[x] Confirmado fluxo financeiro interno e aprovacao manual, sem gateway real.
+
+Validacao automatizada do Dia 5 em 04/07:
+
+- Schema consolidado importado com sucesso em banco limpo: 30 tabelas.
+- Migration 20260704_002_day5_finance.sql aplicada no banco resource.
+- Reserva de R$ 300,00: disponivel 700 e reservado 300.
+- Recusa: disponivel restaurado para 1.000 e reservado zerado.
+- Aprovacao de R$ 400,00: disponivel 600 e total sacado 400.
+- Segunda analise da mesma solicitacao foi bloqueada.
+- Saque acima do saldo e envio duplicado foram bloqueados.
+- Duas notificacoes internas e quatro registros de auditoria foram gerados.
 
 -------------------------------------------------------------------------------
 DIA 6 — INTEGRACAO, POLIMENTO, TESTES E APRESENTACAO
@@ -435,12 +447,32 @@ Responsaveis: Leonardo, Daniel e Geder
 
 Leonardo:
 
-[ ] Congelar novas funcionalidades.
-[ ] Corrigir somente falhas criticas do backend e integracao.
-[ ] Criar script seguro para restaurar os dados da demonstracao.
-[ ] Validar migrations/schema em banco limpo.
-[ ] Garantir que falha de SMTP nao interrompa o fluxo.
-[ ] Preparar contas e dados finais sem credenciais no codigo.
+[x] Congelar novas funcionalidades.
+[x] Corrigir somente falhas criticas do backend e integracao.
+[x] Criar script seguro para restaurar os dados da demonstracao.
+[x] Validar migrations/schema em banco limpo.
+[x] Garantir que falha de SMTP nao interrompa o fluxo.
+[x] Preparar contas e dados finais com credenciais academicas ficticias nos
+  inserts, conforme decisao do responsavel.
+
+Validacao do Leonardo no Dia 6 em 04/07:
+
+- Escopo congelado em Docs/ESCOPO_CONGELADO_MVP.md.
+- Schema deixou de executar CREATE DATABASE/USE resource automaticamente.
+- scripts/prepare_demo_database.php criou e validou banco isolado com
+  30 tabelas, 6 usuarios e 6 anuncios.
+- scripts/validate_clean_database.php validou schema, financeiro, historico de
+  frete, FKs e catalogo de 7 migrations.
+- scripts/test_smtp_failure.php confirmou falha controlada sem excecao.
+- Smoke HTTP confirmou login 200 e redirecionamento das rotas protegidas de
+  admin, estatisticas e saques para o login.
+- create_admin.sql e empresa_demo.sql possuem acessos academicos ficticios para
+  permitir preparacao manual por SQL puro.
+- promover_admin.sql permite transformar uma conta cadastrada em administrador.
+- contexto_projeto.txt e roteiro_teste_dia3.txt foram atualizados para o MVP.
+- A equipe preferiu executar a preparacao e os testes manualmente pelo
+  phpMyAdmin e navegador; os scripts permanecem apenas como ferramentas
+  opcionais de seguranca e diagnostico.
 
 Daniel:
 

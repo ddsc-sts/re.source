@@ -15,9 +15,9 @@ ON DUPLICATE KEY UPDATE
     status = 'concluded', proposed_total = 1000.00, concluded_at = NOW();
 
 INSERT INTO financial_transactions
-    (id, company_id, type, amount, status, description)
+    (id, company_id, negotiation_id, type, amount, status, description)
 VALUES
-    (1001, 1, 'sale', 1000.00, 'completed', 'Saldo da negociacao DEMO-CONCLUIDA-001')
+    (1001, 1, 1001, 'sale', 1000.00, 'completed', 'Saldo da negociacao DEMO-CONCLUIDA-001')
 ON DUPLICATE KEY UPDATE
     amount = VALUES(amount), status = 'completed', description = VALUES(description);
 

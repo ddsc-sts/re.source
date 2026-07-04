@@ -4,12 +4,6 @@
 --  MySQL 8.0+
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS resource
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE resource;
-
 -- ============================================================
 --  Re.Source — Marketplace B2B de Materiais Industriais
 --  SQL FINAL CONSOLIDADO — v4.0 (MVP academico)

@@ -3,7 +3,7 @@
 -- Execute depois de re.sourcebanco.sql.
 -- Login: admin@resource.com.br
 -- Senha inicial: Admin@2026!
--- Troque a senha antes de qualquer uso fora da demonstracao.
+-- Credencial ficticia para a demonstracao academica.
 -- ============================================================
 
 SET @ADMIN_ADDRESS_ID = 9000;

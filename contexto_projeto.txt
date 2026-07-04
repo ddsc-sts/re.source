@@ -1,301 +1,409 @@
-# RE.SOURCE — CONTEXTO PARA CONTINUAR O PROJETO
+# RE.SOURCE — HANDOFF COMPLETO PARA OUTRO COMPUTADOR / CODEX
 
-Atualizado em: 02/07/2026
-Objetivo: permitir que o trabalho seja retomado em outro computador ou em um
-novo chat sem perder as decisoes e o estado atual do MVP.
+Atualizado em: 04/07/2026
+Projeto local: C:\xampp\htdocs\re.source
+Branch: main
+HEAD no momento deste handoff: 2adfb3e (04/07 part 1)
 
-ATENCAO
-
-- Este arquivo e interno, mas agora e versionado para colaborar com a equipe.
-- Somente o .env precisa ser transferido manualmente entre computadores.
-- A senha real do SMTP nao esta registrada aqui.
-- Nao publicar este arquivo antes de revisar os acessos academicos abaixo.
+ATENCAO: existem alteracoes locais posteriores ao HEAD. Antes de mudar de
+computador, revisar, fazer commit e push de todos os arquivos listados na secao
+10. Sem esse commit, o outro computador nao recebera o trabalho mais recente.
 
 ===============================================================================
-1. CONTEXTO DO PROJETO
+1. OBJETIVO DO PROJETO
 ===============================================================================
 
-RE.SOURCE e um ecommerce B2B academico para negociacao de residuos entre
-empresas. O objetivo imediato nao e producao: e apresentar um MVP funcional no
-curso. Existe a possibilidade de evoluir o sistema para producao futuramente.
+Re.Source e um ecommerce B2B academico para negociacao de residuos industriais
+entre empresas. O objetivo atual e apresentar um MVP funcional no curso. Nao e
+um sistema em producao, embora possa ser evoluido futuramente.
 
-Prazo de emergencia: seis dias de desenvolvimento.
-
-Fluxo principal da demonstracao:
+Fluxo principal da apresentacao:
 
 Cadastro
--> confirmacao de e-mail
--> login como empresa pendente
--> navegacao limitada
+-> confirmacao por e-mail
+-> empresa pendente com navegacao limitada
 -> aprovacao pelo administrador
 -> dashboard liberado
--> anuncio e chat
--> proposta e acordo mutuo
--> escolha de frete
--> confirmacao da entrega por codigo
--> liberacao de saldo
--> solicitacao de saque PIX/TED
--> aprovacao ou recusa administrativa
+-> anuncio de residuo
+-> chat entre empresas
+-> proposta e aceite mutuo
+-> frete simulado
+-> codigo de entrega
+-> liberacao do saldo
+-> saque PIX ou TED
+-> aprovacao ou recusa manual pelo administrador.
 
-Regra acordada: antes de implementar qualquer mock, perguntar ao responsavel se
-ele prefere a simulacao ou uma implementacao real.
-
-===============================================================================
-2. AMBIENTE E ARQUITETURA
-===============================================================================
-
-- Windows com XAMPP.
-- Projeto esperado em C:\xampp\htdocs\re.source.
-- PHP com arquitetura MVC propria.
-- Entrada publica: public/index.php.
-- Rotas: routes/web.php.
-- Banco: MariaDB/MySQL via PDO.
-- Banco principal configurado: resource.
-- Configuracoes locais e segredos: .env.
-- Modelo seguro de configuracao: .env.example.
-- URL local base: http://localhost/re.source
-- Painel administrativo: http://localhost/re.source/admin
-- Empresas no admin: http://localhost/re.source/admin/empresas
-
-O arquivo config/env.php carrega as variaveis de ambiente. A conexao fica em
-config/conexao.php e usa resource como nome padrao. O SMTP fica em
-config/mailer.php e le usuario e senha apenas do .env.
+O escopo esta congelado em Docs/ESCOPO_CONGELADO_MVP.md. Ate a apresentacao,
+implementar somente correcoes criticas, integracao, feedback, responsividade,
+testes e preparacao visual. Nao criar novas funcionalidades fora do roteiro sem
+autorizacao explicita do responsavel.
 
 ===============================================================================
-3. ESTADO ATUAL — DIA 1 CONCLUIDO
+2. DECISOES TECNICAS E DE PRODUTO
 ===============================================================================
 
-O fluxo obrigatorio do Dia 1 foi implementado, testado manualmente e commitado.
+- Chat: polling HTTP, sem WebSocket.
+- Frete: tres cotacoes simuladas persistidas no banco.
+- Melhor Envio: opcional; somente se todo o roteiro estiver aprovado.
+- Entregador: portal interno dentro do admin, sem perfil externo.
+- Entrega: codigo aleatorio de seis digitos, armazenado como hash.
+- Codigo: validade de 24 horas, cinco tentativas e uso unico.
+- Financeiro: ledger interno, sem gateway ou transferencia bancaria real.
+- Saque: PIX ou TED, valor reservado imediatamente e aprovacao manual.
+- Recusa de saque: devolve integralmente o valor reservado.
+- ESG: estimativa academica documentada em Docs/FORMULAS_ESG_MVP.md.
+- E-mails: alertas nao podem desfazer operacoes ja commitadas.
+- Preparacao/testes: o responsavel prefere SQL puro, phpMyAdmin e navegador.
+- Nao executar scripts PHP de teste/restauracao sem pedido explicito.
 
-Implementado:
+===============================================================================
+3. ARQUITETURA E AMBIENTE
+===============================================================================
 
-- .env, .env.example e .gitignore.
-- Variaveis de ambiente para banco e SMTP.
-- Remocao de credenciais fixas do codigo.
-- Protecao HTTP de arquivos e diretorios internos.
-- Status pending para empresas.
-- Papeis admin, staff, admin_company e operator.
-- Login de administrador.
-- Login permitido para empresa pendente.
-- Tela de espera pela aprovacao.
+- Windows + XAMPP.
+- Apache e MariaDB/MySQL.
+- PHP com MVC proprio, sem framework.
+- Entrada publica: public/index.php
+- Bootstrap/configuracao: bootstrap.php
+- Rotas: routes/web.php
+- Controllers: app/Controllers
+- Services: app/Services
+- Views: app/Views
+- CSS/JS: public/css e public/js
+- Banco consolidado: database/seeders/re.sourcebanco.sql
+- Inserts: database/inserts
+- Migrations historicas: database/migrations
+- Configuracao local e segredos: .env
+- Modelo de configuracao: .env.example
+- Banco padrao: resource
+- URL local: http://localhost/re.source
+
+O schema consolidado possui 30 tabelas e ja contem o resultado de todas as sete
+migrations. Em banco novo, NAO executar migrations depois de importar
+re.sourcebanco.sql.
+
+===============================================================================
+4. ESTADO ATUAL DO MVP
+===============================================================================
+
+DIA 1 — concluido:
+
+- .env, .gitignore e configuracao segura de banco/SMTP.
+- Cadastro, verificacao por e-mail, login e recuperacao de senha.
+- Empresa pending e tela de aguardando aprovacao.
 - Navegacao limitada para empresa pendente.
-- Middleware ApprovedCompany nas operacoes restritas.
-- Aprovacao administrativa de empresa com CSRF e audit_log.
-- CSRF em login, cadastro, conta, preferencias e anuncios.
-- Exclusao de anuncio por POST em vez de GET.
-- Validacao de CNPJ no backend com BrasilAPI e cache.
-- Correcao das URLs do reset de senha.
-- Tratamento de sessao antiga depois de restaurar o banco.
-- Schema e inserts unificados em SQL puro.
-- Envio real de e-mail testado com sucesso.
-- Teste manual: cadastro -> e-mail -> pendente -> aprovacao -> acesso completo.
+- Admin/staff/admin_company/operator.
+- Aprovacao administrativa e middleware de empresa aprovada.
+- CSRF nas operacoes principais.
 
-- Componente padrao de flash messages com tipos success, error, warning e info.
-- APP_BASE_PATH centralizado no bootstrap, roteador e novas rotas.
-- Helpers app_url e redirect_to para URLs e redirecionamentos internos.
+DIA 2 — concluido:
 
-Os dois extras do Dia 1 foram concluidos em 02/07/2026.
+- Chat unico por anuncio e par de empresas.
+- Bloqueio de conversa no proprio anuncio.
+- Polling incremental a cada tres segundos.
+- Contador de nao lidas e pop-up de mensagem.
+- Atualizacao automatica da lista de conversas.
+- Admin: aprovacao, correcao, rejeicao, suspensao e reativacao de empresas.
+
+DIA 3 — concluido:
+
+- Proposta com quantidade, valor, total, prazo e responsavel pelo frete.
+- Aceites independentes de comprador e vendedor.
+- Acordo mutuo com protocolo unico.
+- Bloqueio de edicao depois do acordo.
+- Recusa e cancelamento com motivo.
+- Notificacoes e e-mails do fluxo.
+- Painel administrativo de negociacoes com dados reais.
+
+DIA 4 — concluido no codigo:
+
+- Tres fretes simulados persistidos.
+- Contratacao, rastreamento e historico de status.
+- Codigo de entrega com hash, expiracao, tentativas e uso unico.
+- Portal interno: http://localhost/re.source/admin/logistica
+- Confirmacao atomica: frete, negociacao, anuncio, transacao e saldo.
+- E-mails de coleta e entrega.
+- Sidebar compartilhada em dashboard, conversas e entregas.
+
+DIA 5 — concluido no codigo e em testes isolados:
+
+- Saldo futuro, disponivel, reservado e sacado.
+- Saque PIX e TED.
+- Reserva transacional do saldo.
+- Bloqueio de saldo insuficiente, duplicidade e segunda analise.
+- Admin: http://localhost/re.source/admin/saques
+- Aprovacao manual conclui o saque sem descontar novamente.
+- Recusa devolve o saldo reservado.
+- Historico financeiro, notificacoes e audit_logs.
+- Exportacao CSV de saques.
+- Dashboard administrativo com dados reais.
+- Formula ESG academica documentada.
+
+Resultados do teste financeiro isolado:
+
+- Saldo 1.000; reserva 300 -> disponivel 700, reservado 300.
+- Recusa -> disponivel 1.000, reservado zero.
+- Aprovacao posterior de 400 -> disponivel 600, sacado 400.
+- Saldo insuficiente, duplicidade e segunda analise foram bloqueados.
+- Foram geradas duas notificacoes e quatro entradas de auditoria.
+
+DIA 6 — parte do Leonardo concluida:
+
+- Escopo congelado.
+- Schema nao executa CREATE DATABASE ou USE automaticamente.
+- Schema limpo validado com 30 tabelas.
+- Resultado das sete migrations conferido no schema.
+- Falha SMTP testada sem excecao.
+- Login publico respondeu HTTP 200.
+- Admin, estatisticas e saques sem sessao redirecionaram para login.
+- Inserts academicos voltaram a ser autocontidos, por decisao do responsavel.
+- promover_admin.sql criado para promover uma conta cadastrada.
+- Contexto e roteiro manual atualizados.
 
 ===============================================================================
-4. BANCO DE DADOS
+5. PENDENCIAS REAIS
 ===============================================================================
 
-Para preparar um banco novo chamado resource, importar nesta ordem:
+Daniel — Dia 6:
 
-1. database/seeders/re.sourcebanco.sql
-2. database/inserts/create_admin.sql
-3. database/inserts/empresa_demo.sql       (opcional)
-4. database/inserts/produto.sql            (opcional; depende da empresa demo)
-5. database/inserts/saldo_demo.sql         (opcional)
+[ ] Concluir o visual de todas as telas do roteiro.
+[ ] Padronizar badges, modais, loading, sucesso e erro.
+[ ] Corrigir responsividade nas resolucoes da apresentacao.
+[ ] Remover links quebrados e botoes sem acao do caminho demonstrado.
+[ ] Preparar dashboard e telas visualmente convincentes.
 
-Para atualizar um banco anterior ao chat do Dia 2, executar tambem:
+Geder/equipe — Dia 6:
 
-database/migrations/20260702_001_chat_indexes.sql
+[ ] Executar roteiro_teste_dia3.txt completo em navegadores diferentes.
+[ ] Repetir o roteiro tres vezes a partir de banco novo.
+[ ] Confirmar visualmente saldo, reserva, recusa e aprovacao.
+[ ] Confirmar recebimento SMTP com contas de teste reais.
+[ ] Testar desktop 1366x768, 1920x1080 e mobile aproximado de 390px.
+[ ] Preparar roteiro oral de 10 a 15 minutos.
+[ ] Gravar uma execucao completa como seguranca.
+[ ] Registrar limitacoes finais do MVP.
 
-O arquivo abaixo deve ser usado somente para atualizar um banco antigo:
-
-database/migrations/20260701_001_pending_and_admin_roles.sql
-
-Ele nao precisa ser executado depois do schema completo em um banco novo.
-
-Os SQLs foram testados em um banco limpo. Eles criaram 27 tabelas, empresas,
-anuncios, negociacao financeira de demonstracao e usuarios com senhas bcrypt.
+O arquivo roteiro_teste_dia3.txt manteve o nome antigo por solicitacao, mas seu
+conteudo agora e o roteiro manual final de todo o MVP.
 
 ===============================================================================
-5. ACESSOS ACADEMICOS
+6. CRIAR O BANCO DO ZERO NO OUTRO COMPUTADOR
 ===============================================================================
+
+O responsavel NAO quer exportar o banco atual e NAO quer depender dos scripts.
+
+No phpMyAdmin:
+
+1. Criar um banco vazio chamado resource.
+2. Usar collation utf8mb4_unicode_ci.
+3. Selecionar o banco resource.
+4. Importar os SQLs nesta ordem:
+
+   1. database/seeders/re.sourcebanco.sql
+   2. database/inserts/create_admin.sql
+   3. database/inserts/empresa_demo.sql   (opcional)
+   4. database/inserts/produto.sql        (opcional; depende do item 3)
+   5. database/inserts/saldo_demo.sql     (opcional; depende dos itens 3 e 4)
+
+Para testar absolutamente desde o cadastro, e possivel importar somente:
+
+- re.sourcebanco.sql
+- create_admin.sql
+
+Depois, cadastrar as empresas pelo site e aprova-las pelo admin.
+
+Nao executar migrations em banco novo. Elas existem somente para atualizar
+bancos antigos.
+
+Insert adicional:
+
+- database/inserts/promover_admin.sql
+
+Esse arquivo promove uma conta cadastrada e confirmada pelo site. Antes de
+executar, editar @ADMIN_EMAIL. Depois, sair e entrar novamente no sistema.
+
+===============================================================================
+7. ACESSOS ACADEMICOS FICTICIOS
+===============================================================================
+
+Administrador criado por create_admin.sql:
+
+- URL: http://localhost/re.source/admin
+- E-mail: admin@resource.com.br
+- Senha: Admin@2026!
+
+Usuarios criados por empresa_demo.sql:
+
+- carlos@metaljoin.com.br
+- ana@madeirasul.com.br
+- roberto@plasticonord.com.br
+- fernanda@textilcat.com.br
+- marina@empresapendente.com.br (empresa pendente)
+- Senha comum: Resource@2026
+
+Esses acessos sao ficticios e deliberadamente publicos para o projeto
+academico. Nunca reutilizar em ambiente real. Antes de publicar o repositorio,
+o historico ainda devera ser reescrito e as credenciais removidas/rotacionadas.
+
+===============================================================================
+8. ARQUIVO .ENV NO OUTRO COMPUTADOR
+===============================================================================
+
+O .env nao acompanha o Git. Copiar manualmente ou recriar a partir do
+.env.example. Campos essenciais:
+
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost/re.source
+APP_BASE_PATH=/re.source
+
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=resource
+DB_USERNAME=root
+DB_PASSWORD=
+
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=<e-mail local>
+MAIL_PASSWORD=<senha de aplicativo local>
+MAIL_FROM_ADDRESS=<e-mail local>
+MAIL_FROM_NAME=Re.Source
+MAIL_VERIFY_TLS=true
+
+Nunca colocar a senha SMTP em contexto_projeto.txt, commits ou mensagens.
+
+===============================================================================
+9. ROTAS IMPORTANTES
+===============================================================================
+
+Cliente:
+
+- /login
+- /aguardando-aprovacao
+- /base
+- /busca
+- /meus-anuncios
+- /conversas
+- /entregas
+- /estatisticas
+- /estatisticas/saque
+- /conta
+- /configuracoes
+
+Frete:
+
+- /frete?negociacao=ID
+- /frete/acompanhar?negociacao=ID
 
 Administrador:
 
-- E-mail: admin@resource.com.br
-- Senha: Admin@2026!
-- URL: http://localhost/re.source/admin
-
-Empresas criadas por empresa_demo.sql:
-
-- Senha comum: Resource@2026
-- Existe uma empresa pendente com e-mail marina@empresapendente.com.br.
-
-Essas credenciais sao apenas para ambiente academico e devem ser trocadas antes
-de qualquer publicacao ou uso real.
+- /admin
+- /admin/empresas
+- /admin/anuncios
+- /admin/negociacoes
+- /admin/logistica
+- /admin/saques
+- /admin/impacto
 
 ===============================================================================
-6. ARQUIVOS LOCAIS QUE NAO VIAJAM PELO GIT
+10. ESTADO DO GIT NESTE HANDOFF
 ===============================================================================
 
-Transferir manualmente para o outro computador apenas:
+HEAD atual: 2adfb3e (origin/main no momento da consulta).
 
-- .env
+Alteracoes locais que precisam de commit/push antes da troca de computador:
 
-Planejamento.txt, contexto_projeto.txt e melhorias.txt agora acompanham o Git.
+- contexto_projeto.txt
+- database/README.md
+- database/inserts/create_admin.sql
+- database/inserts/empresa_demo.sql
+- database/inserts/saldo_demo.sql
+- database/inserts/promover_admin.sql (novo)
+- database/seeders/re.sourcebanco.sql
+- planejamento.txt
+- roteiro_teste_dia3.txt
+- Docs/ESCOPO_CONGELADO_MVP.md (novo)
+- scripts/ (novo; ferramentas opcionais, nao executar sem pedido)
 
-O .env deve manter:
+Antes de trocar de computador:
 
-- DB_DATABASE=resource
-- credenciais locais do MariaDB
-- configuracao do SMTP
-- MAIL_PASSWORD com a senha de aplicativo correta
-
-Nao enviar vendor, caches ou a pasta .git manualmente. O codigo deve ser obtido
-com git clone/pull. Se houver composer.json, executar composer install.
-
-===============================================================================
-7. EQUIPE E DIVISAO A PARTIR DO DIA 2
-===============================================================================
-
-Leonardo:
-
-- Backend do cliente e regras centrais.
-- Banco e transacoes.
-- Chat, negociacao, acordo, frete, entrega, saldo e saque.
-- Frontend basico necessario para o fluxo funcionar.
-
-Daniel:
-
-- Backend e frontend administrativo.
-- Aprovacao de empresas e saques.
-- Metricas administrativas.
-- Frontend completo e acabamento visual do projeto.
-
-Geder:
-
-- Revisao e testes manuais.
-- Correcoes pontuais de frontend.
-- Integracao, responsividade, textos e apoio onde houver bloqueio.
-
-Leonardo e o responsavel principal por routes/web.php e pelo schema. Evitar que
-duas pessoas alterem simultaneamente esses arquivos sem alinhamento.
+1. Executar git status.
+2. Revisar os arquivos acima.
+3. Fazer commit.
+4. Fazer push para origin/main.
+5. No outro computador, fazer git pull.
+6. Recriar/copiar o .env.
+7. Criar o banco resource do zero seguindo a secao 6.
 
 ===============================================================================
-8. ESTADO ATUAL — ESCOPO DO LEONARDO NO DIA 2 CONCLUIDO
+11. REPOSITORIO PUBLICO — PENDENCIA FUTURA
 ===============================================================================
 
-Objetivo obrigatorio:
+O .env esta ignorado, mas credenciais e documentos sensiveis podem existir em
+commits antigos. Antes de tornar o repositorio publico:
 
-Duas empresas aprovadas devem conseguir abrir uma unica conversa e trocar
-mensagens persistidas no banco.
+- criar backup e branch/tag do estado apresentado;
+- revisar documentos internos;
+- procurar segredos no conteudo e no historico;
+- reescrever o historico com git filter-repo;
+- rotacionar SMTP e qualquer credencial encontrada;
+- avisar os tres integrantes antes de force push.
 
-Leonardo:
-
-[x] Criar ChatController e NegotiationController.
-[x] Criar rotas para iniciar conversa, listar conversas e enviar mensagens.
-[x] Ajustar e usar as tabelas negotiations e messages.
-[x] Validar empresa aprovada, propriedade e anuncio de outra empresa.
-[x] Impedir conversa consigo mesma e conversa duplicada.
-[x] Criar telas basicas de lista e conversa.
-[x] Implementar polling HTTP incremental a cada 3 segundos.
-[x] Integrar o botao de contato ao anuncio com POST e CSRF.
-[x] Criar migration e atualizar o schema de banco limpo.
-
-Daniel:
-
-[x] Finalizar aprovacao, suspensao e reativacao administrativa de empresas.
-[x] Finalizar tela administrativa de empresas pendentes, incluindo solicitacao
-    de correcao, reenvio para analise e rejeicao fundamentada.
-[x] Criar filtros, confirmacoes, auditoria e notificacoes internas.
-[ ] Aplicar visual final na tela pendente e no chat.
-
-Extras do chat concluidos:
-
-[x] Contador de mensagens nao lidas por conversa e no cabecalho.
-[x] Indicador visual de atualizacao automatica do chat.
-[x] Pop-up global de nova mensagem com atalho para a conversa.
-[x] Lista de conversas atualizada automaticamente a cada 3 segundos.
-
-Banco atualizado:
-
-[x] Migration 20260702_002_company_review_workflow.sql criada e aplicada.
-[x] Todas as migrations refletidas no re.sourcebanco.sql.
-[x] Schema completo validado em banco temporario limpo com 27 tabelas.
-
-Dia 3 adiantado:
-
-[x] Proposta com quantidade, valor, prazo, total e responsavel pelo frete.
-[x] Aceite independente de comprador e vendedor.
-[x] Acordo mutuo com protocolo unico e bloqueio de edicao.
-[x] Recusa e cancelamento com motivo.
-[x] Notificacoes internas e e-mails de nova mensagem/proposta/acordo.
-[x] Teste transacional de calculo, autorizacao e maquina de estados aprovado.
-[x] Painel admin de negociacoes com metricas, busca, filtros e detalhes reais.
-[x] Roteiro manual completo criado em roteiro_teste_dia3.txt.
-
-Geder:
-
-[x] Repetir os testes completos do Dia 1.
-[x] Testar acessos indevidos de empresa pendente.
-[x] Testar conversa consigo mesma e conversa duplicada.
-[x] Revisar responsividade, textos e integracao.
-
-Resultado da regressao manual:
-
-- Fluxos obrigatorios aprovados.
-- Anuncio proprio bloqueado com orientacao visivel ao usuario.
-- Contador global de conversas atualizado automaticamente a cada 3 segundos.
-
-Decisao do chat:
-
-[x] Polling HTTP confirmado e implementado a cada 3 segundos.
-
-Validacoes tecnicas executadas: PHP lint, roteamento e redirecionamentos de
-protecao, indices do banco e persistencia transacional de negociacao/mensagem
-com rollback. O teste manual em dois navegadores continua atribuido ao Geder.
+Nao executar reescrita de historico sem autorizacao explicita.
 
 ===============================================================================
-9. ORIENTACAO PARA O NOVO CHAT
+12. PROMPT PRONTO PARA COLAR NO CODEX DO OUTRO COMPUTADOR
 ===============================================================================
 
-Ao abrir o projeto no outro computador, enviar esta instrucao ao novo chat:
+COPIE A PARTIR DA LINHA ABAIXO:
 
-"Leia contexto_projeto.txt, planejamento.txt, melhorias.txt, a pasta Docs e o
-codigo atual. Conclua a revisao do Dia 2 e continue pelo Dia 3. Antes de alterar
-arquivos, confira se o repositorio e o banco resource estao atualizados. Nao
-implemente mocking sem me perguntar se prefiro mock ou implementacao real."
+-------------------------------------------------------------------------------
+Estou continuando o projeto academico Re.Source em outro computador.
 
-Antes de iniciar o desenvolvimento:
+Atue como PM e desenvolvedor Full-Stack Senior. Antes de alterar qualquer
+arquivo, leia integralmente:
 
-[ ] Confirmar que Apache e MariaDB estao ativos.
-[ ] Confirmar que o repositorio recebeu o ultimo push.
-[ ] Colocar o .env local no projeto.
-[ ] Importar ou restaurar o banco resource.
-[ ] Testar login do admin.
-[ ] Testar login de uma empresa aprovada.
-[ ] Ler o Dia 2 completo no planejamento.txt.
+1. contexto_projeto.txt
+2. planejamento.txt
+3. melhorias.txt
+4. roteiro_teste_dia3.txt
+5. Docs/ESCOPO_CONGELADO_MVP.md
+6. Docs/FORMULAS_ESG_MVP.md
+7. routes/web.php e o codigo relacionado a tarefa atual
 
-===============================================================================
-10. REPOSITORIO PUBLICO — FUTURO
-===============================================================================
+Depois execute apenas verificacoes de leitura: git status, git log recente e
+estrutura dos arquivos. Confirme que a main recebeu o ultimo push.
 
-Ainda sera necessario reescrever o historico antes de publicar o repositorio,
-pois arquivos e credenciais sensiveis podem ter aparecido em commits antigos.
-Essa operacao nao foi executada e exige autorizacao explicita, copia segura e
-aviso aos tres integrantes.
+Contexto obrigatorio:
 
-Manter ignorados:
+- O MVP e academico e o escopo esta congelado.
+- Dias 1 a 5 estao implementados.
+- A parte do Leonardo no Dia 6 esta concluida.
+- Frete permanece simulado.
+- Financeiro e interno e saques possuem aprovacao manual.
+- Eu prefiro preparar banco e testar manualmente via phpMyAdmin/navegador.
+- Nao execute scripts PHP de restauracao ou teste sem me perguntar.
+- Nao implemente Melhor Envio, gateway, WebSocket ou outra funcionalidade
+  opcional sem me perguntar se prefiro mocking ou implementacao real.
+- Nao sobrescreva alteracoes de colaboradores e nao use comandos destrutivos.
 
-- .env
-- caches, temporarios e uploads locais
+Banco neste computador:
 
-Planejamento.txt, melhorias.txt e contexto_projeto.txt estao versionados para
-uso dos colaboradores e precisam de revisao antes de publicacao aberta.
+- Criar resource vazio.
+- Importar database/seeders/re.sourcebanco.sql.
+- Importar database/inserts/create_admin.sql.
+- Opcionalmente importar empresa_demo.sql, produto.sql e saldo_demo.sql nessa
+  ordem.
+- Nao executar migrations depois do schema consolidado.
 
-Fim do contexto.
+Minha proxima tarefa e continuar o Dia 6. Primeiro identifique exatamente quais
+itens de Daniel e Geder continuam desmarcados no planejamento. Em seguida,
+ajude-me a executar o roteiro manual e corrija somente falhas comprovadas no
+caminho da apresentacao. Ao concluir cada item, atualize planejamento.txt e
+contexto_projeto.txt. Nao marque testes manuais que eu ainda nao confirmei.
+-------------------------------------------------------------------------------
+
+FIM DO PROMPT.
+
+Fim do contexto do projeto.

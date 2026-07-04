@@ -1,255 +1,250 @@
 ================================================================================
-RE.SOURCE — REGISTRO DE MELHORIAS E PENDÊNCIAS
-Atualizado em: 03/07/2026
-════════════════════════════════════════════════════════════════════════════════
+RE.SOURCE — REGISTRO ATUAL DE MELHORIAS, LIMITACOES E PENDENCIAS
+Atualizado em: 04/07/2026
+Objetivo atual: MVP academico funcional para apresentacao
+================================================================================
 
-🟢 O QUE JÁ FOI FEITO — MIGRAÇÃO MVC + BASE DO MVP
-════════════════════════════════════════════════════════════════════════════════
+Este arquivo registra o estado real do projeto. O planejamento operacional e a
+divisao por integrante ficam em planejamento.txt. O handoff completo para outro
+computador fica em contexto_projeto.txt.
 
-1. ROTEADOR (public/index.php + bootstrap.php)
+O escopo esta congelado. Ate a apresentacao, somente corrigir falhas comprovadas
+no roteiro principal, seguranca, integracao, feedback e responsividade.
 
-[✅] Roteador central criado e funcionando via routes/web.php
-[✅] Bootstrap com helper view() usando extract()
-[✅] .htaccess redirecionando tudo para index.php
-[✅] Arquitetura MVC funcional (Controller → View → Route)
+================================================================================
+1. IMPLEMENTADO — BASE E SEGURANCA
+================================================================================
 
-2. ROTAS (routes/web.php)
+[x] Arquitetura MVC propria com bootstrap, roteador e mapa de rotas.
+[x] Configuracao por .env e modelo .env.example.
+[x] Banco MariaDB/MySQL via PDO e schema consolidado.
+[x] 30 tabelas no schema atual.
+[x] Sete migrations historicas refletidas no schema consolidado.
+[x] CSRF nas operacoes principais.
+[x] Middlewares UserAuth, ApprovedCompany e AdminAuth.
+[x] Papeis admin, staff, admin_company e operator.
+[x] Sessoes persistentes, logout e recuperacao de senha.
+[x] Flash messages padronizadas.
+[x] APP_BASE_PATH, app_url e redirect_to centralizados.
+[x] .env ignorado pelo Git.
+[x] Schema nao executa CREATE DATABASE ou USE automaticamente.
 
-[✅] Sistema completo de rotas limpas implementado
+================================================================================
+2. IMPLEMENTADO — CADASTRO E EMPRESAS
+================================================================================
 
-Inclui:
+[x] Cadastro completo de empresa e usuario.
+[x] Validacao de CNPJ no backend e consulta BrasilAPI com cache.
+[x] Bloqueio de dominios gratuitos configurados.
+[x] Codigo de verificacao e confirmacao por e-mail.
+[x] Login permitido para empresa pendente.
+[x] Tela de aguardando aprovacao e navegacao limitada.
+[x] Aprovacao administrativa.
+[x] Solicitacao de correcao e reenvio para analise.
+[x] Rejeicao fundamentada.
+[x] Suspensao e reativacao.
+[x] Notificacoes, e-mails e auditoria das alteracoes administrativas.
 
-Auth:
-/login → AuthController@login
-/cadastro → AuthController@cadastro
-/pendente → AuthController@pendente
-/reset → AuthController@showReset
-/logout → AuthController@logout
-/process → AuthController@process
-Base usuário:
-/base
-/conta
-/configuracoes
-/estatisticas
-/busca
-/anuncio
-Admin:
-/admin + subrotas completas
-3. CONTROLLERS (estado real atual)
-🟢 AuthController (ATUAL — PRINCIPAL DO SISTEMA)
+================================================================================
+3. IMPLEMENTADO — ANUNCIOS, BUSCA E NAVEGACAO
+================================================================================
 
-[✅] Login completo (PDO + password_verify + sessão)
-[✅] Cadastro completo com:
+[x] CRUD de anuncios.
+[x] Exclusao por POST com CSRF.
+[x] Busca e filtros basicos.
+[x] Imagens e categorias.
+[x] Bloqueio de operacoes para empresa nao aprovada.
+[x] Bloqueio de conversa no proprio anuncio com mensagem visivel.
+[x] Header com conversas e Minhas entregas.
+[x] Sidebar compartilhada nas areas empresariais.
 
-validação de campos
-validação de CNPJ (algoritmo + BrasilAPI + cache)
-bloqueio de domínio gratuito
-geração de código 6 dígitos
-fluxo de confirmação por e-mail
+================================================================================
+4. IMPLEMENTADO — CHAT, PROPOSTA E ACORDO
+================================================================================
 
-[✅] ProcessLogin com:
+[x] Uma conversa por anuncio e par de empresas.
+[x] Mensagens persistidas.
+[x] Polling incremental a cada tres segundos.
+[x] Lista de conversas atualizada automaticamente.
+[x] Contador de mensagens nao lidas.
+[x] Pop-up de nova mensagem.
+[x] E-mail de nova mensagem sem desfazer a mensagem salva em caso de falha.
+[x] Proposta com quantidade, valor unitario, total e prazo.
+[x] Responsavel pelo frete: comprador, vendedor ou dividido.
+[x] Aceite independente das duas empresas.
+[x] Acordo mutuo e protocolo unico.
+[x] Bloqueio de edicao depois do acordo.
+[x] Recusa e cancelamento com motivo.
+[x] Painel administrativo de negociacoes com busca, filtros e detalhes reais.
 
-bloqueio por status da empresa
-persistência de sessão
-remember token (user_sessions)
-last_login_at
-redirecionamento por role/status
+================================================================================
+5. IMPLEMENTADO — FRETE E ENTREGA
+================================================================================
 
-[✅] Reset de senha completo:
+[x] Tres opcoes de frete simulado persistidas no banco.
+[x] Transportadora, modalidade, valor, taxa e prazo.
+[x] Contratacao e codigo de rastreamento.
+[x] Linha do tempo e historico detalhado do frete.
+[x] Inicio simulado do transporte.
+[x] Codigo de entrega aleatorio de seis digitos.
+[x] Codigo armazenado somente como hash.
+[x] Validade de 24 horas, cinco tentativas e uso unico.
+[x] Portal interno do entregador em /admin/logistica.
+[x] Confirmacao atomica da entrega.
+[x] Conclusao da negociacao e do anuncio.
+[x] Liberacao do saldo exatamente uma vez.
+[x] Notificacoes e e-mails de coleta/entrega.
+[x] Animacao de entrega concluida.
 
-token SHA-256
-expiração
-invalidação de sessão
-atualização segura de senha
+Limitacao deliberada do MVP:
 
-[✅] Recover de senha por e-mail
-[✅] Verificação de cadastro (código 6 dígitos)
-[✅] Reenvio de código com limite de tempo
-[✅] Logout seguro com limpeza de sessão + banco
+- O frete nao consulta transportadora real.
+- Nao existe perfil externo de entregador.
+- Mudancas de status sao simuladas pela interface interna.
 
-🟡 BaseController
+================================================================================
+6. IMPLEMENTADO — FINANCEIRO E SAQUES
+================================================================================
 
-[✅] Dashboard base
-[✅] Conta / configurações
-[✅] Exclusão de conta (cascade lógica)
-[⚠] Negociações (placeholder parcial)
-[⚠] Logística (placeholder)
-[⚠] Impacto (placeholder)
-[⚠] Suporte (placeholder)
+[x] Ledger financeiro interno.
+[x] Saldo futuro, disponivel, reservado e sacado.
+[x] Credito do vendedor depois da confirmacao da entrega.
+[x] Saque PIX.
+[x] Saque TED com banco, agencia, conta, digito e tipo.
+[x] Reserva imediata do saldo ao solicitar saque.
+[x] Bloqueio de saldo insuficiente.
+[x] Bloqueio de solicitacao duplicada.
+[x] Aprovacao manual pelo administrador.
+[x] Recusa com motivo e devolucao do saldo reservado.
+[x] Bloqueio de segunda analise da mesma solicitacao.
+[x] Historico financeiro.
+[x] Notificacoes e e-mails de aprovacao/recusa.
+[x] Audit logs administrativos.
+[x] Exportacao CSV dos saques.
+[x] Dashboard admin com saques pendentes e entregas ativas.
 
-🟡 AdminController
+Limitacao deliberada do MVP:
 
-[✅] Dashboard admin
-[✅] Empresas
-[✅] Anúncios
-[✅] Negociações
-[⚠] Financeiro ainda não iniciado
+- Nenhuma transferencia bancaria real e executada.
+- Nao existe gateway financeiro, PIX automatico ou conciliacao bancaria.
+- O administrador apenas confirma manualmente a operacao academica.
 
-🟡 ListingController
+================================================================================
+7. IMPLEMENTADO — METRICAS E ESG
+================================================================================
 
-[✅] CRUD completo de anúncios
-[⚠] integração com chat ainda não ligada ao fluxo de negociação
+[x] Estatisticas empresariais com dados reais do MVP.
+[x] Dashboard administrativo com empresas, anuncios e negociacoes.
+[x] GMV baseado em negociacoes concluidas.
+[x] Indicadores ESG estimados.
+[x] Formula academica documentada em Docs/FORMULAS_ESG_MVP.md.
+[x] Rotulo de estimativa visivel nas metricas ambientais.
 
-🟡 SearchController / Estatísticas
+Limitacao deliberada do MVP:
 
-[✅] Busca funcional
-[✅] Estatísticas básicas
-[⚠] integração financeira ainda não iniciada
+- O fator de CO2 e academico e fixo.
+- Os numeros nao representam inventario ambiental auditado.
 
-4. AUTH CONTROLLER — OBSERVAÇÃO IMPORTANTE DO ESTADO REAL
-🔥 O sistema de autenticação está:
+================================================================================
+8. BANCO E DADOS DE DEMONSTRACAO
+================================================================================
 
-✔ completo
-✔ seguro
-✔ funcional
-✔ pronto para produção de MVP
+[x] Schema completo em database/seeders/re.sourcebanco.sql.
+[x] Admin academico em database/inserts/create_admin.sql.
+[x] Empresas demonstrativas em empresa_demo.sql.
+[x] Anuncios em produto.sql.
+[x] Negociacao concluida e saldo em saldo_demo.sql.
+[x] promover_admin.sql para transformar conta cadastrada em admin local.
+[x] Credenciais academicas ficticias autocontidas nos inserts.
 
-MAS:
+Ordem para banco novo:
 
-⚠ ainda com dependências antigas de rota:
+1. re.sourcebanco.sql
+2. create_admin.sql
+3. empresa_demo.sql (opcional)
+4. produto.sql (opcional)
+5. saldo_demo.sql (opcional)
 
-/re.source/... ainda aparece em redirects
-mistura de arquitetura antiga + nova
-5. VIEWS (estado atual)
+Nao executar migrations depois do schema consolidado em banco novo.
 
-[✅] Auth:
+================================================================================
+9. VALIDACOES TECNICAS JA EXECUTADAS
+================================================================================
 
-login
-cadastro
-pendente
-reset
+[x] Lint PHP de controllers, services, views e scripts auxiliares.
+[x] git diff --check.
+[x] Importacao limpa com 30 tabelas.
+[x] Indices do chat e colunas de proposta.
+[x] Tabelas e FKs de frete e financeiro.
+[x] Reserva, aprovacao, recusa e devolucao de saldo.
+[x] Bloqueio de saldo insuficiente, duplicidade e segunda analise.
+[x] Notificacoes internas e audit logs do financeiro.
+[x] Falha SMTP controlada sem excecao.
+[x] Smoke HTTP de login e redirecionamento das rotas protegidas.
 
-[✅] Dashboard:
+Preferencia atual do responsavel:
 
-base
-conta
-config
+- Preparar o banco manualmente pelo phpMyAdmin.
+- Executar os testes manualmente pelo navegador.
+- Nao executar scripts PHP auxiliares sem solicitacao explicita.
 
-[🟡] Admin:
+================================================================================
+10. PENDENCIAS OBRIGATORIAS ANTES DA APRESENTACAO
+================================================================================
 
-funcional, mas ainda em evolução visual
-6. MIDDLEWARE
+[ ] Executar roteiro_teste_dia3.txt completo em dois navegadores.
+[ ] Repetir o fluxo principal tres vezes a partir de banco novo.
+[ ] Confirmar recebimento SMTP com contas reais de teste.
+[ ] Conferir valores exibidos contra o banco depois de entrega e saque.
+[ ] Testar 1366x768, 1920x1080 e aproximadamente 390px de largura.
+[ ] Corrigir overflow, modal, loading ou botao quebrado encontrado no roteiro.
+[ ] Revisar ortografia e acentuacao de todas as telas apresentadas.
+[ ] Preparar roteiro oral de 10 a 15 minutos.
+[ ] Gravar uma execucao completa como seguranca.
+[ ] Registrar as limitacoes apresentadas a banca.
 
-[✅] UserAuth (proteção de login)
-[✅] AdminAuth (controle de permissões)
+================================================================================
+11. MELHORIAS OPCIONAIS — SOMENTE SE O ROTEIRO ESTIVER VERDE
+================================================================================
 
-════════════════════════════════════════════════════════════════════════════════
+[ ] Integrar Melhor Envio Sandbox para cotacao real.
+[ ] Criar pagina central de notificacoes.
+[ ] Melhorar busca, filtros e paginacao.
+[ ] Adicionar microinteracoes sem alterar regras de negocio.
+[ ] Exportar tambem negociacoes e metricas ESG em CSV.
 
-🧠 ESTADO REAL DO MVP (IMPORTANTE)
-════════════════════════════════════════════════════════════════════════════════
+Esses itens nao fazem parte da meta obrigatoria da apresentacao.
 
-🟢 CONCLUÍDO (FASE 1 — BASE FORTE)
-Arquitetura MVC
-Rotas limpas
-Auth completo
-Cadastro com validação forte
-Aprovação de empresa (pending → active)
-Sessões seguras
-Reset de senha completo
-Admin base funcional
-CRUD de anúncios
-🟡 EM ANDAMENTO (FASE 2 — CORE DO MARKETPLACE)
+================================================================================
+12. MELHORIAS FUTURAS PARA UMA VERSAO DE PRODUCAO
+================================================================================
 
-Ainda não finalizado:
+[ ] Substituir credenciais academicas por provisionamento seguro.
+[ ] Reescrever o historico Git e remover segredos antigos.
+[ ] Rotacionar SMTP e todas as credenciais encontradas.
+[ ] Adicionar suite automatizada de testes unitarios e integracao.
+[ ] Executar e-mails em fila, fora da requisicao web.
+[ ] Implementar rate limiting de login, cadastro, chat e codigos.
+[ ] Adicionar observabilidade, logs estruturados e alertas.
+[ ] Usar storage privado/externo para documentos e uploads.
+[ ] Criar politica de privacidade, termos e adequacao LGPD.
+[ ] Integrar transportadora real com OAuth e webhooks.
+[ ] Integrar pagamentos/PIX com provedor homologado.
+[ ] Implementar conciliacao, estorno, disputa e comprovantes.
+[ ] Tornar fatores ESG configuraveis por material e metodologia.
+[ ] Criar backups automatizados e plano de recuperacao.
+[ ] Revisar seguranca com testes de autorizacao e pentest.
 
-Chat real entre empresas
-Negociações com estados
-Propostas formais
-Aceite mútuo
-Frete
-Entrega com código 6 dígitos
-Liberação de saldo
-Saque PIX/TED
-Dashboard financeiro real
-🔴 NÃO INICIADO (FASE 3 — SISTEMA COMPLETO)
-Fluxo financeiro completo (saldo futuro / disponível / reservado)
-Aprovação de saque admin
-Auditoria financeira completa
-ESG metrics
-logística real
-sistema de entregador
-tracking completo
-API externa de frete
-════════════════════════════════════════════════════════════════════════════════
+================================================================================
+13. STATUS GERAL ATUAL
+================================================================================
 
-🧹 LIMPEZA DE LEGADO (APÓS VALIDAÇÃO)
-════════════════════════════════════════════════════════════════════════════════
+Codigo do fluxo obrigatorio do MVP: implementado.
+Validacoes tecnicas isoladas: aprovadas.
+Teste manual completo da equipe: pendente.
+Acabamento visual final do Dia 6: pendente.
+Integracoes reais externas: fora do escopo atual.
 
-Arquivos da raiz ainda podem ser removidos:
-
-✔ já migrados para MVC:
-
-login.php
-cadastro.php
-base.php
-admin.php
-anuncio.php
-process.php
-
-⚠ manter:
-
-bootstrap.php
-config/
-vendor/
-════════════════════════════════════════════════════════════════════════════════
-
-⏳ O QUE AINDA PRECISA SER FEITO (PRÓXIMO BLOCO REAL)
-════════════════════════════════════════════════════════════════════════════════
-
-🔥 PRIORIDADE MÁXIMA (CORE DO MVP)
-
-[ ] Implementar CHAT real (persistido + validações)
-[ ] Implementar NEGOCIAÇÃO com estados:
-
-open → proposal_sent → accepted → shipping → delivered → concluded
-
-[ ] Implementar PROPOSTAS formais
-[ ] Implementar FRETE simulado funcional
-[ ] Implementar ENTREGA com código de 6 dígitos (hash + uso único)
-[ ] Implementar SALDO (futuro / disponível / reservado)
-[ ] Implementar SAQUE PIX/TED
-[ ] Implementar APROVAÇÃO ADMIN de saque
-
-🟡 PRIORIDADE MÉDIA
-
-[ ] Corrigir redirects antigos /re.source/*
-[ ] Unificar camada de serviços (tirar lógica do controller)
-[ ] Completar BaseController placeholders
-[ ] Melhorar UI admin
-[ ] Integrar estatísticas com financeiro real
-
-🟢 PRIORIDADE BAIXA
-
-[ ] Paginação completa admin/busca
-[ ] Upload AJAX de imagens
-[ ] Rate limiting em /process
-[ ] logs e auditoria avançada
-[ ] melhorias de UX
-
-════════════════════════════════════════════════════════════════════════════════
-
-📌 CHECK FINAL DO SISTEMA
-════════════════════════════════════════════════════════════════════════════════
-
-✔ FUNCIONANDO HOJE:
-Cadastro completo
-Login completo
-Sessão segura
-Admin base
-Estrutura MVC
-Rotas limpas
-Reset de senha
-Aprovação de empresa
-⚠ NÃO FINALIZADO:
-todo o fluxo de marketplace (core do MVP ainda não começou)
-🧭 CONCLUSÃO TÉCNICA
-
-Você já construiu:
-
-🔥 A BASE REAL DE UM SAAS MULTI-EMPRESA COM AUTENTICAÇÃO E ADMIN COMPLETO
-
-Mas o sistema ainda está:
-
-⚠ 60% infraestrutura / 40% produto final
-
-O próximo salto não é mais arquitetura — é lógica de negócio (marketplace completo).
+O proximo passo correto nao e criar funcionalidade nova. E executar o roteiro
+manual, registrar defeitos reproduziveis e corrigir somente o que ameaçar a
+apresentacao.

@@ -24,16 +24,16 @@ desviada para outro banco.
 O primeiro arquivo contém toda a estrutura necessária. Não é necessário
 executar `ALTER TABLE` ou código PHP depois de um reset completo.
 
-## Credenciais acadêmicas
+## Contas acadêmicas
 
-Administrador:
+O insert `create_admin.sql` cria:
 
 ```text
 E-mail: admin@resource.com.br
-Senha:  Admin@2026!
+Senha: Admin@2026!
 ```
 
-Empresas de demonstração usam a senha:
+O insert `empresa_demo.sql` usa a senha abaixo em todas as empresas:
 
 ```text
 Resource@2026
@@ -49,8 +49,12 @@ fernanda@textilcat.com.br
 marina@empresapendente.com.br  (empresa pending)
 ```
 
-Essas credenciais são exclusivamente para ambiente acadêmico. Troque ou remova
-as contas antes de qualquer publicação funcional.
+Essas credenciais são fictícias e exclusivas do ambiente acadêmico. Antes de
+publicar o repositório ou utilizar o sistema fora da demonstração, substitua-as
+e reescreva o histórico conforme o planejamento de publicação segura.
+
+Também existe `database/inserts/promover_admin.sql`, que promove uma conta
+cadastrada normalmente pelo site para administrador local.
 
 ## Banco criado com schema antigo
 

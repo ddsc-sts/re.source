@@ -1,115 +1,223 @@
-# RE.SOURCE — ROTEIRO MANUAL DE TESTE DO DIA 3
+# RE.SOURCE — ROTEIRO MANUAL FINAL DO MVP (DIA 6)
 
-Objetivo: validar proposta, aceite mutuo, notificacoes, cancelamento e painel admin.
+Objetivo: validar o caminho completo da apresentacao sem alterar o banco
+manualmente durante o fluxo. O nome do arquivo foi mantido por compatibilidade.
 
-Preparacao:
-
-[ ] Apache e MariaDB ativos.
-[ ] Migration 20260702_003_proposals_and_mutual_agreement.sql aplicada.
-[ ] Duas empresas ativas com usuarios diferentes.
-[ ] Uma empresa possui anuncio ativo.
-[ ] Navegador normal logado na Empresa A.
-[ ] Janela anonima ou segundo navegador logado na Empresa B.
-[ ] Uma terceira empresa disponivel para teste de acesso indevido.
+Use um navegador normal para a Empresa A, uma janela anonima para a Empresa B
+e outro perfil/janela para o administrador.
 
 ===============================================================================
-1. CRIACAO DA PROPOSTA
+0. PREPARACAO MANUAL
 ===============================================================================
 
-[ ] Empresa A abre o anuncio da Empresa B e entra na conversa.
-[ ] Abrir "Criar nova proposta".
-[ ] Informar quantidade 10, valor unitario 25,50 e prazo futuro.
-[ ] Escolher o responsavel pelo frete e adicionar uma observacao.
-[ ] Enviar a proposta.
-[ ] Confirmar que o total exibido e R$ 255,00.
-[ ] Confirmar que o anuncio/negociacao fica com status de proposta enviada.
-[ ] Empresa B recebe mensagem, pop-up e atualizacao automatica do card.
-[ ] Confirmar recebimento do e-mail de nova proposta.
+[ ] Apache e MariaDB estao ativos no XAMPP.
+[ ] O repositorio esta na main e recebeu o ultimo pull.
+[ ] O .env local existe e nao esta rastreado pelo Git.
+[ ] Confirmar no .env: DB_DATABASE=resource.
+[ ] Criar um banco resource vazio e seleciona-lo no phpMyAdmin.
+[ ] Importar database/seeders/re.sourcebanco.sql.
+[ ] Importar database/inserts/create_admin.sql.
+[ ] Se quiser dados prontos, importar em seguida empresa_demo.sql, produto.sql
+    e saldo_demo.sql, exatamente nessa ordem.
+[ ] No phpMyAdmin, confirmar que o banco resource possui 30 tabelas.
+[ ] Confirmar a existencia das tabelas withdrawals, financial_transactions,
+    freight_quotes, freights, freight_status_history e delivery_attempts.
+[ ] Confirmar que existem usuarios admin e duas empresas ativas para o teste.
+[ ] Confirmar que existem pelo menos dois anuncios de empresas diferentes.
+[ ] Reiniciar Apache se a configuracao do .env tiver sido alterada.
+[ ] Abrir http://localhost/re.source e confirmar que nao ocorre erro 500.
 
-Resultado esperado: dados persistidos e iguais nos dois navegadores.
-
-===============================================================================
-2. EDICAO E VALIDACOES
-===============================================================================
-
-[ ] Empresa A edita a proposta antes do acordo.
-[ ] Alterar quantidade ou valor e confirmar que o total e recalculado no backend.
-[ ] Tentar quantidade zero ou prazo passado e confirmar a mensagem de erro.
-[ ] Empresa B nao consegue substituir a proposta enviada pela Empresa A.
-[ ] Atualizar as paginas e confirmar que os dados continuam salvos.
+Resultado esperado: banco resource atual preservado e pronto para teste manual.
 
 ===============================================================================
-3. ACEITE UNILATERAL E MUTUO
+1. CADASTRO, E-MAIL E STATUS PENDENTE
 ===============================================================================
 
-[ ] Empresa A aceita a proposta.
-[ ] Confirmar estado "Comprador aceitou" ou "Vendedor aceitou".
-[ ] Confirmar que ainda nao existe protocolo de acordo.
-[ ] Empresa B visualiza automaticamente o aceite da Empresa A.
-[ ] Empresa B aceita a proposta.
-[ ] Confirmar estado "Acordo confirmado" nos dois navegadores.
-[ ] Confirmar geracao de protocolo no formato RES-data-id-codigo.
-[ ] Confirmar que o botao "Continuar para o frete" aparece.
+[ ] Criar uma empresa nova usando um e-mail de teste acessivel.
+[ ] Tentar dados obrigatorios invalidos e conferir mensagens claras.
+[ ] Enviar o cadastro e confirmar recebimento do codigo/link por e-mail.
+[ ] Confirmar o e-mail e entrar com a conta criada.
+[ ] Confirmar a tela de empresa aguardando aprovacao.
+[ ] Navegar em anuncios, conta e configuracoes.
+[ ] Tentar criar anuncio, iniciar chat ou solicitar saque.
+[ ] Confirmar que operacoes restritas continuam bloqueadas.
+
+Resultado esperado: a empresa pendente navega, mas nao opera o marketplace.
+
+===============================================================================
+2. APROVACAO ADMINISTRATIVA
+===============================================================================
+
+[ ] Entrar como admin@resource.com.br usando Admin@2026!.
+[ ] Acessar http://localhost/re.source/admin/empresas.
+[ ] Localizar a empresa recem-cadastrada.
+[ ] Testar solicitacao de correcao com uma justificativa.
+[ ] Reenviar a empresa para analise pela conta empresarial, se aplicavel.
+[ ] Aprovar a empresa.
+[ ] Atualizar a sessao empresarial e confirmar o dashboard liberado.
+[ ] Conferir notificacao/e-mail de mudanca de status.
+
+Resultado esperado: a aprovacao libera anuncio, chat, frete e financeiro.
+
+===============================================================================
+3. ANUNCIO E CHAT EM DOIS NAVEGADORES
+===============================================================================
+
+[ ] Empresa A cria ou utiliza um anuncio ativo.
+[ ] Empresa A tenta conversar no proprio anuncio e recebe orientacao visivel.
+[ ] Empresa B abre o anuncio da Empresa A e inicia contato.
+[ ] Confirmar que uma unica conversa foi criada.
+[ ] Trocar mensagens nos dois sentidos sem atualizar manualmente a pagina.
+[ ] Confirmar contador de nao lidas, pop-up e lista atualizada por polling.
+[ ] Confirmar recebimento do e-mail de nova mensagem.
+
+Resultado esperado: mensagens persistem e aparecem em ate poucos segundos.
+
+===============================================================================
+4. PROPOSTA E ACORDO MUTUO
+===============================================================================
+
+[ ] Criar proposta com quantidade, valor unitario, prazo futuro e frete.
+[ ] Conferir o total calculado nos dois navegadores.
+[ ] Testar quantidade zero e prazo passado; ambos devem ser recusados.
+[ ] Uma empresa aceita e a interface mostra que falta o outro aceite.
+[ ] A segunda empresa aceita.
+[ ] Confirmar protocolo unico e estado "Acordo confirmado".
 [ ] Confirmar que a proposta nao pode mais ser editada.
-[ ] Confirmar recebimento do e-mail de acordo pelas duas empresas.
+[ ] Confirmar e-mails e notificacoes do acordo.
+[ ] Em outra conversa, testar recusa e cancelamento com motivo valido.
+
+Resultado esperado: o botao para frete aparece somente depois dos dois aceites.
 
 ===============================================================================
-4. RECUSA COM MOTIVO
+5. FRETE SIMULADO E RASTREAMENTO
 ===============================================================================
 
-Usar outra conversa ou cancelar/restaurar os dados de demonstracao.
+[ ] Clicar em "Continuar para o frete".
+[ ] Conferir tres opcoes simuladas com transportadora, valor e prazo.
+[ ] Confirmar origem, destino e responsavel pelo frete.
+[ ] A empresa nao responsavel nao consegue contratar.
+[ ] Escolher uma opcao e conferir o codigo de rastreamento.
+[ ] Clicar em "Simular inicio do transporte".
+[ ] Conferir linha do tempo e historico detalhado.
+[ ] Confirmar e-mail de coleta sem duplicar a mudanca de status.
 
-[ ] Criar uma nova proposta.
-[ ] Tentar recusar com menos de 10 caracteres.
-[ ] Confirmar que o backend rejeita o motivo curto.
-[ ] Recusar novamente com um motivo valido.
-[ ] Confirmar que o motivo aparece no card e como evento do chat.
-[ ] Confirmar que a conversa fica aberta para uma nova proposta.
-
-===============================================================================
-5. CANCELAMENTO
-===============================================================================
-
-[ ] Cancelar uma negociacao antes da escolha do frete.
-[ ] Informar um motivo entre 10 e 1.000 caracteres.
-[ ] Confirmar o status "Cancelada" nos dois navegadores.
-[ ] Confirmar que o motivo fica salvo.
-[ ] Confirmar que nao e mais possivel aceitar ou editar a proposta cancelada.
+Resultado esperado: o frete passa para transporte e permanece salvo ao recarregar.
 
 ===============================================================================
-6. PERMISSOES E SEGURANCA
+6. CODIGO DE ENTREGA E LIBERACAO DO SALDO
 ===============================================================================
 
-[ ] Copiar a URL da conversa e tentar abrir com a terceira empresa.
-[ ] Confirmar bloqueio de acesso.
-[ ] Alterar manualmente negotiation_id em um formulario e confirmar bloqueio.
-[ ] Tentar repetir o aceite da mesma empresa e confirmar que nao duplica.
-[ ] Atualizar a pagina depois do acordo e confirmar um unico protocolo.
+[ ] Como comprador, gerar o codigo de seis digitos.
+[ ] Anotar o codigo exibido uma unica vez.
+[ ] Confirmar que o vendedor nao consegue gerar o codigo do comprador.
+[ ] No admin, acessar http://localhost/re.source/admin/logistica.
+[ ] Informar um codigo incorreto e conferir a tentativa registrada.
+[ ] Informar o codigo correto.
+[ ] Tentar reutilizar o mesmo codigo e confirmar bloqueio.
+[ ] Reabrir o rastreamento e conferir conclusao, historico e animacao.
+[ ] Conferir que anuncio e negociacao foram concluidos.
+
+Resultado esperado: o saldo do vendedor e creditado exatamente uma vez.
 
 ===============================================================================
-7. PAINEL ADMINISTRATIVO
+7. ESTATISTICAS E SALDOS DA EMPRESA
 ===============================================================================
 
-[ ] Acessar http://localhost/re.source/admin/negociacoes.
-[ ] Confirmar que os numeros do topo usam dados reais.
-[ ] Buscar pelo nome da empresa, anuncio e protocolo.
-[ ] Filtrar cada status disponivel.
-[ ] Abrir o modal de detalhes de uma negociacao.
-[ ] Conferir comprador, vendedor, quantidade, valores, prazo e frete.
-[ ] Conferir os aceites independentes e o protocolo.
-[ ] Conferir motivo de recusa ou cancelamento quando existir.
-[ ] Confirmar que nao existem botoes falsos de aprovar ou cancelar pelo admin.
+[ ] Como vendedor, acessar http://localhost/re.source/estatisticas.
+[ ] Conferir saldo futuro, disponivel, reservado e total sacado.
+[ ] Comparar o saldo disponivel com a venda confirmada.
+[ ] Conferir negociacoes recentes e historico de saques.
+[ ] Atualizar a pagina e confirmar que os valores nao duplicam.
+
+Anotar saldo inicial disponivel: R$ ____________________
 
 ===============================================================================
-8. CRITERIO DE APROVACAO
+8. SAQUE PIX — RECUSA E DEVOLUCAO
 ===============================================================================
 
-O Dia 3 esta aprovado quando:
+[ ] Solicitar um valor PIX de teste maior ou igual a R$ 10,00.
+[ ] Tentar primeiro valor acima do saldo e confirmar bloqueio.
+[ ] Enviar duas vezes a mesma solicitacao e confirmar que nao duplica.
+[ ] Conferir que o valor saiu de disponivel e entrou em reservado.
+[ ] No admin, acessar http://localhost/re.source/admin/saques.
+[ ] Recusar informando motivo com pelo menos cinco caracteres.
+[ ] Conferir notificacao/e-mail de recusa.
+[ ] Voltar as estatisticas e confirmar devolucao integral ao disponivel.
 
-[ ] Os dois navegadores completam o acordo sem editar o banco manualmente.
-[ ] O protocolo aparece somente depois dos dois aceites.
-[ ] Recusa e cancelamento exigem motivo.
-[ ] Uma terceira empresa nao acessa nem altera a negociacao.
-[ ] O painel administrativo reflete os mesmos dados do chat.
-[ ] Falha de e-mail nao desfaz a proposta ou o acordo salvo.
+Resultado esperado: recusa zera a reserva correspondente e nao perde saldo.
 
+===============================================================================
+9. SAQUE TED — APROVACAO MANUAL
+===============================================================================
+
+[ ] Solicitar saque TED preenchendo banco, agencia, conta, digito e tipo.
+[ ] Conferir o valor em reservado.
+[ ] No admin, filtrar por TED e status pendente.
+[ ] Aprovar manualmente.
+[ ] Confirmar notificacao/e-mail de aprovacao.
+[ ] Conferir reservado reduzido e total sacado aumentado.
+[ ] Tentar aprovar ou recusar novamente e confirmar bloqueio.
+
+Resultado esperado: aprovacao nao desconta o saldo uma segunda vez.
+
+===============================================================================
+10. DASHBOARD, CSV, AUDITORIA E ESG
+===============================================================================
+
+[ ] Abrir http://localhost/re.source/admin.
+[ ] Conferir empresas, anuncios, negociacoes, entregas, GMV e saques pendentes.
+[ ] Confirmar que atalhos levam a telas reais e nao existem botoes falsos.
+[ ] Em /admin/saques, testar busca, filtros de status e PIX/TED.
+[ ] Exportar CSV e abrir o arquivo; conferir cabecalho e valores.
+[ ] Conferir historico administrativo da solicitacao, aprovacao e recusa.
+[ ] Abrir Impacto ESG e confirmar indicacao de que os numeros sao estimados.
+[ ] Comparar a explicacao com Docs/FORMULAS_ESG_MVP.md.
+
+===============================================================================
+11. SEGURANCA E CASOS NEGATIVOS
+===============================================================================
+
+[ ] Empresa pendente nao acessa rotas aprovadas digitando a URL diretamente.
+[ ] Empresa terceira nao abre conversa, frete ou negociacao alheia por ID.
+[ ] Formularios POST sem CSRF sao rejeitados.
+[ ] Staff sem permissao financeira nao acessa /admin/saques.
+[ ] Codigo expirado ou apos cinco erros nao confirma entrega.
+[ ] Saque acima do saldo, duplicado ou ja analisado nao altera valores.
+[ ] Atualizar paginas apos cada erro e confirmar estado consistente.
+
+===============================================================================
+12. FALHA SMTP SEM QUEBRAR O FLUXO
+===============================================================================
+
+[ ] Exportar um backup do banco antes deste teste.
+[ ] Em copia local do .env, remover temporariamente MAIL_PASSWORD.
+[ ] Enviar mensagem ou realizar uma operacao de alerta.
+[ ] Confirmar que o dado foi salvo mesmo sem e-mail.
+[ ] Restaurar MAIL_PASSWORD antes da apresentacao.
+
+Nao testar cadastro sem SMTP: a verificacao do e-mail e obrigatoria nessa etapa.
+
+===============================================================================
+13. RESPONSIVIDADE E APRESENTACAO
+===============================================================================
+
+[ ] Testar 1366x768, 1920x1080 e largura mobile aproximada de 390px.
+[ ] Conferir header, sidebar, chat, cards de frete, codigo e painel de saques.
+[ ] Confirmar que nenhum modal ou botao fica fora da tela.
+[ ] Conferir textos, acentos, valores monetarios e datas.
+[ ] Executar o fluxo principal tres vezes usando o banco resource preparado.
+[ ] Gravar uma execucao completa como seguranca.
+
+===============================================================================
+14. CRITERIO FINAL DE APROVACAO
+===============================================================================
+
+O MVP esta pronto quando:
+
+[ ] O fluxo completo roda sem SQL manual depois da restauracao.
+[ ] Nenhuma operacao financeira duplica saldo ou saque.
+[ ] Uma falha SMTP nao desfaz operacoes ja confirmadas.
+[ ] Todas as permissoes por empresa e administrador funcionam.
+[ ] O banco pode ser exportado e importado pelo phpMyAdmin sem perder acessos.
+[ ] A equipe consegue apresentar usando somente o roteiro acima.

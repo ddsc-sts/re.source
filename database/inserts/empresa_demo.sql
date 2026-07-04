@@ -2,6 +2,7 @@
     -- Re.Source — Empresas e usuarios para demonstracao
     -- Execute depois de re.sourcebanco.sql e antes de produto.sql.
     -- Senha de todos os usuarios abaixo: Resource@2026
+    -- Credenciais ficticias para a demonstracao academica.
     -- ============================================================
 
     INSERT INTO addresses (id, zip_code, street, number, district, city, state, lat, lng) VALUES
