@@ -92,8 +92,14 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
           <i data-lucide="bell"></i>
           <span class="header-bell-dot"></span>
         </button>
-        <div class="header-user-divider"></div>
-        <div class="header-user-chip">
+        <button
+          type="button"
+          class="header-user-chip"
+          id="userMenuBtn"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-controls="dropdownMenu"
+        >
           <div class="header-user-text">
             <strong><?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?></strong>
             <span>Conta B2B Verificada</span>
@@ -105,16 +111,11 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
               <i data-lucide="factory"></i>
             <?php endif; ?>
           </div>
-        </div>
+          <i data-lucide="chevron-down" class="header-user-caret"></i>
+        </button>
       </div>
       <?php endif; ?>
 
-      <div class="header-actions">
-        <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
-          <i data-lucide="menu"  class="icon-menu"></i>
-          <i data-lucide="x"    class="icon-close"></i>
-        </button>
-      </div>
 
       <div class="dropdown-menu" id="dropdownMenu">
         <div class="dropdown-label">
