@@ -499,6 +499,11 @@ Avanco visual e correcoes de regressao em 06/07/2026:
 [x] Refinar Meus Anuncios: remover conflito com footer global, ampliar respiros,
     alinhar metadados, preco, status e acoes e melhorar responsividade.
 [x] Padronizar Editar Anuncio com o mesmo visual e sidebar de Novo Anuncio.
+[x] Aplicar o prototipo Base (2) na Base com busca, categorias e metricas reais.
+[x] Ocultar o status tecnico de sincronizacao do chat sem interromper o polling.
+[x] Colocar proposta e acordo em uma bandeja expansivel na conversa.
+[x] Auditar cadastro, persistencia, Detalhes da Conta e campos fantasmas.
+[x] Auditar todos os gatilhos de e-mail existentes fora do cadastro.
 [x] Criar Central Operacional de Suporte administrativo com dados reais.
 [x] Criar Configuracoes Administrativas persistidas e auditadas.
 [x] Alterar navbar/topbar do admin e tornar pesquisa e atalhos funcionais.
@@ -511,6 +516,9 @@ Pendencias desta rodada:
     configuracoes administrativas. Em banco novo, usar somente o schema.
 [ ] Testar manualmente as quatro telas nas resolucoes da apresentacao.
 [ ] Confirmar menu, sino, busca, categoria e carrossel no navegador.
+[ ] Decidir se cargo, perfil da conta, cidade, segmento e newsletter serao
+    persistidos ou removidos do cadastro. Nenhum foi alterado nesta rodada.
+[ ] Completar a cobertura de e-mails listada em melhorias.txt.
 
 Geder:
 

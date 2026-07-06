@@ -27,22 +27,26 @@
   $canManageProposal = in_array($negotiationStatus, ['open', 'proposal_sent', 'buyer_accepted', 'seller_accepted'], true);
   $canEditProposal = $canManageProposal && (!$proposalPending || (int) $proposal['sender_company_id'] === (int) $companyId);
   $freightLabels = ['buyer' => 'Comprador', 'seller' => 'Vendedor', 'shared' => 'Dividido entre as empresas'];
+  $negotiationStatusLabel = match ($negotiationStatus) {
+    'open' => 'Conversa aberta', 'proposal_sent' => 'Proposta enviada',
+    'buyer_accepted' => 'Comprador aceitou', 'seller_accepted' => 'Vendedor aceitou',
+    'accepted' => 'Acordo confirmado', 'cancelled' => 'Cancelada',
+    default => ucfirst(str_replace('_', ' ', $negotiationStatus)),
+  };
   ?>
 
-  <section class="proposal-panel" aria-label="Proposta da negociação">
+  <details class="proposal-drawer">
+    <summary class="proposal-drawer-trigger">
+      <span><i data-lucide="handshake"></i><strong>Proposta e acordo comercial</strong></span>
+      <span class="negotiation-status status-<?= htmlspecialchars($negotiationStatus, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($negotiationStatusLabel, ENT_QUOTES, 'UTF-8') ?></span>
+      <i class="proposal-drawer-chevron" data-lucide="chevron-down"></i>
+    </summary>
+    <section class="proposal-panel" aria-label="Proposta da negociação">
     <div class="proposal-panel-heading">
       <div>
         <span class="chat-eyebrow">Acordo comercial</span>
         <h2>Proposta da negociação</h2>
       </div>
-      <span class="negotiation-status status-<?= htmlspecialchars($negotiationStatus, ENT_QUOTES, 'UTF-8') ?>">
-        <?= htmlspecialchars(match ($negotiationStatus) {
-          'open' => 'Conversa aberta', 'proposal_sent' => 'Proposta enviada',
-          'buyer_accepted' => 'Comprador aceitou', 'seller_accepted' => 'Vendedor aceitou',
-          'accepted' => 'Acordo confirmado', 'cancelled' => 'Cancelada',
-          default => ucfirst(str_replace('_', ' ', $negotiationStatus)),
-        }, ENT_QUOTES, 'UTF-8') ?>
-      </span>
     </div>
 
     <?php if ($proposal): ?>
@@ -118,7 +122,8 @@
         </form>
       </details>
     <?php endif; ?>
-  </section>
+    </section>
+  </details>
 
   <section
     class="chat-room"

@@ -11,16 +11,54 @@ class BaseController
         $recentListings = self::getAnunciosRecentes($pdo);
         $companyId = (int) ($_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 0);
         $profileNotifications = self::getProfileNotifications($pdo, $companyId);
+        $baseCategories = self::getBaseCategories($pdo);
+        $marketplaceStats = self::getMarketplaceStats($pdo);
 
         view('dashboard/index', [
             'titulo_pagina'  => 'Re.Source — Economia Circular em Joinville',
             'recentListings' => $recentListings,
             'profileNotifications' => $profileNotifications,
+            'baseCategories' => $baseCategories,
+            'marketplaceStats' => $marketplaceStats,
             'unitLabel'      => [
                 'kg' => 'Kg', 'ton' => 'Ton', 'm2' => 'm²', 'm3' => 'm³',
                 'unidade' => 'un.', 'litro' => 'L', 'outro' => ''
             ],
         ]);
+    }
+
+    private static function getBaseCategories(PDO $pdo): array
+    {
+        try {
+            $stmt = $pdo->query(
+                "SELECT c.id, c.name, c.slug, COUNT(l.id) AS listing_count
+                 FROM categories c
+                 LEFT JOIN listings l ON l.category_id = c.id
+                    AND l.status = 'active' AND l.deleted_at IS NULL
+                 WHERE c.is_active = 1
+                 GROUP BY c.id, c.name, c.slug
+                 ORDER BY listing_count DESC, c.name ASC"
+            );
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            error_log('Falha ao carregar categorias da Base: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    private static function getMarketplaceStats(PDO $pdo): array
+    {
+        try {
+            return [
+                'companies' => (int) $pdo->query("SELECT COUNT(*) FROM companies WHERE status = 'active'")->fetchColumn(),
+                'listings' => (int) $pdo->query("SELECT COUNT(*) FROM listings WHERE status = 'active' AND deleted_at IS NULL")->fetchColumn(),
+                'negotiations' => (int) $pdo->query("SELECT COUNT(*) FROM negotiations")->fetchColumn(),
+                'deliveries' => (int) $pdo->query("SELECT COUNT(*) FROM freights WHERE status = 'delivered'")->fetchColumn(),
+            ];
+        } catch (Throwable $e) {
+            error_log('Falha ao carregar indicadores da Base: ' . $e->getMessage());
+            return ['companies' => 0, 'listings' => 0, 'negotiations' => 0, 'deliveries' => 0];
+        }
     }
 
     public static function notifications(): void

@@ -33,7 +33,7 @@ no roteiro principal, seguranca, integracao, feedback e responsividade.
 2. IMPLEMENTADO — CADASTRO E EMPRESAS
 ================================================================================
 
-[x] Cadastro completo de empresa e usuario.
+[x] Cadastro funcional de empresa e usuario para o fluxo do MVP.
 [x] Validacao de CNPJ no backend e consulta BrasilAPI com cache.
 [x] Bloqueio de dominios gratuitos configurados.
 [x] Codigo de verificacao e confirmacao por e-mail.
@@ -43,7 +43,13 @@ no roteiro principal, seguranca, integracao, feedback e responsividade.
 [x] Solicitacao de correcao e reenvio para analise.
 [x] Rejeicao fundamentada.
 [x] Suspensao e reativacao.
-[x] Notificacoes, e-mails e auditoria das alteracoes administrativas.
+[x] Notificacoes internas e auditoria das alteracoes administrativas.
+[ ] Enviar e-mails nas aprovacoes, correcoes, rejeicoes, suspensoes e reativacoes.
+
+Campos fantasmas confirmados no cadastro, mantidos sem alteracao por decisao do
+responsavel: cargo, perfil da conta, cidade, segmento e newsletter aparecem na
+interface, mas nao sao persistidos. Cidade e segmento tambem aparecem em
+Detalhes da Conta, portanto ficam vazios depois do primeiro cadastro.
 
 ================================================================================
 3. IMPLEMENTADO — ANUNCIOS, BUSCA E NAVEGACAO
@@ -69,6 +75,8 @@ no roteiro principal, seguranca, integracao, feedback e responsividade.
 [x] Cards de Meus Anuncios refinados em espacamento, hierarquia e responsividade.
 [x] Editar Anuncio padronizado visualmente com Novo Anuncio.
 [x] Central interna de notificacoes com listagem e marcacao de leitura.
+[x] Base reestilizada a partir do prototipo Base (2), preservando dados reais.
+[x] Busca movida para o hero da Base e categorias/indicadores carregados do banco.
 
 ================================================================================
 4. IMPLEMENTADO — CHAT, PROPOSTA E ACORDO
@@ -88,6 +96,8 @@ no roteiro principal, seguranca, integracao, feedback e responsividade.
 [x] Bloqueio de edicao depois do acordo.
 [x] Recusa e cancelamento com motivo.
 [x] Painel administrativo de negociacoes com busca, filtros e detalhes reais.
+[x] Indicador tecnico de sincronizacao ocultado sem desativar o polling.
+[x] Painel de proposta transformado em bandeja expansivel dentro da conversa.
 
 ================================================================================
 5. IMPLEMENTADO — FRETE E ENTREGA
@@ -207,6 +217,20 @@ Em banco criado antes de 06/07, executar apenas
 [x] Smoke HTTP local: home e login 200; base protegida redirecionou ao login.
 [x] Busca por texto e categoria respondeu HTTP 200 no ambiente local.
 
+Auditoria de e-mails em 06/07:
+
+[x] Verificacao e reenvio do codigo de cadastro.
+[x] Recuperacao de senha.
+[x] Nova mensagem, respeitando notify_chat.
+[x] Nova proposta e confirmacao do acordo mutuo.
+[x] Inicio/coleta do frete e confirmacao final da entrega.
+[x] Aprovacao ou recusa de saque.
+[ ] Propostas ainda nao respeitam a preferencia notify_proposals.
+[ ] Nao ha e-mail para aceite parcial, recusa ou cancelamento de proposta.
+[ ] Nao ha e-mail para contratacao do frete ou geracao do codigo de entrega.
+[ ] Nao ha e-mail de recebimento da solicitacao de saque.
+[ ] Nao ha e-mails para decisoes administrativas sobre empresas.
+
 Preferencia atual do responsavel:
 
 - Preparar o banco manualmente pelo phpMyAdmin.
@@ -229,6 +253,16 @@ Preferencia atual do responsavel:
 [ ] Testar rotacao e indicadores do carrossel por pelo menos 15 segundos.
 [ ] Validar Meus Anuncios, Novo Anuncio e Detalhes da Conta em desktop e celular.
 [ ] Executar 20260706_001_admin_settings.sql no banco local existente.
+[ ] Testar visualmente a nova Base e a bandeja de proposta em desktop e celular.
+[ ] Corrigir ou remover os campos fantasmas do cadastro apos decisao de produto.
+[ ] Implementar as paginas reais de Impacto e Suporte da empresa.
+[ ] Implementar troca de senha e 2FA; os controles atuais sao apenas visuais.
+[ ] Criar rotas/paginas de Termos de Uso e Politica de Privacidade.
+[ ] Fazer as configuracoes administrativas influenciarem o restante do sistema.
+[ ] Substituir a lista de dispositivos baseada apenas na sessao por sessoes reais.
+[ ] Implementar a acao Derrubar Sessao; atualmente ela remove somente o HTML.
+[ ] Alinhar o texto de exclusao de conta com a desativacao logica feita no backend.
+[ ] Corrigir o link /marketplace da tela de sucesso do cadastro para uma rota real.
 [ ] Preparar roteiro oral de 10 a 15 minutos.
 [ ] Gravar uma execucao completa como seguranca.
 [ ] Registrar as limitacoes apresentadas a banca.

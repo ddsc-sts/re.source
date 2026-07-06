@@ -321,7 +321,7 @@
 .conversation-live-status { margin-top: 0.85rem; }
 
 .chat-sync-status {
-    display: inline-flex;
+    display: none !important;
     align-items: center;
     gap: 0.4rem;
     color: var(--muted);
@@ -375,7 +375,16 @@
 }
 
 /* ── Proposal Panel ── */
-.proposal-panel { display: grid; gap: 1rem; margin-bottom: 1.25rem; padding: 1.2rem; background: var(--white); border: 1px solid var(--border-color); }
+.proposal-drawer { margin-bottom: 1.25rem; background: var(--white); border: 1px solid var(--border-color); }
+.proposal-drawer-trigger { display: grid; grid-template-columns: minmax(0,1fr) auto 18px; align-items: center; gap: 1rem; min-height: 64px; padding: 1rem 1.2rem; cursor: pointer; list-style: none; transition: background .15s, color .15s; }
+.proposal-drawer-trigger::-webkit-details-marker { display: none; }
+.proposal-drawer-trigger:hover { background: var(--bg); }
+.proposal-drawer-trigger > span:first-child { display: inline-flex; align-items: center; gap: .7rem; min-width: 0; color: var(--dark); font-family: var(--font-main); text-transform: uppercase; letter-spacing: .035em; }
+.proposal-drawer-trigger > span:first-child svg { width: 19px; height: 19px; color: var(--green); flex: none; }
+.proposal-drawer-chevron { width: 18px; height: 18px; color: var(--muted); transition: transform .2s; }
+.proposal-drawer[open] .proposal-drawer-chevron { transform: rotate(180deg); }
+.proposal-drawer[open] .proposal-drawer-trigger { border-bottom: 1px solid var(--border-color); }
+.proposal-panel { display: grid; gap: 1rem; margin: 0; padding: 1.2rem; background: var(--white); border: 0; }
 .proposal-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .proposal-panel h2 { margin: 0.25rem 0 0; font: 700 1.05rem var(--font-main); text-transform: uppercase; }
 .negotiation-status { padding: 0.4rem 0.75rem; color: var(--muted); background: var(--bg); font-family: var(--font-main); font-size: 0.68rem; font-weight: 400; text-transform: uppercase; letter-spacing: 0.03em; }
@@ -506,7 +515,8 @@
     .message-form { grid-template-columns: 1fr auto; }
     .message-form button span { display: none; }
     .chat-secondary-button { font-size: 0.8rem; padding: 0.85rem 1.25rem; }
-    .chat-sync-status { width: 100%; margin-left: 52px; }
+    .proposal-drawer-trigger { grid-template-columns: minmax(0,1fr) 18px; }
+    .proposal-drawer-trigger .negotiation-status { grid-column: 1 / -1; grid-row: 2; justify-self: start; }
     .proposal-values { grid-template-columns: 1fr 1fr; }
     .proposal-editor form { grid-template-columns: 1fr; }
     .proposal-notes-field { grid-column: auto; }
