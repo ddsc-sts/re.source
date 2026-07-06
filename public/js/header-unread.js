@@ -41,7 +41,7 @@
     const normalized = Math.max(0, Number(count) || 0);
     badge.textContent = normalized > 99 ? '99+' : String(normalized);
     badge.setAttribute('aria-label', `${normalized} mensagens não lidas`);
-    badge.style.display = normalized > 0 ? 'inline-grid' : 'none';
+    badge.hidden = normalized <= 0;
   }
 
   async function updateUnreadCount() {

@@ -81,66 +81,101 @@ require_once __DIR__ . '/../components/header.php';
   </div>
 </section>
 
-<!-- ══ CATEGORIAS ══ -->
+<!-- ══ CATEGORIAS + PAINEL DE CIRCULARIDADE ══ -->
 <section class="category-section">
   <h2 class="section-title">Explore por Categoria</h2>
-  <div class="category-grid">
 
-    <a href="/re.source/busca?category_id=4" class="category-card">
-      <img src="https://images.unsplash.com/photo-1759300635757-19ab99f4cfed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Madeira" />
-      <div class="category-overlay"></div>
-      <div class="category-hover-tint"></div>
-      <div class="category-name">MADEIRA</div>
-    </a>
+  <div class="category-layout">
 
-    <a href="/re.source/busca?category_id=3" class="category-card">
-      <img src="https://images.unsplash.com/photo-1606037150583-fb842a55bae7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Plástico" />
-      <div class="category-overlay"></div>
-      <div class="category-hover-tint"></div>
-      <div class="category-name">PLÁSTICO</div>
-    </a>
+    <div class="category-grid">
 
-    <a href="/re.source/busca?category_id=1" class="category-card">
-      <img src="https://images.unsplash.com/photo-1758264629814-44559c99e506?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Têxtil" />
-      <div class="category-overlay"></div>
-      <div class="category-hover-tint"></div>
-      <div class="category-name">TÊXTIL</div>
-    </a>
+      <a href="/re.source/busca?category_id=4" class="category-card">
+        <img src="https://images.unsplash.com/photo-1759300635757-19ab99f4cfed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Madeira" />
+        <div class="category-overlay"></div>
+        <div class="category-hover-tint"></div>
+        <div class="category-name">MADEIRA</div>
+      </a>
 
-    <a href="/re.source/busca?category_id=2" class="category-card">
-      <img src="https://images.unsplash.com/photo-1722695510527-cc033e43be1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Metal" />
-      <div class="category-overlay"></div>
-      <div class="category-hover-tint"></div>
-      <div class="category-name">METAL</div>
-    </a>
+      <a href="/re.source/busca?category_id=3" class="category-card">
+        <img src="https://images.unsplash.com/photo-1606037150583-fb842a55bae7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Plástico" />
+        <div class="category-overlay"></div>
+        <div class="category-hover-tint"></div>
+        <div class="category-name">PLÁSTICO</div>
+      </a>
 
-    <a href="/re.source/busca?category_id=5" class="category-card">
-      <img src="https://images.unsplash.com/photo-1719600804011-3bff3909b183?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Papelão" />
-      <div class="category-overlay"></div>
-      <div class="category-hover-tint"></div>
-      <div class="category-name">PAPELÃO</div>
-    </a>
+      <a href="/re.source/busca?category_id=1" class="category-card">
+        <img src="https://images.unsplash.com/photo-1758264629814-44559c99e506?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Têxtil" />
+        <div class="category-overlay"></div>
+        <div class="category-hover-tint"></div>
+        <div class="category-name">TÊXTIL</div>
+      </a>
 
-    <a href="/re.source/busca?category_id=7" class="category-card">
-      <img src="https://images.unsplash.com/photo-1761765030682-26f51cfbc034?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Borracha" />
-      <div class="category-overlay"></div>
-      <div class="category-hover-tint"></div>
-      <div class="category-name">BORRACHA</div>
-    </a>
+      <a href="/re.source/busca?category_id=2" class="category-card">
+        <img src="https://images.unsplash.com/photo-1722695510527-cc033e43be1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Metal" />
+        <div class="category-overlay"></div>
+        <div class="category-hover-tint"></div>
+        <div class="category-name">METAL</div>
+      </a>
 
-    <a href="/re.source/busca?category_id=8" class="category-card">
-      <img src="https://images.unsplash.com/photo-1759500657339-6e11b99a8882?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Eletrônicos" />
-      <div class="category-overlay"></div>
-      <div class="category-hover-tint"></div>
-      <div class="category-name">ELETRÔNICOS</div>
-    </a>
+      <a href="/re.source/busca?category_id=5" class="category-card">
+        <img src="https://images.unsplash.com/photo-1719600804011-3bff3909b183?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Papelão" />
+        <div class="category-overlay"></div>
+        <div class="category-hover-tint"></div>
+        <div class="category-name">PAPELÃO</div>
+      </a>
 
-    <a href="/re.source/busca?category_id=6" class="category-card">
-      <img src="https://images.unsplash.com/photo-1646803101279-d1a2461a5eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Vidro" />
-      <div class="category-overlay"></div>
-      <div class="category-hover-tint"></div>
-      <div class="category-name">VIDRO</div>
-    </a>
+      <a href="/re.source/busca?category_id=7" class="category-card">
+        <img src="https://images.unsplash.com/photo-1761765030682-26f51cfbc034?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Borracha" />
+        <div class="category-overlay"></div>
+        <div class="category-hover-tint"></div>
+        <div class="category-name">BORRACHA</div>
+      </a>
+
+      <a href="/re.source/busca?category_id=8" class="category-card">
+        <img src="https://images.unsplash.com/photo-1759500657339-6e11b99a8882?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Eletrônicos" />
+        <div class="category-overlay"></div>
+        <div class="category-hover-tint"></div>
+        <div class="category-name">ELETRÔNICOS</div>
+      </a>
+
+      <a href="/re.source/busca?category_id=6" class="category-card">
+        <img src="https://images.unsplash.com/photo-1646803101279-d1a2461a5eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Vidro" />
+        <div class="category-overlay"></div>
+        <div class="category-hover-tint"></div>
+        <div class="category-name">VIDRO</div>
+      </a>
+
+    </div>
+
+    <!-- Painel de Circularidade — inspirado na Imagem 2 (dashboard),
+         com a paleta verde-escura da marca em vez de preto/lime -->
+    <aside class="circularity-panel" aria-label="Perfil de circularidade da plataforma">
+      <div class="circularity-header">
+        <span class="circularity-title">Perfil de Circularidade</span>
+        <i data-lucide="recycle" style="width:20px;height:20px;color:var(--accent-mint)"></i>
+      </div>
+
+      <div class="circularity-metric">
+        <div class="circularity-metric-label">
+          <span>Taxa de Reaproveitamento</span>
+          <strong><?= (int) $circularityRate ?>%</strong>
+        </div>
+        <div class="circularity-bar">
+          <div class="circularity-fill" style="width: <?= (int) $circularityRate ?>%"></div>
+        </div>
+      </div>
+
+      <div class="circularity-badge">
+        <i data-lucide="shield-check" style="width:14px;height:14px"></i>
+        Conformidade ESG: <?= htmlspecialchars($circularityStatus, ENT_QUOTES, 'UTF-8') ?>
+      </div>
+
+      <br>
+
+      <a href="/re.source/relatorios" class="circularity-link">
+        Relatórios completos <i data-lucide="arrow-right"></i>
+      </a>
+    </aside>
 
   </div>
 </section>

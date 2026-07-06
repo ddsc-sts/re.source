@@ -1,0 +1,297 @@
+/* Settings Page Styles (Stark Industrial) */
+.config-panel {
+    background: var(--white);
+    border-radius: 0 !important;
+    border: 1px solid var(--border-color);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-card);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.panel-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.panel-header i, .panel-header svg {
+    color: var(--green);
+}
+
+.panel-header h2 {
+    font-family: var(--font-main);
+    font-size: 1.35rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--dark);
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.setting-row:last-child {
+    border-bottom: none;
+}
+
+.setting-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.setting-info label {
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--dark);
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.setting-info p {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+/* Custom Toggle Switch for Industrial Aesthetic */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+    background: #e5e5e5;
+    border: 1px solid var(--dark);
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: 0.2s;
+    border-radius: 0 !important;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--dark);
+    transition: 0.2s;
+    border-radius: 0 !important;
+}
+
+input:checked + .slider {
+    background-color: var(--green) !important;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+    background-color: var(--white);
+}
+
+.config-select {
+    padding: 0.6rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0 !important;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--dark);
+    background-color: white;
+    min-width: 180px;
+    outline: none;
+}
+
+.config-select:focus {
+    border-color: var(--green);
+}
+
+.device-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0 !important;
+    margin-bottom: 0.75rem;
+}
+
+.device-icon {
+    width: 44px;
+    height: 44px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    flex-shrink: 0;
+}
+
+.device-details h4 {
+    font-size: 0.9rem;
+    color: var(--dark);
+}
+
+.device-details p {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.device-badge {
+    margin-left: auto;
+    background: var(--green);
+    color: var(--white);
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    font-weight: 400;
+    padding: 0.3rem 0.75rem;
+    border-radius: 0 !important;
+    letter-spacing: 0.05em;
+}
+
+.danger-zone {
+    border-color: var(--error);
+    background: rgba(186, 26, 26, 0.02);
+}
+
+.danger-zone .panel-header i, .danger-zone .panel-header svg {
+    color: var(--error);
+}
+
+.btn-danger {
+    background: var(--error);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.75rem;
+    border-radius: 0 !important;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    text-transform: uppercase;
+}
+
+.btn-danger:hover {
+    opacity: 0.9;
+}
+
+[data-theme="dark"] .danger-zone {
+    background: var(--white);
+    border-color: var(--border-color);
+}
+
+.btn-logout {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--error);
+    padding: 0.6rem 1.5rem;
+    border-radius: 0 !important;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+.btn-logout:hover {
+    background: #f3f4f6;
+    color: var(--dark);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.crit-modal {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 0 !important;
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--dark);
+}
+
+.crit-modal i, .crit-modal svg {
+    color: var(--error);
+    margin-bottom: 1rem;
+}
+
+.crit-modal h3 {
+    font-family: var(--font-main);
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+    text-transform: uppercase;
+}
+
+.crit-modal p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .setting-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .config-select {
+        width: 100%;
+    }
+}

@@ -29,7 +29,7 @@ $counts = $companyStatusCounts ?? [];
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/admin-dashboard.css'), ENT_QUOTES, 'UTF-8') ?>" />
 <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/empresas.css'), ENT_QUOTES, 'UTF-8') ?>" />
-<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
 </head>
 <body>
 

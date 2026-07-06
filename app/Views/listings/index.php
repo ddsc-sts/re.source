@@ -1,187 +1,237 @@
 <?php
-$titulo_pagina = $titulo_pagina ?? "Meus Anúncios — Re.Source";
+$titulo_pagina = $titulo_pagina ?? 'Re.Source — Painel Industrial';
+
+/* Dados do painel de circularidade — placeholders com fallback.
+   Troque pelas variáveis reais assim que o backend calcular esses valores. */
+$circularityRate   = $circularityRate   ?? 78;
+$circularityStatus = $circularityStatus ?? 'A+ Verified';
+
+/* Atividade recente — placeholder com fallback, no mesmo padrão acima.
+   Substitua por uma consulta real (ex.: log de negociações/anúncios)
+   assim que existir uma fonte de dados para isso. */
+$recentActivity = $recentActivity ?? [
+    ['type' => 'highlight', 'title' => 'Lance Aceito', 'text' => "Seu lance foi aceito por um comprador.", 'time' => 'Há 2 horas'],
+    ['type' => 'normal',    'title' => 'Novo Anúncio', 'text' => 'Um novo anúncio foi publicado na sua categoria.', 'time' => 'Há 5 horas'],
+    ['type' => 'highlight', 'title' => 'Documentação', 'text' => 'Certificado de desvio de aterro disponível.', 'time' => 'Ontem'],
+];
+
+/* Esconde a barra de busca do header nesta página (é um painel logado,
+   não a home pública) sem remover o HTML/JS da busca — só oculta via CSS. */
+$hideSearchBar = true;
+
 require_once __DIR__ . '/../components/header.php';
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-<style>
-.dashboard-layout {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 3rem auto;
-    padding: 0 1.5rem;
-    align-items: start;
-}
+<main class="dash-home">
+  <div class="dash-home-grid">
 
-.dashboard-layout {
-    max-width: 1280px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 2rem;
-    align-items: start;
-}
-.dashboard-container { width: 100%; }
+    <!-- ══ COLUNA PRINCIPAL ══ -->
+    <div class="dash-home-main">
 
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--border-color);
-}
-
-.dashboard-header h2 {
-    font-family: var(--font-main);
-    color: var(--dark);
-    font-size: 1.75rem;
-    font-weight: 700;
-}
-
-.btn-new {
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--white);
-    background: var(--green);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background 0.2s;
-}
-.btn-new:hover { background: var(--green-d); color: var(--white); }
-
-.listing-card {
-    display: flex;
-    align-items: center;
-    background: var(--white);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    gap: 1.5rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.listing-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
-
-.listing-img { width: 100px; height: 100px; border-radius: 0.5rem; object-fit: cover; background: var(--bg); border: 1px solid var(--border-color); }
-.listing-img-placeholder { width: 100px; height: 100px; border-radius: 0.5rem; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--muted); border: 1px solid var(--border-color); }
-
-.listing-info { flex: 1; }
-.listing-title { font-size: 1.15rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
-.listing-meta { font-size: 0.85rem; color: var(--muted); display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
-
-.badge { padding: 0.25rem 0.6rem; border-radius: 2rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-.badge-offer { background: #e0f2fe; color: #0284c7; }
-.badge-demand { background: #fef3c7; color: #d97706; }
-
-.listing-price { font-weight: 700; color: var(--green); font-size: 1.1rem; }
-.listing-actions { display: flex; gap: 0.5rem; }
-.btn-action { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; border: 1px solid var(--border-color); background: var(--white); color: var(--dark); cursor: pointer; transition: all 0.2s; text-decoration: none; }
-.btn-action:hover { background: var(--bg); }
-.btn-delete:hover { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
-
-.empty-state { text-align: center; padding: 4rem 2rem; background: var(--white); border: 1px dashed var(--border-color); border-radius: var(--radius); color: var(--muted); }
-.alert { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
-.alert-success { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
-.alert-danger { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
-
-@media (max-width: 992px) {
-    .dashboard-layout { grid-template-columns: 1fr; }
-    .dashboard-sidebar { position: relative; top: 0; height: auto; }
-}
-@media (max-width: 768px) {
-    .listing-card { flex-direction: column; align-items: flex-start; }
-    .listing-img, .listing-img-placeholder { width: 100%; height: 180px; }
-    .listing-actions { width: 100%; justify-content: flex-end; margin-top: 1rem; }
-}
-</style>
-
-<main class="dashboard-layout">
-    
-    <?php $sidebarActive = 'listings'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
-
-    <div class="dashboard-container">
-        
-        <div class="dashboard-header">
-            <h2>Meus Anúncios</h2>
-            <a href="/re.source/anuncios/novo" class="btn-new">
-                <i data-lucide="plus"></i> Novo Anúncio
-            </a>
+      <!-- Catálogo por Categoria -->
+      <section class="dash-home-section">
+        <div class="dash-home-section-head">
+          <h2>Catálogo por Categoria</h2>
+          <a href="/re.source/busca">Ver todos <i data-lucide="chevron-right"></i></a>
         </div>
 
-        <?php echo $mensagem; ?>
+        <div class="catalog-grid">
+          <a href="/re.source/busca?category_id=4" class="catalog-card">
+            <div class="catalog-card-img">
+              <img src="https://images.unsplash.com/photo-1759300635757-19ab99f4cfed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Madeira" />
+            </div>
+            <div class="catalog-card-body">
+              <h3>Madeira</h3>
+              <p>Ver materiais disponíveis</p>
+              <i data-lucide="arrow-right"></i>
+            </div>
+          </a>
 
-        <div class="listings-list">
-            <?php if (empty($anuncios)): ?>
-                <div class="empty-state">
-                    <i data-lucide="inbox" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <h3>Nenhum anúncio encontrado</h3>
-                    <p>Você ainda não possui nenhum anúncio cadastrado.</p>
+          <a href="/re.source/busca?category_id=3" class="catalog-card">
+            <div class="catalog-card-img">
+              <img src="https://images.unsplash.com/photo-1606037150583-fb842a55bae7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Plástico" />
+            </div>
+            <div class="catalog-card-body">
+              <h3>Plástico</h3>
+              <p>Ver materiais disponíveis</p>
+              <i data-lucide="arrow-right"></i>
+            </div>
+          </a>
+
+          <a href="/re.source/busca?category_id=1" class="catalog-card">
+            <div class="catalog-card-img">
+              <img src="https://images.unsplash.com/photo-1758264629814-44559c99e506?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Têxtil" />
+            </div>
+            <div class="catalog-card-body">
+              <h3>Têxtil</h3>
+              <p>Ver materiais disponíveis</p>
+              <i data-lucide="arrow-right"></i>
+            </div>
+          </a>
+
+          <a href="/re.source/busca?category_id=2" class="catalog-card">
+            <div class="catalog-card-img">
+              <img src="https://images.unsplash.com/photo-1722695510527-cc033e43be1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Metal" />
+            </div>
+            <div class="catalog-card-body">
+              <h3>Metal</h3>
+              <p>Ver materiais disponíveis</p>
+              <i data-lucide="arrow-right"></i>
+            </div>
+          </a>
+
+          <a href="/re.source/busca?category_id=5" class="catalog-card">
+            <div class="catalog-card-img">
+              <img src="https://images.unsplash.com/photo-1719600804011-3bff3909b183?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Papelão" />
+            </div>
+            <div class="catalog-card-body">
+              <h3>Papelão</h3>
+              <p>Ver materiais disponíveis</p>
+              <i data-lucide="arrow-right"></i>
+            </div>
+          </a>
+
+          <a href="/re.source/busca?category_id=7" class="catalog-card">
+            <div class="catalog-card-img">
+              <img src="https://images.unsplash.com/photo-1761765030682-26f51cfbc034?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Borracha" />
+            </div>
+            <div class="catalog-card-body">
+              <h3>Borracha</h3>
+              <p>Ver materiais disponíveis</p>
+              <i data-lucide="arrow-right"></i>
+            </div>
+          </a>
+
+          <a href="/re.source/busca?category_id=8" class="catalog-card">
+            <div class="catalog-card-img">
+              <img src="https://images.unsplash.com/photo-1759500657339-6e11b99a8882?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Eletrônicos" />
+            </div>
+            <div class="catalog-card-body">
+              <h3>Eletrônicos</h3>
+              <p>Ver materiais disponíveis</p>
+              <i data-lucide="arrow-right"></i>
+            </div>
+          </a>
+
+          <a href="/re.source/busca?category_id=6" class="catalog-card">
+            <div class="catalog-card-img">
+              <img src="https://images.unsplash.com/photo-1646803101279-d1a2461a5eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600" alt="Vidro" />
+            </div>
+            <div class="catalog-card-body">
+              <h3>Vidro</h3>
+              <p>Ver materiais disponíveis</p>
+              <i data-lucide="arrow-right"></i>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Recomendado para Você / Anúncios Recentes -->
+      <section class="dash-home-section">
+        <div class="dash-home-section-head">
+          <h2>Recomendado para Você</h2>
+          <a href="/re.source/busca">Ver todos <i data-lucide="chevron-right"></i></a>
+        </div>
+
+        <?php if (empty($recentListings)): ?>
+          <div class="empty-state">
+            <i data-lucide="package-open" style="width:40px;height:40px;margin-bottom:1rem;opacity:.5"></i>
+            <p>Nenhum anúncio disponível no momento.</p>
+            <a href="/re.source/anuncios/novo" class="btn-view first-listing">Seja o primeiro a anunciar</a>
+          </div>
+        <?php else: ?>
+          <div class="reco-grid">
+            <?php foreach ($recentListings as $item): ?>
+              <article class="reco-card">
+                <div class="reco-card-img">
+                  <img src="<?= htmlspecialchars($item['thumb'], ENT_QUOTES, 'UTF-8') ?>"
+                       alt="<?= htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+                  <span class="reco-tag <?= $item['type'] === 'offer' ? 'reco-tag-offer' : 'reco-tag-demand' ?>">
+                    <?= $item['type'] === 'offer' ? 'Venda' : 'Procura' ?>
+                  </span>
                 </div>
-            <?php else: ?>
-                <?php foreach ($anuncios as $ad): ?>
-                    <div class="listing-card" onclick="window.location.href='/re.source/anuncio?id=<?= $ad['id']; ?>';" style="cursor: pointer;" title="Ver detalhes do anúncio">
-                        
-                        <?php if (!empty($ad['main_image'])): ?>
-                            <img src="<?= htmlspecialchars($ad['main_image']); ?>" alt="Imagem" class="listing-img">
-                        <?php else: ?>
-                            <div class="listing-img-placeholder">
-                                <i data-lucide="image" style="width: 32px; height: 32px;"></i>
-                            </div>
-                        <?php endif; ?>
-
-                        <div class="listing-info">
-                            <div class="listing-title"><?= htmlspecialchars($ad['title']); ?></div>
-                            <div class="listing-meta">
-                                <span><i data-lucide="tag" style="width:14px; height:14px; vertical-align:middle;"></i> <?= htmlspecialchars($ad['category_name']); ?></span>
-                                <span><i data-lucide="box" style="width:14px; height:14px; vertical-align:middle;"></i> <?= floatval($ad['quantity']) . ' ' . $ad['unit']; ?></span>
-                                <span><i data-lucide="map-pin" style="width:14px; height:14px; vertical-align:middle;"></i> <?= htmlspecialchars($ad['location_city'] . '/' . $ad['location_state']); ?></span>
-                            </div>
-                            
-                            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
-                                <?php if ($ad['type'] === 'offer'): ?>
-                                    <span class="badge badge-offer">Oferta</span>
-                                    <span class="listing-price">
-                                        <?= ($ad['price'] > 0) ? 'R$ ' . number_format($ad['price'], 2, ',', '.') : 'Doação'; ?>
-                                    </span>
-                                <?php else: ?>
-                                    <span class="badge badge-demand">Demanda</span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <div class="listing-actions">
-                            <a href="/re.source/anuncios/editar?id=<?= $ad['id']; ?>" class="btn-action" title="Editar" onclick="event.stopPropagation();">
-                                <i data-lucide="pencil" style="width: 18px; height: 18px;"></i>
-                            </a>
-                            <form action="/re.source/anuncios/excluir" method="POST" style="display:inline;" onclick="event.stopPropagation();" onsubmit="return confirm('⚠️ Deseja realmente apagar este anúncio?\nEsta ação não pode ser desfeita.');">
-                                <?= csrf_field() ?>
-                                <input type="hidden" name="id" value="<?= (int) $ad['id'] ?>">
-                                <button type="submit" class="btn-action btn-delete" title="Excluir" style="cursor:pointer;">
-                                    <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+                <div class="reco-card-body">
+                  <div class="reco-card-top">
+                    <h4><?= htmlspecialchars($item['title'], ENT_QUOTES, 'UTF-8') ?></h4>
+                    <?php if ($item['type'] === 'offer' && $item['price'] !== null): ?>
+                      <span class="reco-price"><?= (float) $item['price'] > 0 ? 'R$ ' . number_format((float) $item['price'], 2, ',', '.') : 'Doação' ?></span>
+                    <?php else: ?>
+                      <span class="reco-price reco-price-demand">Busca</span>
+                    <?php endif; ?>
+                  </div>
+                  <p class="reco-meta">
+                    <?php
+                    $quantity = (float) $item['quantity'];
+                    $formattedQuantity = $quantity == floor($quantity)
+                        ? number_format($quantity, 0, ',', '.')
+                        : number_format($quantity, 3, ',', '.');
+                    echo 'Qtd: ' . $formattedQuantity . ' ' . htmlspecialchars($unitLabel[$item['unit']] ?? $item['unit']);
+                    ?>
+                    | <?= htmlspecialchars($item['location_city'] . ' - ' . $item['location_state'], ENT_QUOTES, 'UTF-8') ?>
+                  </p>
+                  <a href="/re.source/anuncio?id=<?= (int) $item['id'] ?>" class="btn-view reco-btn">Ver Detalhes</a>
+                </div>
+              </article>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </section>
 
     </div>
-</main>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        if (typeof lucide !== 'undefined') { lucide.createIcons(); }
-    });
-</script>
+    <!-- ══ COLUNA LATERAL ══ -->
+    <div class="dash-home-side">
+
+      <!-- Painel de Circularidade -->
+      <aside class="circularity-panel" aria-label="Perfil de circularidade da plataforma">
+        <div class="circularity-header">
+          <span class="circularity-title">Perfil de Circularidade</span>
+          <i data-lucide="recycle" style="width:20px;height:20px;color:var(--accent-lime)"></i>
+        </div>
+
+        <div class="circularity-metric">
+          <div class="circularity-metric-label">
+            <span>Taxa de Reaproveitamento</span>
+            <strong><?= (int) $circularityRate ?>%</strong>
+          </div>
+          <div class="circularity-bar">
+            <div class="circularity-fill" style="width: <?= (int) $circularityRate ?>%"></div>
+          </div>
+        </div>
+
+        <div class="circularity-badge">
+          <i data-lucide="shield-check" style="width:14px;height:14px"></i>
+          Conformidade ESG: <?= htmlspecialchars($circularityStatus, ENT_QUOTES, 'UTF-8') ?>
+        </div>
+
+        <br>
+
+        <a href="/re.source/relatorios" class="circularity-link">
+          Relatórios completos <i data-lucide="arrow-right"></i>
+        </a>
+      </aside>
+
+      <!-- Atividade Recente -->
+      <aside class="activity-panel" aria-label="Atividade recente">
+        <h3>Atividade Recente</h3>
+        <ul class="activity-list">
+          <?php foreach ($recentActivity as $activity): ?>
+            <li class="activity-item activity-<?= htmlspecialchars($activity['type'], ENT_QUOTES, 'UTF-8') ?>">
+              <span class="activity-dot"></span>
+              <div>
+                <p class="activity-title"><?= htmlspecialchars($activity['title'], ENT_QUOTES, 'UTF-8') ?></p>
+                <p class="activity-text"><?= htmlspecialchars($activity['text'], ENT_QUOTES, 'UTF-8') ?></p>
+                <span class="activity-time"><?= htmlspecialchars($activity['time'], ENT_QUOTES, 'UTF-8') ?></span>
+              </div>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+        <a href="/re.source/estatisticas" class="btn-outline activity-history-btn">Ver histórico total</a>
+      </aside>
+
+    </div>
+
+  </div>
+</main>
 
 <?php require_once __DIR__ . '/../components/footer.php'; ?>

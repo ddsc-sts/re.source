@@ -1,0 +1,218 @@
+/* My Listings Page Styles (Stark Industrial) */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--dark);
+}
+
+.dashboard-header h2 {
+    font-family: var(--font-main);
+    color: var(--dark);
+    font-size: 1.75rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.btn-new {
+    padding: 0.75rem 1.75rem;
+    border-radius: 0 !important;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--white);
+    background: var(--green);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s, transform 0.1s;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.btn-new:hover {
+    background: var(--green-d);
+    color: var(--white);
+}
+
+.btn-new:active {
+    transform: scale(0.98);
+}
+
+.listing-card {
+    display: flex;
+    align-items: center;
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 0 !important;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow-card);
+    gap: 1.5rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.listing-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--green);
+}
+
+.listing-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 0 !important;
+    object-fit: cover;
+    background: var(--bg);
+    border: 1px solid var(--border-color);
+}
+
+.listing-img-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 0 !important;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    border: 1px solid var(--border-color);
+}
+
+.listing-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.listing-title {
+    font-family: var(--font-main);
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--dark);
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.listing-meta {
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+
+.badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 0 !important;
+    font-family: var(--font-main);
+    font-size: 0.8rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.badge-offer {
+    background: rgba(16, 107, 68, 0.1);
+    color: var(--green);
+    border: 1px solid rgba(16, 107, 68, 0.3);
+}
+
+.badge-demand {
+    background: rgba(253, 126, 20, 0.1);
+    color: #fd7e14;
+    border: 1px solid rgba(253, 126, 20, 0.3);
+}
+
+.listing-price {
+    font-weight: 700;
+    color: var(--green);
+    font-size: 1.1rem;
+}
+
+.listing-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 !important;
+    border: 1px solid var(--border-color);
+    background: var(--white);
+    color: var(--dark);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.btn-action:hover {
+    background: var(--bg);
+    border-color: var(--border-stark);
+}
+
+.btn-delete:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--white);
+    border: 1px dashed var(--border-color);
+    border-radius: 0 !important;
+    color: var(--muted);
+    box-shadow: var(--shadow-card);
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 0 !important;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+
+@media (max-width: 768px) {
+    .listing-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .listing-img, .listing-img-placeholder {
+        width: 100%;
+        height: 180px;
+    }
+    .listing-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 1rem;
+    }
+}

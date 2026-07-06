@@ -53,14 +53,16 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?php echo isset($titulo_pagina) ? $titulo_pagina : 'Re.Source — Economia Circular'; ?></title>
   
-  <link rel="stylesheet" href="/re.source/public/css/style.css" />
-  <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/style.css'), ENT_QUOTES, 'UTF-8') ?>" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <?php if (isset($css_especifico)): ?>
     <link rel="stylesheet" href="<?php echo $css_especifico; ?>" />
   <?php endif; ?>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
@@ -84,6 +86,29 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
         <a href="/re.source/contato"><i data-lucide="phone"></i> Contato</a>
       </nav>
 
+      <?php if ($headerCompanyId && !$headerIsPending): ?>
+      <div class="header-user-actions">
+        <button class="header-bell" aria-label="Notificações" type="button">
+          <i data-lucide="bell"></i>
+          <span class="header-bell-dot"></span>
+        </button>
+        <div class="header-user-divider"></div>
+        <div class="header-user-chip">
+          <div class="header-user-text">
+            <strong><?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?></strong>
+            <span>Conta B2B Verificada</span>
+          </div>
+          <div class="header-user-avatar">
+            <?php if (!empty($headerCompany['logo_url'])): ?>
+              <img src="<?= htmlspecialchars($headerCompany['logo_url'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?>">
+            <?php else: ?>
+              <i data-lucide="factory"></i>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+      <?php endif; ?>
+
       <div class="header-actions">
         <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
           <i data-lucide="menu"  class="icon-menu"></i>
@@ -95,7 +120,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
         <div class="dropdown-label">
           <?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?>
           <?php if ($headerIsPending): ?>
-            <span style="display:block;margin-top:5px;color:#9a6700;font-size:.7rem;font-weight:700;">
+            <span class="header-status-note">
               <?= $headerCompanyStatus === 'changes_requested' ? 'CORREÇÃO SOLICITADA' : 'AGUARDANDO APROVAÇÃO' ?>
             </span>
           <?php endif; ?>
@@ -110,10 +135,11 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
             Conversas
             <span
               id="headerUnreadBadge"
+              class="header-unread-badge"
               data-unread-url="<?= htmlspecialchars(app_url('/conversas/nao-lidas'), ENT_QUOTES, 'UTF-8') ?>"
               data-latest-message-id="<?= $headerLatestUnreadId ?>"
               aria-label="<?= $headerUnreadMessages ?> mensagens não lidas"
-              style="<?= $headerUnreadMessages > 0 ? 'display:inline-grid' : 'display:none' ?>;place-items:center;min-width:20px;height:20px;margin-left:6px;padding:0 6px;border-radius:999px;background:#dc2626;color:#fff;font-size:.68rem;font-weight:800;"
+              <?= $headerUnreadMessages > 0 ? '' : 'hidden' ?>
             ><?= $headerUnreadMessages > 99 ? '99+' : $headerUnreadMessages ?></span>
           </a>
         <?php endif; ?>
@@ -131,7 +157,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
     </div>
   </div>
 
-  <div class="search-bar-wrap">
+  <div class="search-bar-wrap" <?= !empty($hideSearchBar) ? 'style="display:none"' : '' ?>>
     <div class="search-bar-inner">
       <form action="/re.source/busca" method="GET" class="search-pill">
         
@@ -158,7 +184,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
             <button type="button" onclick="selectCategory('Eletrônicos', 8)">Eletrônicos</button>
           </div>
           
-          <input type="hidden" name="category_id" id="hiddenCategory" value="">
+          <input type="hidden" name="category_id" id="categoryIdInput" value="">
         </div>
 
         <button type="submit" class="search-btn"><i data-lucide="search"></i></button>
@@ -171,11 +197,3 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
 <?php if (!$headerIsPending && $headerCompanyStatus === 'active'): ?>
   <script src="<?= htmlspecialchars(app_url('/public/js/header-unread.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 <?php endif; ?>
-
-<script>
-function selectCategory(categoryName, categoryId) {
-    document.getElementById('categoryLabel').innerText = categoryName;
-    document.getElementById('hiddenCategory').value = categoryId;
-    document.getElementById('categoryDropdown').classList.remove('active'); 
-}
-</script>

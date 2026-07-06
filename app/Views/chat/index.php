@@ -1,6 +1,6 @@
 <?php require __DIR__ . '/../components/header.php'; ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/chat.css'), ENT_QUOTES, 'UTF-8') ?>">
-<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 
 <main class="dashboard-shell">
   <?php $sidebarActive = 'conversations'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>

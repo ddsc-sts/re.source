@@ -6,50 +6,8 @@ $companyName = $company['nome_fantasia'] ?: ($company['razao_social'] ?? 'Sua em
 $document = preg_replace('/\D/', '', (string) ($company['cnpj'] ?? ''));
 require_once __DIR__ . '/../components/header.php';
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
-
-<style>
-.withdraw-page { width:100%; min-width:0; }
-.withdraw-back { display: inline-flex; align-items: center; gap: .4rem; margin-bottom: 1.25rem; color: var(--muted); text-decoration: none; font-weight: 600; }
-.withdraw-back:hover { color: var(--green); }
-.withdraw-heading { margin-bottom: 1.75rem; position: static; }
-.withdraw-heading h1 { color: var(--dark); font-family: var(--font-main); font-size: clamp(1.8rem, 4vw, 2.5rem); }
-.withdraw-heading p { max-width: 720px; margin-top: .5rem; color: var(--muted); line-height: 1.6; }
-.withdraw-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .75fr); gap: 1.5rem; align-items: start; }
-.withdraw-card { padding: 1.75rem; background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,.04); }
-.balance-card { margin-bottom: 1.5rem; padding: 1.4rem; color: #fff; background: linear-gradient(135deg, var(--green), #0d4a2e); border-radius: .9rem; }
-.balance-card span { display: block; margin-bottom: .35rem; font-size: .85rem; opacity: .85; }
-.balance-card strong { font-family: var(--font-main); font-size: 2rem; }
-.form-section-title { margin: 1.6rem 0 1rem; padding-bottom: .6rem; color: var(--dark); border-bottom: 1px solid var(--border-color); font-family: var(--font-main); font-size: 1rem; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.field { display: flex; flex-direction: column; gap: .4rem; }
-.field.full { grid-column: 1 / -1; }
-.field label { color: var(--dark); font-size: .86rem; font-weight: 700; }
-.field input, .field select, .field textarea { width: 100%; padding: .82rem .9rem; color: var(--dark); background: var(--bg); border: 1px solid var(--border-color); border-radius: .55rem; font: inherit; }
-.field input:focus, .field select:focus, .field textarea:focus { outline: 0; border-color: var(--green); box-shadow: 0 0 0 3px rgba(21,115,71,.13); }
-.field small { color: var(--muted); line-height: 1.4; }
-.terms-box { margin-top: 1.5rem; padding: 1rem; background: var(--bg); border: 1px solid var(--border-color); border-radius: .65rem; }
-.terms-box label { display: flex; gap: .7rem; align-items: flex-start; color: var(--dark); font-size: .86rem; line-height: 1.55; cursor: pointer; }
-.terms-box input { margin-top: .25rem; }
-.withdraw-actions { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.5rem; }
-.btn-cancel, .btn-submit { padding: .8rem 1.2rem; border-radius: .55rem; font-weight: 700; text-decoration: none; cursor: pointer; }
-.btn-cancel { color: var(--muted); background: transparent; border: 1px solid var(--border-color); }
-.btn-submit { color: #fff; background: var(--green); border: 1px solid var(--green); }
-.btn-submit:disabled { opacity: .55; cursor: not-allowed; }
-.form-alert { margin-bottom: 1rem; padding: 1rem; color: #842029; background: #f8d7da; border: 1px solid #f5c2c7; border-radius: .55rem; }
-.info-stack { display: grid; gap: 1rem; }
-.info-card { padding: 1.3rem; background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius); }
-.info-card h2 { display: flex; align-items: center; gap: .5rem; margin-bottom: .85rem; color: var(--dark); font-size: 1rem; }
-.info-card p, .info-card li { color: var(--muted); font-size: .86rem; line-height: 1.55; }
-.info-card ol { display: grid; gap: .75rem; padding-left: 1.2rem; }
-.history-row { display: flex; justify-content: space-between; gap: 1rem; padding: .7rem 0; border-bottom: 1px solid var(--border-color); font-size: .83rem; }
-.history-row:last-child { border-bottom: 0; }
-.history-row strong { color: var(--dark); }
-.status-pending { color: #b45309; }
-.payment-options{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}.payment-option{display:flex;align-items:center;gap:.55rem;padding:.9rem;border:1px solid var(--border-color);border-radius:.65rem;cursor:pointer}.payment-option:has(input:checked){border-color:var(--green);background:rgba(21,115,71,.07);color:var(--green);font-weight:700}.method-fields[hidden]{display:none}
-@media (max-width: 850px) { .withdraw-layout { grid-template-columns: 1fr; } }
-@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .field.full { grid-column: auto; } .withdraw-card { padding: 1.2rem; } .withdraw-actions { flex-direction: column-reverse; } .btn-cancel, .btn-submit { text-align: center; } }
-</style>
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/saque.css'), ENT_QUOTES, 'UTF-8') ?>">
 
 <main class="dashboard-shell">
   <?php $sidebarActive = 'statistics'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>

@@ -2,104 +2,10 @@
 $titulo_pagina = $titulo_pagina ?? 'Configurações do Sistema — Re.Source';
 require_once __DIR__ . '/../components/header.php';
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/configuracoes.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-<style>
-.dashboard-layout {
-    max-width: 1280px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 2rem;
-    align-items: start;
-}
-
-.dashboard-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    position: sticky;
-    top: 100px;
-    height: calc(100vh - 120px);
-    overflow-y: auto;
-    padding-right: 10px;
-}
-
-.config-panel {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-    transition: background 0.3s, border-color 0.3s;
-}
-
-.panel-header {
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-.panel-header i { color: var(--green); }
-.panel-header h2 { font-family: var(--font-main); font-size: 1.25rem; color: var(--dark); }
-
-.setting-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--border-color);
-}
-.setting-row:last-child { border-bottom: none; }
-
-.setting-info { display: flex; flex-direction: column; gap: 0.25rem; }
-.setting-info label { font-weight: 600; color: var(--dark); font-size: 0.95rem; cursor: pointer; }
-.setting-info p { font-size: 0.85rem; color: var(--muted); }
-
-.switch { position: relative; display: inline-block; width: 46px; height: 24px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 24px; }
-.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-input:checked + .slider { background-color: var(--green); }
-input:checked + .slider:before { transform: translateX(22px); }
-
-.config-select { padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.9rem; color: var(--dark); background-color: white; min-width: 180px; }
-
-.device-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--bg); border-radius: 0.5rem; margin-bottom: 0.75rem; }
-.device-icon { width: 40px; height: 40px; background: white; border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--muted); }
-.device-details h4 { font-size: 0.9rem; color: var(--dark); }
-.device-details p { font-size: 0.8rem; color: var(--muted); }
-.device-badge { margin-left: auto; background: rgba(21, 115, 71, 0.1); color: var(--green); font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
-
-.danger-zone { border-color: #fca5a5; background: #fff5f5; }
-.danger-zone .panel-header i { color: #ef4444; }
-.btn-danger { background: #ef4444; color: white; border: none; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-.btn-danger:hover { background: #dc2626; }
-
-[data-theme="dark"] .danger-zone { background: var(--white); border-color: var(--border-color); }
-
-.btn-logout { background: transparent; border: 1px solid #d1d5db; color: #ef4444; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
-.btn-logout:hover { background: #f3f4f6; color: var(--dark); }
-
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; }
-.modal-overlay.active { display: flex; }
-.crit-modal { background: white; padding: 2.5rem; border-radius: var(--radius); width: 100%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-.crit-modal i { color: #ef4444; margin-bottom: 1rem; }
-.crit-modal h3 { font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--dark); }
-.crit-modal p { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.5; }
-.modal-actions { display: flex; gap: 1rem; justify-content: center; }
-
-@media (max-width: 768px) {
-    .dashboard-layout { grid-template-columns: 1fr; }
-    .setting-row { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    .config-select { width: 100%; }
-}
-</style>
-
-<main class="dashboard-layout">
+<main class="dashboard-shell">
     
     <?php $sidebarActive = 'settings'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
 

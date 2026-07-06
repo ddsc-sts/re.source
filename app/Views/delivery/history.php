@@ -4,7 +4,7 @@ $css_especifico = app_url('/public/css/freight.css');
 require __DIR__ . '/../components/header.php';
 $statusLabels = ['contracted' => 'Contratado', 'preparing' => 'Preparando', 'in_transit' => 'Em transporte', 'out_for_delivery' => 'Saiu para entrega', 'delivered' => 'Entregue', 'concluded' => 'Concluído', 'cancelled' => 'Cancelado'];
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 <main class="dashboard-shell">
   <?php $sidebarActive = 'deliveries'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
   <div class="freight-page">

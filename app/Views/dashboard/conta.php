@@ -22,119 +22,19 @@ $admin_email     = $admin['email']             ?? 'seu e-mail';
 $titulo_pagina = $titulo_pagina ?? 'Configurações da Conta — Re.Source';
 require_once __DIR__ . '/../components/header.php';
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/conta.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-<style>
-.dashboard-layout {
-    max-width: 1280px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 2rem;
-    align-items: start;
-}
-.dashboard-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    position: sticky;
-    top: 100px;
-    height: calc(100vh - 120px);
-    overflow-y: auto;
-    padding-right: 10px;
-}
-.account-panel {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-}
-.panel-header {
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-.panel-header i { color: var(--green); }
-.panel-header h2 { font-family: var(--font-main); font-size: 1.25rem; color: var(--dark); }
-.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-.form-group { display: flex; flex-direction: column; gap: 0.5rem; }
-.form-group.full { grid-column: span 2; }
-.form-group label { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
-.form-group input, .form-group select, .form-group textarea {
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    font-family: var(--font-body);
-    font-size: 0.95rem;
-    transition: border-color 0.2s;
-}
-.form-group input:focus {
-    border-color: var(--green);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(21, 115, 71, 0.1);
-}
-.logo-upload-container {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: var(--bg);
-    border-radius: 0.5rem;
-}
-.current-logo {
-    width: 100px;
-    height: 100px;
-    border-radius: 0.5rem;
-    object-fit: cover;
-    background: white;
-    border: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-.btn-save {
-    background: var(--green);
-    color: white;
-    padding: 0.8rem 2rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: background 0.2s;
-    border: none;
-    cursor: pointer;
-}
-.btn-save:hover { background: #0f5132; }
-.security-row { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem; margin-bottom: 1rem; }
-.security-info h3 { font-size: 1rem; color: var(--dark); margin-bottom: 0.25rem; }
-.security-info p { font-size: 0.85rem; color: var(--muted); }
-.btn-outline { background: transparent; border: 1px solid var(--green); color: var(--green); padding: 0.5rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-.btn-outline:hover { background: var(--green); color: white; }
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; }
-.modal-overlay.active { display: flex; }
-.security-modal { background: white; padding: 2rem; border-radius: 0.5rem; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.modal-header h3 { font-size: 1.2rem; }
-.btn-close { background: none; border: none; cursor: pointer; color: var(--muted); }
-.code-inputs { display: flex; gap: 0.5rem; justify-content: space-between; margin-bottom: 1.5rem; }
-.code-inputs input { width: 45px; height: 50px; text-align: center; font-size: 1.5rem; font-weight: bold; border: 1px solid #d1d5db; border-radius: 0.5rem; }
-.code-inputs input:focus { border-color: var(--green); outline: none; }
-#dynamic-modal-content { display: none; margin-top: 1.5rem; }
-@media (max-width: 768px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .dashboard-layout { grid-template-columns: 1fr; }
-    .security-row { flex-direction: column; align-items: flex-start; gap: 1rem; }
-}
-</style>
-
-<main class="dashboard-layout">
+<main class="dashboard-shell">
 
     <?php $sidebarActive = 'account'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
 
     <div class="dashboard-content">
+
+        <div class="account-page-header">
+            <h1>Detalhes da Conta</h1>
+            <p>Gerencie o perfil industrial da sua empresa e as informações legais.</p>
+        </div>
 
         <form action="/re.source/conta/atualizar" method="POST" enctype="multipart/form-data">
             <?= csrf_field() ?>

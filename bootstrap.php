@@ -56,6 +56,19 @@ function app_url(string $path = ''): string {
     return APP_BASE_PATH . ($path === '/' ? '/' : $path);
 }
 
+/** Monta URL de asset publico com versao baseada na data do arquivo. */
+function asset_url(string $path = ''): string {
+    $path = '/' . ltrim($path, '/');
+    $url = app_url('/public' . $path);
+    $file = PUBLIC_PATH . str_replace('/', DIRECTORY_SEPARATOR, $path);
+
+    if (is_file($file)) {
+        $url .= '?v=' . filemtime($file);
+    }
+
+    return $url;
+}
+
 /** Redireciona para uma rota interna e encerra a requisicao. */
 function redirect_to(string $path, int $status = 302): never {
     header('Location: ' . app_url($path), true, $status);
