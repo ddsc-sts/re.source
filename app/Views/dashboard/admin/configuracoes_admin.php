@@ -1,55 +1,14 @@
-<?php
-// Variáveis injetadas pelo AdminController:
-// $user, $metrics, $recentCompanies, $recentActivity, $esgIndicators, $volumeChart, $chartStats, $heroStats
-
-$userName     = htmlspecialchars($user['name'] ?? 'Administrador');
-$userInitials = implode('', array_map(fn($p) => strtoupper($p[0]), array_slice(explode(' ', $userName), 0, 2)));
-$hour         = (int)(new DateTime())->format('H');
-$greeting     = $hour < 12 ? 'Bom dia' : ($hour < 18 ? 'Boa tarde' : 'Boa noite');
-
-function companyColor(string $name): string {
-    $colors = ['#157347','#1d4ed8','#7c3aed','#0d9488','#ea580c','#be185d','#0369a1'];
-    return $colors[abs(crc32($name)) % count($colors)];
-}
-
-// Helper para renderizar o badge de delta
-function renderDelta(?array $delta): string {
-    if (!$delta) return '';
-    $dir   = $delta['direcao'];
-    $val   = htmlspecialchars($delta['valor']);
-    $icon  = $dir === 'up' ? 'trending-up' : ($dir === 'down' ? 'trending-down' : 'minus');
-    $class = $dir === 'up' ? 'up' : ($dir === 'down' ? 'down' : 'flat');
-    return "<div class=\"metric-delta {$class}\"><i data-lucide=\"{$icon}\"></i>{$val}</div>";
-}
-?>
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel Administrativo — Re.Source</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <link rel="stylesheet" href="/re.source/public/css/admin-dashboard.css" />
-</head>
-
-<body>
-
-<!-- ═══════════════════════
-     HEADER
-═══════════════════════ -->
-<header class="site-header">
-
-<?php require_once __DIR__ . '/../../components/topbar.php'; ?>
-
-<?php require_once __DIR__ . '/../../components/navbar.php'; ?>
-
-</header>
-
-<script>
-    lucide.createIcons();
-</script>
-
-</body>
+<?php $userName = htmlspecialchars($user['name'] ?? 'Administrador', ENT_QUOTES, 'UTF-8'); ?>
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Configurações Administrativas — Re.Source</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"><script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script><link rel="stylesheet" href="/re.source/public/css/admin-dashboard.css"><link rel="stylesheet" href="/re.source/public/css/flash.css"></head><body>
+<?php require __DIR__ . '/../../components/flash.php'; ?><header class="site-header"><?php require __DIR__ . '/../../components/topbar.php'; require __DIR__ . '/../../components/navbar.php'; ?></header>
+<main class="admin-content admin-operational-page"><header class="admin-page-heading"><div><span>Administração</span><h1>Configurações</h1><p>Preferências institucionais persistidas no banco de dados.</p></div></header>
+<form class="admin-settings-form" method="post" action="/re.source/admin/configuracoes/salvar"><?= csrf_field() ?>
+  <section class="admin-panel"><header><div><h2>Identidade e atendimento</h2><p>Informações exibidas e usadas pela equipe administrativa.</p></div></header><div class="admin-settings-grid">
+    <label><span>Nome da plataforma</span><input name="platform_name" maxlength="100" value="<?= htmlspecialchars($adminSettings['platform_name'] ?? 'Re.Source',ENT_QUOTES,'UTF-8') ?>" required></label>
+    <label><span>E-mail de suporte</span><input type="email" name="support_email" maxlength="190" value="<?= htmlspecialchars($adminSettings['support_email'] ?? '',ENT_QUOTES,'UTF-8') ?>"></label>
+    <label><span>WhatsApp de suporte</span><input name="support_whatsapp" maxlength="30" value="<?= htmlspecialchars($adminSettings['support_whatsapp'] ?? '',ENT_QUOTES,'UTF-8') ?>" placeholder="5547999999999"></label>
+    <label class="full"><span>Mensagem de manutenção</span><textarea name="maintenance_message" maxlength="500" rows="4" placeholder="Deixe vazio quando não houver manutenção."><?= htmlspecialchars($adminSettings['maintenance_message'] ?? '',ENT_QUOTES,'UTF-8') ?></textarea></label>
+  </div></section>
+  <section class="admin-panel"><header><div><h2>Ambiente acadêmico</h2><p>Controles adequados ao modo de apresentação.</p></div></header><label class="admin-toggle-row"><span><strong>Modo de demonstração</strong><small>Mantém explícito que frete e financeiro são simulações internas.</small></span><input type="checkbox" name="demo_mode" value="1" <?= ($adminSettings['demo_mode'] ?? '1') === '1' ? 'checked' : '' ?>></label></section>
+  <div class="admin-settings-actions"><button type="submit" class="admin-primary-action"><i data-lucide="save"></i> Salvar configurações</button></div>
+</form></main><script>window.lucide?.createIcons();document.getElementById('navToggle')?.addEventListener('click',()=>document.getElementById('navbar')?.classList.toggle('mobile-open'));</script></body></html>

@@ -292,7 +292,7 @@ nav.desktop-nav a i { width: 14px; height: 14px; }
   gap: 1.5rem;
 }
 @media (min-width: 1024px) {
-  .category-layout { grid-template-columns: 1fr 320px; align-items: start; }
+  .category-layout { grid-template-columns: 1fr; align-items: start; }
 }
 
 .category-grid {
@@ -776,6 +776,27 @@ footer {
   display: none;
 }
 .header-bell.has-unread .header-bell-dot { display: block; }
+
+.sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+.notification-panel {
+  position: absolute; top: calc(100% + 10px); right: 48px; z-index: 210;
+  width: min(380px, calc(100vw - 2rem)); max-height: min(520px, 72vh);
+  overflow: hidden; background: var(--white); border: 1px solid var(--border-color);
+  box-shadow: 0 18px 42px rgba(0,0,0,.18);
+}
+.notification-panel[hidden] { display: none; }
+.notification-panel.open { display: block; }
+.notification-panel-head { display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem;border-bottom:1px solid var(--border-color); }
+.notification-panel-head strong { font-family:var(--font-stencil);font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em; }
+.notification-panel-head button { color:var(--green);font-size:.72rem;font-weight:700;text-transform:uppercase; }
+.notification-panel-list { max-height: 430px; overflow-y:auto; }
+.notification-item { display:flex;flex-direction:column;gap:.25rem;padding:1rem;border-bottom:1px solid var(--border-color);background:var(--white); }
+.notification-item:hover { background:var(--bg); }
+.notification-item.is-unseen { border-left:4px solid var(--green);background:var(--green-l); }
+.notification-item strong { font-size:.86rem; }
+.notification-item span { color:var(--muted);font-size:.78rem;line-height:1.45; }
+.notification-item time { color:var(--muted);font-size:.65rem;text-transform:uppercase; }
+.notification-empty { padding:2rem 1rem;text-align:center;color:var(--muted);font-size:.82rem; }
 
 /* CHIP = botão que abre o dropdown */
 .header-user-chip {

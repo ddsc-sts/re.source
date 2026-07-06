@@ -89,8 +89,11 @@ class SearchController
             $params = [];
 
             if (!empty($q)) {
-                $sql .= " AND (l.title LIKE :q OR l.description LIKE :q)";
-                $params[':q'] = "%{$q}%";
+                // Não reutilize o mesmo placeholder nomeado: com prepared
+                // statements nativos do MySQL isso pode gerar HY093.
+                $sql .= " AND (l.title LIKE :q_title OR l.description LIKE :q_description)";
+                $params[':q_title'] = "%{$q}%";
+                $params[':q_description'] = "%{$q}%";
             }
 
             if ($category_id) {

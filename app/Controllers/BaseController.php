@@ -9,15 +9,89 @@ class BaseController
         global $pdo;
 
         $recentListings = self::getAnunciosRecentes($pdo);
+        $companyId = (int) ($_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 0);
+        $profileNotifications = self::getProfileNotifications($pdo, $companyId);
 
         view('dashboard/index', [
             'titulo_pagina'  => 'Re.Source — Economia Circular em Joinville',
             'recentListings' => $recentListings,
+            'profileNotifications' => $profileNotifications,
             'unitLabel'      => [
                 'kg' => 'Kg', 'ton' => 'Ton', 'm2' => 'm²', 'm3' => 'm³',
                 'unidade' => 'un.', 'litro' => 'L', 'outro' => ''
             ],
         ]);
+    }
+
+    public static function notifications(): void
+    {
+        global $pdo;
+        header('Content-Type: application/json; charset=utf-8');
+
+        $companyId = (int) ($_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 0);
+        if ($companyId <= 0) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Sessão inválida.']);
+            return;
+        }
+
+        $items = self::getProfileNotifications($pdo, $companyId, 12);
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM notifications WHERE company_id = ? AND is_seen = 0');
+        $stmt->execute([$companyId]);
+
+        echo json_encode([
+            'success' => true,
+            'unseen_count' => (int) $stmt->fetchColumn(),
+            'notifications' => $items,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    public static function markNotificationsRead(): void
+    {
+        global $pdo;
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Método não permitido.']);
+            return;
+        }
+        if (!csrf_validate()) {
+            http_response_code(419);
+            echo json_encode(['success' => false, 'message' => 'Sessão expirada.']);
+            return;
+        }
+
+        $companyId = (int) ($_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 0);
+        $stmt = $pdo->prepare(
+            'UPDATE notifications SET is_seen = 1, read_at = COALESCE(read_at, CURRENT_TIMESTAMP)
+             WHERE company_id = ? AND is_seen = 0'
+        );
+        $stmt->execute([$companyId]);
+        echo json_encode(['success' => true, 'updated' => $stmt->rowCount()]);
+    }
+
+    private static function getProfileNotifications(PDO $pdo, int $companyId, int $limit = 5): array
+    {
+        if ($companyId <= 0) {
+            return [];
+        }
+
+        try {
+            $limit = max(1, min(20, $limit));
+            $stmt = $pdo->prepare(
+                "SELECT id, type, title, body, data_json, is_seen, created_at
+                 FROM notifications
+                 WHERE company_id = ?
+                 ORDER BY created_at DESC, id DESC
+                 LIMIT {$limit}"
+            );
+            $stmt->execute([$companyId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            error_log('Falha ao carregar notificações: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public static function sobre(): void

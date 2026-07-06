@@ -1,0 +1,192 @@
+.listings-dashboard {
+  width: min(1400px, calc(100% - 48px));
+  max-width: none;
+  gap: 2.75rem;
+}
+
+.my-listings-content { gap: 2rem; }
+
+.my-listings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2.5rem;
+  padding: 2rem 1.75rem 2.25rem;
+  border-bottom: 2px solid var(--dark);
+}
+
+.my-listings-header > div { min-width: 0; }
+.my-listings-header span {
+  color: var(--green);
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+}
+.my-listings-header h1 {
+  margin: .35rem 0 .8rem;
+  font-family: var(--font-stencil);
+  font-size: clamp(3.25rem, 6vw, 5.25rem);
+  font-weight: 400;
+  line-height: .9;
+  text-transform: uppercase;
+  letter-spacing: .015em;
+}
+.my-listings-header p { color: var(--muted); line-height: 1.6; }
+
+.new-listing-button,
+.my-listings-empty a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .7rem;
+  min-height: 54px;
+  padding: 1rem 1.65rem;
+  background: var(--green);
+  color: #fff;
+  border: 1px solid var(--green);
+  font-size: .76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  white-space: nowrap;
+  transition: background .18s, border-color .18s, transform .18s;
+}
+.new-listing-button:hover,
+.my-listings-empty a:hover { background: var(--green-d); border-color: var(--green-d); transform: translateY(-2px); }
+.new-listing-button svg { width: 18px; height: 18px; }
+
+.my-listings-list { display: flex; flex-direction: column; gap: 1.5rem; }
+.my-listing-card {
+  display: grid;
+  grid-template-columns: minmax(250px, 31%) minmax(0, 1fr);
+  min-height: 245px;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid #b9c3bc;
+  box-shadow: 5px 5px 0 rgba(16, 107, 68, .08);
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.my-listing-card:hover {
+  border-color: var(--green);
+  box-shadow: 7px 7px 0 rgba(16, 107, 68, .13);
+  transform: translateY(-2px);
+}
+
+.my-listing-image { position: relative; min-height: 245px; overflow: hidden; background: #e9ece9; }
+.my-listing-image::after { content: ''; position: absolute; inset: 0; border-right: 1px solid rgba(0,0,0,.08); pointer-events: none; }
+.my-listing-image img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(.65); transition: filter .3s, transform .35s; }
+.my-listing-card:hover .my-listing-image img { filter: grayscale(0); transform: scale(1.025); }
+.my-listing-image > span {
+  position: absolute;
+  top: 1.15rem;
+  left: 1.15rem;
+  z-index: 1;
+  padding: .48rem .9rem;
+  background: var(--green);
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.my-listing-body { display: flex; flex-direction: column; min-width: 0; padding: 1.75rem 1.9rem 1.45rem; }
+.my-listing-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; }
+.my-listing-title-row > div:first-child { min-width: 0; }
+.my-listing-title-row h2 {
+  margin: 0;
+  color: var(--dark);
+  font-family: var(--font-main);
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: .015em;
+  overflow-wrap: anywhere;
+}
+.my-listing-meta { display: flex; flex-wrap: wrap; gap: .7rem 1.15rem; margin-top: .95rem; color: var(--muted); font-size: .73rem; font-weight: 700; text-transform: uppercase; letter-spacing: .035em; }
+.my-listing-meta span { display: inline-flex; align-items: center; gap: .4rem; }
+.my-listing-meta svg { width: 15px; height: 15px; flex: none; color: #718078; }
+
+.my-listing-price { flex: none; min-width: 125px; padding-left: 1rem; text-align: right; }
+.my-listing-price small { display: block; margin-bottom: .25rem; color: var(--muted); font-size: .65rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.my-listing-price strong { display: block; color: var(--green); font-family: var(--font-stencil); font-size: 2.15rem; font-weight: 400; line-height: 1; white-space: nowrap; }
+
+.my-listing-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  width: 100%;
+  margin-top: auto;
+  padding: 1.25rem 0 0;
+  color: var(--dark);
+  background: transparent;
+  border-top: 1px solid #d9dfdb;
+}
+.listing-status { display: inline-flex; align-items: center; gap: .6rem; min-height: 42px; color: var(--green); font-size: .71rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+.listing-status i { width: 9px; height: 9px; flex: none; background: currentColor; }
+.status-paused, .status-draft { color: #8a6400; }
+.status-sold, .status-expired, .status-removed { color: var(--muted); }
+
+.my-listing-actions { display: flex; align-items: stretch; gap: .55rem; }
+.my-listing-actions form { display: flex; margin: 0; }
+.icon-action {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--dark);
+  background: #fff;
+  border: 1px solid #aeb9b1;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.icon-action svg { width: 18px; height: 18px; }
+.icon-action:hover { color: #fff; background: var(--green); border-color: var(--green); }
+.icon-action.danger:hover { color: #fff; background: #b42318; border-color: #b42318; }
+.details-action {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .8rem 1.35rem;
+  color: #fff;
+  background: var(--dark);
+  border: 1px solid var(--dark);
+  font-size: .7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .075em;
+  transition: background .15s, border-color .15s;
+}
+.details-action:hover { background: var(--green); border-color: var(--green); }
+
+.my-listings-empty { padding: 5.5rem 2rem; text-align: center; background: #fff; border: 1px dashed #9ba69f; }
+.my-listings-empty svg { width: 50px; height: 50px; margin: auto; color: var(--green); }
+.my-listings-empty h2 { margin: 1.25rem 0 .65rem; text-transform: uppercase; }
+.my-listings-empty p { margin-bottom: 1.75rem; color: var(--muted); }
+.alert { padding: 1rem 1.2rem; color: #14532d; background: #effaf3; border: 1px solid #8ab99e; }
+
+@media (max-width: 1100px) {
+  .listings-dashboard { gap: 1.75rem; }
+  .my-listing-card { grid-template-columns: 235px minmax(0, 1fr); }
+  .my-listing-body { padding: 1.4rem; }
+  .my-listing-title-row { gap: 1rem; }
+}
+@media (max-width: 780px) {
+  .listings-dashboard { width: min(100% - 24px, 1400px); }
+  .my-listings-header { align-items: flex-start; flex-direction: column; padding: 1.5rem 1.25rem; }
+  .my-listing-card { grid-template-columns: 1fr; }
+  .my-listing-image { height: 240px; min-height: 0; }
+  .my-listing-title-row { flex-direction: column; }
+  .my-listing-price { min-width: 0; padding-left: 0; text-align: left; }
+  .my-listing-footer { align-items: flex-start; flex-direction: column; }
+  .my-listing-actions { width: 100%; flex-wrap: wrap; }
+  .details-action { flex: 1; }
+}
+@media (max-width: 460px) {
+  .my-listing-body { padding: 1.2rem; }
+  .new-listing-button { width: 100%; }
+  .my-listing-actions { display: grid; grid-template-columns: 44px 44px 1fr; }
+}

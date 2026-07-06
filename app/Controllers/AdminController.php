@@ -558,20 +558,108 @@ class AdminController
 
     public static function suporte(): void
     {
+        global $pdo;
         $user = AdminAuth::user();
 
-        $metrics = self::getMetrics($GLOBALS['pdo']);
+        $metrics = self::getMetrics($pdo);
+        $supportSummary = [
+            'pending_companies' => (int) $pdo->query("SELECT COUNT(*) FROM companies WHERE status IN ('pending','changes_requested')")->fetchColumn(),
+            'open_negotiations' => (int) $pdo->query("SELECT COUNT(*) FROM negotiations WHERE status NOT IN ('concluded','cancelled')")->fetchColumn(),
+            'active_deliveries' => (int) $pdo->query("SELECT COUNT(*) FROM freights WHERE status IN ('contracted','preparing','in_transit','out_for_delivery')")->fetchColumn(),
+            'pending_withdrawals' => (int) $pdo->query("SELECT COUNT(*) FROM withdrawals WHERE status = 'pending'")->fetchColumn(),
+        ];
+        $supportQueue = $pdo->query(
+            "SELECT n.id, n.status, n.created_at, l.title,
+                    buyer.nome_fantasia AS buyer_name, seller.nome_fantasia AS seller_name
+             FROM negotiations n
+             INNER JOIN listings l ON l.id = n.listing_id
+             INNER JOIN companies buyer ON buyer.id = n.buyer_company_id
+             INNER JOIN companies seller ON seller.id = n.seller_company_id
+             WHERE n.status NOT IN ('concluded','cancelled')
+             ORDER BY n.updated_at DESC LIMIT 12"
+        )->fetchAll(PDO::FETCH_ASSOC);
+        $supportActivity = $pdo->query(
+            "SELECT action, severity, entity_type, entity_id, created_at
+             FROM audit_logs WHERE severity IN ('warning','critical')
+             ORDER BY created_at DESC LIMIT 10"
+        )->fetchAll(PDO::FETCH_ASSOC);
 
         require_once __DIR__ . '/../Views/dashboard/admin/suporte.php';
     }
 
     public static function configuracoes_admin(): void
     {
+        global $pdo;
+        if (!AdminAuth::can('view_settings')) {
+            http_response_code(403);
+            exit('Acesso negado.');
+        }
         $user = AdminAuth::user();
 
-        $metrics = self::getMetrics($GLOBALS['pdo']);
+        $metrics = self::getMetrics($pdo);
+        $adminSettings = [];
+        try {
+            foreach ($pdo->query('SELECT setting_key, setting_value FROM system_settings') as $row) {
+                $adminSettings[$row['setting_key']] = $row['setting_value'];
+            }
+        } catch (Throwable $e) {
+            error_log('Tabela system_settings indisponível: ' . $e->getMessage());
+        }
 
         require_once __DIR__ . '/../Views/dashboard/admin/configuracoes_admin.php';
+    }
+
+    public static function salvarConfiguracoesAdmin(): void
+    {
+        global $pdo;
+        if (!AdminAuth::can('view_settings')) {
+            http_response_code(403);
+            exit('Acesso negado.');
+        }
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || !csrf_validate()) {
+            flash('error', 'A sessão do formulário expirou.');
+            redirect_to('/admin/configuracoes');
+        }
+
+        $definitions = [
+            'platform_name' => 100,
+            'support_email' => 190,
+            'support_whatsapp' => 30,
+            'maintenance_message' => 500,
+            'demo_mode' => 1,
+        ];
+
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare(
+                'INSERT INTO system_settings (setting_key, setting_value, updated_by_user_id)
+                 VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value),
+                 updated_by_user_id = VALUES(updated_by_user_id), updated_at = CURRENT_TIMESTAMP'
+            );
+            foreach ($definitions as $key => $maxLength) {
+                $value = $key === 'demo_mode' ? (isset($_POST[$key]) ? '1' : '0') : trim((string) ($_POST[$key] ?? ''));
+                $value = mb_substr($value, 0, $maxLength);
+                if ($key === 'support_email' && $value !== '' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    throw new DomainException('Informe um e-mail de suporte válido.');
+                }
+                $stmt->execute([$key, $value, (int) (AdminAuth::user()['id'] ?? 0)]);
+            }
+            $pdo->prepare(
+                "INSERT INTO audit_logs (user_id, action, severity, entity_type, new_values_json, ip_address, user_agent)
+                 VALUES (?, 'ADMIN_SETTINGS_UPDATED', 'info', 'system_settings', ?, ?, ?)"
+            )->execute([
+                (int) (AdminAuth::user()['id'] ?? 0),
+                json_encode(array_keys($definitions), JSON_UNESCAPED_UNICODE),
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            ]);
+            $pdo->commit();
+            flash('success', 'Configurações administrativas salvas.');
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            flash('error', $e instanceof DomainException ? $e->getMessage() : 'Não foi possível salvar as configurações. Execute o schema atualizado.');
+        }
+        redirect_to('/admin/configuracoes');
     }
 
     public static function empresas(): void

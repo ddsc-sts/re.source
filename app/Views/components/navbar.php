@@ -9,7 +9,7 @@ $rota = strtok($_SERVER['REQUEST_URI'], '?'); // ex: /re.source/admin
   <a href="/re.source/admin"
     class="nav-item <?= $rota === '/re.source/admin' ? 'active' : '' ?>">
       <i data-lucide="layout-dashboard"></i>
-      Dashboard
+      Visão geral
   </a>
   <a href="/re.source/admin/empresas"
     class="nav-item <?= $rota === '/re.source/admin/empresas' ? 'active' : '' ?>">
@@ -18,7 +18,7 @@ $rota = strtok($_SERVER['REQUEST_URI'], '?'); // ex: /re.source/admin
   </a>
   <a href="/re.source/admin/anuncios"
     class="nav-item <?= $rota === '/re.source/admin/anuncios' ? 'active' : '' ?>">
-      <i data-lucide="tag"></i>Anúncios
+      <i data-lucide="tag"></i>Marketplace
 
       <?php if (($metrics['anuncios_pendentes'] ?? 0) > 0): ?>
           <span class="badge"><?= $metrics['anuncios_pendentes'] ?></span>
@@ -32,7 +32,7 @@ $rota = strtok($_SERVER['REQUEST_URI'], '?'); // ex: /re.source/admin
   <a href="/re.source/admin/logistica"
     class="nav-item <?= $rota === '/re.source/admin/logistica' ? 'active' : '' ?>">
       <i data-lucide="truck"></i>
-      Logística
+      Entregas
   </a>
   <?php if (AdminAuth::can('view_financial')): ?>
   <a href="/re.source/admin/saques"
@@ -44,11 +44,11 @@ $rota = strtok($_SERVER['REQUEST_URI'], '?'); // ex: /re.source/admin
   <a href="/re.source/admin/impacto"
     class="nav-item <?= $rota === '/re.source/admin/impacto' ? 'active' : '' ?>">
       <i data-lucide="leaf"></i>
-      Impacto ESG
+      Métricas ESG
   </a>
   <a href="/re.source/admin/suporte"
     class="nav-item <?= $rota === '/re.source/admin/suporte' ? 'active' : '' ?>">
-      <i data-lucide="life-buoy"></i>Suporte
+      <i data-lucide="life-buoy"></i>Central operacional
 
     <?php if (($metrics['chamados_abertos'] ?? 0) > 0): ?>
           <span class="badge"><?= $metrics['chamados_abertos'] ?></span>
@@ -58,7 +58,7 @@ $rota = strtok($_SERVER['REQUEST_URI'], '?'); // ex: /re.source/admin
     <a href="/re.source/admin/configuracoes"
       class="nav-item <?= $rota === '/re.source/admin/configuracoes' ? 'active' : '' ?>">
         <i data-lucide="settings"></i>
-        Configurações
+        Ajustes
     </a>
   <?php endif; ?>
   <a href="/re.source/logout"

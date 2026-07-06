@@ -169,6 +169,7 @@
     background: var(--bg);
     border: 1px solid var(--border-color);
 }
+.identity-description textarea { min-height: 140px; resize: vertical; }
 
 .logo-upload-preview {
     aspect-ratio: 1 / 1;

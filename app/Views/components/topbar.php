@@ -12,19 +12,19 @@
       </div>
     </a>
 
-    <div class="topbar-search">
+    <form class="topbar-search" action="/re.source/admin/empresas" method="get">
       <i data-lucide="search"></i>
-      <input type="text" placeholder="Buscar empresas, anúncios, resíduos…" />
-      <kbd>⌘K</kbd>
-    </div>
+      <input type="search" name="q" placeholder="Buscar empresas por nome, CNPJ ou e-mail" />
+      <kbd>Enter</kbd>
+    </form>
 
     <div class="topbar-actions">
-      <button class="topbar-btn" title="Mensagens"><i data-lucide="message-square"></i></button>
-      <button class="topbar-btn" title="Notificações">
+      <a class="topbar-btn" title="Suporte" href="/re.source/admin/suporte"><i data-lucide="life-buoy"></i></a>
+      <a class="topbar-btn" title="Alertas operacionais" href="/re.source/admin/suporte">
         <i data-lucide="bell"></i>
         <span class="topbar-notif-dot"></span>
-      </button>
-      <button class="topbar-btn" title="Configurações"><i data-lucide="settings"></i></button>
+      </a>
+      <?php if (AdminAuth::can('view_settings')): ?><a class="topbar-btn" title="Configurações" href="/re.source/admin/configuracoes"><i data-lucide="settings"></i></a><?php endif; ?>
       <div class="topbar-user">
         <div class="topbar-avatar"><?= $userInitials ?></div>
         <div class="topbar-user-info">

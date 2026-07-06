@@ -482,6 +482,36 @@ Daniel:
 [ ] Remover links quebrados e botoes sem acao do caminho demonstrado.
 [ ] Preparar dashboard e telas visualmente convincentes.
 
+Avanco visual e correcoes de regressao em 06/07/2026:
+
+[x] Auditar os commits 0038afc e b8c5bcf e localizar as regressoes do CSS.
+[x] Corrigir a busca por nome/descricao com placeholders PDO distintos.
+[x] Carregar as categorias reais do banco no seletor do cabecalho.
+[x] Corrigir a abertura do menu da conta e do seletor de categorias.
+[x] Tornar o JavaScript independente da disponibilidade da biblioteca de icones.
+[x] Corrigir o carrossel principal e a navegacao pelos indicadores.
+[x] Corrigir a estrutura HTML e a largura de Explore por Categoria.
+[x] Criar central interna de notificacoes no sino do cabecalho.
+[x] Permitir listar e marcar notificacoes como lidas com backend real.
+[x] Separar o perfil da empresa em componente PHP e CSS independentes.
+[x] Reconstruir Meus Anuncios usando os dados reais do controller.
+[x] Aplicar os esbocos em Detalhes da Conta, Novo Anuncio e Meus Anuncios.
+[x] Refinar Meus Anuncios: remover conflito com footer global, ampliar respiros,
+    alinhar metadados, preco, status e acoes e melhorar responsividade.
+[x] Padronizar Editar Anuncio com o mesmo visual e sidebar de Novo Anuncio.
+[x] Criar Central Operacional de Suporte administrativo com dados reais.
+[x] Criar Configuracoes Administrativas persistidas e auditadas.
+[x] Alterar navbar/topbar do admin e tornar pesquisa e atalhos funcionais.
+[x] Consolidar system_settings no schema e criar migration para banco existente.
+[x] Executar PHP lint, JavaScript syntax check e git diff --check.
+
+Pendencias desta rodada:
+
+[ ] Executar 20260706_001_admin_settings.sql no banco existente antes de salvar
+    configuracoes administrativas. Em banco novo, usar somente o schema.
+[ ] Testar manualmente as quatro telas nas resolucoes da apresentacao.
+[ ] Confirmar menu, sino, busca, categoria e carrossel no navegador.
+
 Geder:
 
 [ ] Liderar o teste completo de regressao.
@@ -500,11 +530,11 @@ Cadastro -> pendente -> aprovacao -> chat -> proposta -> acordo -> frete
 
 Extras permitidos somente se a meta estiver verde ate o meio do dia:
 
-[ ] Central de notificacoes com contador.
+[x] Central de notificacoes com contador e marcacao de leitura.
 [ ] CSV administrativo simples.
 [ ] Animacoes e microinteracoes.
 [ ] Metricas ESG estimadas.
-[ ] Melhorias extras de busca e filtros.
+[x] Correcao da busca por texto e categoria no cabecalho.
 [ ] Integrar cotacao real com o Melhor Envio Sandbox no lugar das opcoes
   simuladas, sem alterar o restante do fluxo.
 
@@ -576,12 +606,12 @@ Checklist final:
 [x] Login aprovado
 [x] Chat entre empresas
 [x] Proposta e acordo mutuo
-[ ] Frete escolhido
-[ ] Codigo de entrega
-[ ] Saldo liberado uma unica vez
-[ ] Saque PIX/TED
-[ ] Aprovacao/recusa do saque
-[ ] Metricas administrativas
+[x] Frete escolhido
+[x] Codigo de entrega
+[x] Saldo liberado uma unica vez
+[x] Saque PIX/TED
+[x] Aprovacao/recusa do saque
+[x] Metricas administrativas
 [x] Dados de demonstracao restauraveis
 [ ] Video/capturas de seguranca
 

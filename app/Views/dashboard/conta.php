@@ -46,22 +46,19 @@ require_once __DIR__ . '/../components/header.php';
                 </div>
 
                 <div class="logo-upload-container">
-                    <?php if (!empty($logo_url)): ?>
-                        <img src="<?= htmlspecialchars($logo_url) ?>" class="current-logo" id="logoPreview" alt="Logo atual">
-                    <?php else: ?>
-                        <img src="/re.source/public/img/logos/logo.png" class="current-logo" id="logoPreview" alt="Logo padrão">
-                    <?php endif; ?>
-
-                    <div class="form-group">
-                        <label>Logotipo da Empresa</label>
-                        <input type="file" name="logo_empresa" accept="image/*" onchange="previewImage(event)">
-                        <p style="font-size: 0.75rem; color: var(--muted);">Recomendado: PNG ou JPG, 500x500px.</p>
+                    <label class="logo-upload-preview" title="Selecionar novo logotipo">
+                        <?php if (!empty($logo_url)): ?>
+                            <img src="<?= htmlspecialchars($logo_url) ?>" class="current-logo" id="logoPreview" alt="Logo atual">
+                        <?php else: ?>
+                            <img src="/re.source/public/img/logos/logo.png" class="current-logo" id="logoPreview" alt="Logo padrão">
+                        <?php endif; ?>
+                        <input type="file" name="logo_empresa" accept="image/png,image/jpeg,image/webp" onchange="previewImage(event)">
+                    </label>
+                    <div class="form-group identity-description">
+                        <label>Biografia / Descrição da Empresa</label>
+                        <textarea name="segment" rows="6" placeholder="Conte um pouco sobre o que sua empresa faz..."><?= htmlspecialchars($segment) ?></textarea>
+                        <small>Logotipo recomendado: PNG/JPG, 500 × 500 px.</small>
                     </div>
-                </div>
-
-                <div class="form-group full">
-                    <label>Biografia / Descrição da Empresa</label>
-                    <textarea name="segment" rows="3" placeholder="Conte um pouco sobre o que sua empresa faz..."><?= htmlspecialchars($segment) ?></textarea>
                 </div>
             </div>
 

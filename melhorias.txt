@@ -1,6 +1,6 @@
 ================================================================================
 RE.SOURCE — REGISTRO ATUAL DE MELHORIAS, LIMITACOES E PENDENCIAS
-Atualizado em: 04/07/2026
+Atualizado em: 06/07/2026
 Objetivo atual: MVP academico funcional para apresentacao
 ================================================================================
 
@@ -18,8 +18,8 @@ no roteiro principal, seguranca, integracao, feedback e responsividade.
 [x] Arquitetura MVC propria com bootstrap, roteador e mapa de rotas.
 [x] Configuracao por .env e modelo .env.example.
 [x] Banco MariaDB/MySQL via PDO e schema consolidado.
-[x] 30 tabelas no schema atual.
-[x] Sete migrations historicas refletidas no schema consolidado.
+[x] 31 tabelas no schema atual, incluindo system_settings.
+[x] Oito migrations historicas refletidas no schema consolidado.
 [x] CSRF nas operacoes principais.
 [x] Middlewares UserAuth, ApprovedCompany e AdminAuth.
 [x] Papeis admin, staff, admin_company e operator.
@@ -52,11 +52,23 @@ no roteiro principal, seguranca, integracao, feedback e responsividade.
 [x] CRUD de anuncios.
 [x] Exclusao por POST com CSRF.
 [x] Busca e filtros basicos.
+[x] Busca por nome/descricao corrigida para prepared statements nativos do MySQL.
+[x] Seletor de categorias alimentado pelo banco, sem IDs escritos no HTML.
 [x] Imagens e categorias.
 [x] Bloqueio de operacoes para empresa nao aprovada.
 [x] Bloqueio de conversa no proprio anuncio com mensagem visivel.
 [x] Header com conversas e Minhas entregas.
 [x] Sidebar compartilhada nas areas empresariais.
+[x] Perfil da sidebar separado em componente PHP e CSS independentes.
+[x] Menu da conta e dropdown de categorias corrigidos.
+[x] Carrossel principal corrigido e tolerante a falha da biblioteca de icones.
+[x] Secao Explore por Categoria corrigida em estrutura e largura.
+[x] Meus Anuncios reconstruido com dados reais, edicao e exclusao por POST/CSRF.
+[x] Novo Anuncio, Meus Anuncios e Detalhes da Conta alinhados ao visual industrial.
+[x] Rodape interno dos cards de Meus Anuncios isolado do footer global.
+[x] Cards de Meus Anuncios refinados em espacamento, hierarquia e responsividade.
+[x] Editar Anuncio padronizado visualmente com Novo Anuncio.
+[x] Central interna de notificacoes com listagem e marcacao de leitura.
 
 ================================================================================
 4. IMPLEMENTADO — CHAT, PROPOSTA E ACORDO
@@ -139,6 +151,9 @@ Limitacao deliberada do MVP:
 [x] Indicadores ESG estimados.
 [x] Formula academica documentada em Docs/FORMULAS_ESG_MVP.md.
 [x] Rotulo de estimativa visivel nas metricas ambientais.
+[x] Central Operacional administrativa com filas e alertas reais.
+[x] Configuracoes administrativas persistidas e registradas em audit_logs.
+[x] Navbar/topbar administrativa revisada, com busca e atalhos funcionais.
 
 Limitacao deliberada do MVP:
 
@@ -156,6 +171,8 @@ Limitacao deliberada do MVP:
 [x] Negociacao concluida e saldo em saldo_demo.sql.
 [x] promover_admin.sql para transformar conta cadastrada em admin local.
 [x] Credenciais academicas ficticias autocontidas nos inserts.
+[x] Configuracoes administrativas persistidas em system_settings.
+[x] Migration 20260706_001_admin_settings.sql para bancos existentes.
 
 Ordem para banco novo:
 
@@ -166,6 +183,8 @@ Ordem para banco novo:
 5. saldo_demo.sql (opcional)
 
 Nao executar migrations depois do schema consolidado em banco novo.
+Em banco criado antes de 06/07, executar apenas
+20260706_001_admin_settings.sql para habilitar as configuracoes administrativas.
 
 ================================================================================
 9. VALIDACOES TECNICAS JA EXECUTADAS
@@ -173,7 +192,8 @@ Nao executar migrations depois do schema consolidado em banco novo.
 
 [x] Lint PHP de controllers, services, views e scripts auxiliares.
 [x] git diff --check.
-[x] Importacao limpa com 30 tabelas.
+[x] Importacao limpa anterior com 30 tabelas; schema atual possui 31 e requer
+    nova validacao manual em banco limpo.
 [x] Indices do chat e colunas de proposta.
 [x] Tabelas e FKs de frete e financeiro.
 [x] Reserva, aprovacao, recusa e devolucao de saldo.
@@ -181,6 +201,11 @@ Nao executar migrations depois do schema consolidado em banco novo.
 [x] Notificacoes internas e audit logs do financeiro.
 [x] Falha SMTP controlada sem excecao.
 [x] Smoke HTTP de login e redirecionamento das rotas protegidas.
+[x] PHP lint dos arquivos alterados na auditoria de 06/07.
+[x] Validacao de sintaxe do JavaScript do cabecalho/carrossel.
+[x] git diff --check depois das correcoes visuais.
+[x] Smoke HTTP local: home e login 200; base protegida redirecionou ao login.
+[x] Busca por texto e categoria respondeu HTTP 200 no ambiente local.
 
 Preferencia atual do responsavel:
 
@@ -199,6 +224,11 @@ Preferencia atual do responsavel:
 [ ] Testar 1366x768, 1920x1080 e aproximadamente 390px de largura.
 [ ] Corrigir overflow, modal, loading ou botao quebrado encontrado no roteiro.
 [ ] Revisar ortografia e acentuacao de todas as telas apresentadas.
+[ ] Testar manualmente busca por texto e categoria no banco local.
+[ ] Testar abertura/fechamento do menu da conta e do painel de notificacoes.
+[ ] Testar rotacao e indicadores do carrossel por pelo menos 15 segundos.
+[ ] Validar Meus Anuncios, Novo Anuncio e Detalhes da Conta em desktop e celular.
+[ ] Executar 20260706_001_admin_settings.sql no banco local existente.
 [ ] Preparar roteiro oral de 10 a 15 minutos.
 [ ] Gravar uma execucao completa como seguranca.
 [ ] Registrar as limitacoes apresentadas a banca.
@@ -208,7 +238,7 @@ Preferencia atual do responsavel:
 ================================================================================
 
 [ ] Integrar Melhor Envio Sandbox para cotacao real.
-[ ] Criar pagina central de notificacoes.
+[x] Criar painel central de notificacoes no cabecalho.
 [ ] Melhorar busca, filtros e paginacao.
 [ ] Adicionar microinteracoes sem alterar regras de negocio.
 [ ] Exportar tambem negociacoes e metricas ESG em CSV.
@@ -242,7 +272,8 @@ Esses itens nao fazem parte da meta obrigatoria da apresentacao.
 Codigo do fluxo obrigatorio do MVP: implementado.
 Validacoes tecnicas isoladas: aprovadas.
 Teste manual completo da equipe: pendente.
-Acabamento visual final do Dia 6: pendente.
+Acabamento das quatro telas recebidas: implementado, aguardando teste manual.
+Suporte, configuracoes e navegacao administrativa: implementados.
 Integracoes reais externas: fora do escopo atual.
 
 O proximo passo correto nao e criar funcionalidade nova. E executar o roteiro

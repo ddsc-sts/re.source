@@ -1,0 +1,11 @@
+.create-listing-shell{width:min(1320px,calc(100% - 32px));max-width:none;align-items:start}
+.create-listing-shell .form-container{width:100%;max-width:none!important;margin:0!important;padding:2.5rem!important;border:1px solid #bfc8c2!important;border-radius:0!important;box-shadow:8px 8px 0 #dbe3de!important;background:#fff!important}
+.create-listing-shell .form-title-group{padding-left:1.25rem!important;border-left:4px solid var(--green)!important;border-bottom:0!important;margin-bottom:2.5rem!important}
+.create-listing-shell .form-title-group h2{font-family:var(--font-stencil)!important;font-size:clamp(2.8rem,5vw,4.5rem)!important;font-weight:400!important;text-transform:uppercase;line-height:1!important}
+.create-listing-shell .form-title-group p{color:var(--muted)!important}
+.create-listing-shell .input-box{gap:.55rem!important}.create-listing-shell .input-box label{font-size:.7rem!important;font-weight:800!important;text-transform:uppercase;letter-spacing:.08em}
+.create-listing-shell .input-box input[type=text],.create-listing-shell .input-box input[type=number],.create-listing-shell .input-box select,.create-listing-shell .input-box textarea{padding:.9rem 1rem!important;border:1px solid #aeb8b1!important;border-radius:0!important;background:#fafafa!important;box-shadow:none!important}
+.create-listing-shell .input-box input:focus,.create-listing-shell .input-box select:focus,.create-listing-shell .input-box textarea:focus{border-color:var(--green)!important;box-shadow:0 0 0 2px rgba(16,107,68,.12)!important}
+.create-listing-shell .input-box input[type=file]{border-radius:0!important;background:#fafafa!important}.create-listing-shell .olx-grid,.create-listing-shell .olx-item,.create-listing-shell .lightbox-img{border-radius:0!important}
+.create-listing-shell .submit-wrap{border-top:1px solid #bfc8c2!important}.create-listing-shell .btn-submit{padding:1rem 2rem!important;border-radius:0!important;background:#106b44!important;box-shadow:none!important;text-transform:uppercase;letter-spacing:.08em}.create-listing-shell .btn-back{text-transform:uppercase;font-size:.72rem!important;letter-spacing:.06em}
+@media(max-width:700px){.create-listing-shell .form-container{padding:1.25rem!important}.create-listing-shell .form-grid{grid-template-columns:1fr!important}.create-listing-shell .full-width{grid-column:auto!important}}

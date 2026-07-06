@@ -12,17 +12,7 @@ $sidebarLinks = [
 ];
 ?>
 <aside class="dashboard-sidebar" aria-label="Navegação da empresa">
-  <div class="sidebar-user">
-    <div class="sidebar-avatar">
-      <?php if ($sidebarLogoUrl): ?>
-        <img src="<?= htmlspecialchars($sidebarLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="Logo da empresa">
-      <?php else: ?>
-        <i data-lucide="building-2"></i>
-      <?php endif; ?>
-    </div>
-    <h3><?= htmlspecialchars($sidebarCompanyName, ENT_QUOTES, 'UTF-8') ?></h3>
-    <p>Conta B2B verificada</p>
-  </div>
+  <?php require __DIR__ . '/profile/sidebar_profile.php'; ?>
   <nav class="sidebar-nav">
     <?php foreach ($sidebarLinks as [$key, $path, $icon, $label]): ?>
       <a href="<?= htmlspecialchars(app_url($path), ENT_QUOTES, 'UTF-8') ?>" class="sidebar-link <?= $sidebarActive === $key ? 'active' : '' ?>">

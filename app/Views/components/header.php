@@ -10,6 +10,16 @@ $headerCompanyId = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ??
 $headerCompanyStatus = $_SESSION['user']['company_status'] ?? null;
 $headerUnreadMessages = 0;
 $headerLatestUnreadId = 0;
+$headerUnseenNotifications = 0;
+$headerCategories = [];
+
+try {
+    $headerCategories = $pdo->query(
+        'SELECT id, name FROM categories WHERE is_active = 1 ORDER BY name ASC'
+    )->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    error_log('Falha ao carregar categorias do cabeçalho: ' . $e->getMessage());
+}
 
 if ($headerCompanyId) {
     $stmt = $pdo->prepare("SELECT theme, nome_fantasia, status, logo_url FROM companies WHERE id = ?");
@@ -42,6 +52,12 @@ if ($headerCompanyId) {
         $headerUnreadMessages = (int) ($headerUnreadOverview['unread_count'] ?? 0);
         $headerLatestUnreadId = (int) ($headerUnreadOverview['latest_message_id'] ?? 0);
     }
+
+    $stmtNotifications = $pdo->prepare(
+        'SELECT COUNT(*) FROM notifications WHERE company_id = ? AND is_seen = 0'
+    );
+    $stmtNotifications->execute([$headerCompanyId]);
+    $headerUnseenNotifications = (int) $stmtNotifications->fetchColumn();
 }
 $headerIsPending = in_array($headerCompanyStatus, ['pending', 'changes_requested'], true);
 $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('/base');
@@ -55,6 +71,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
   
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/style.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/profile.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <?php if (isset($css_especifico)): ?>
     <link rel="stylesheet" href="<?php echo $css_especifico; ?>" />
   <?php endif; ?>
@@ -88,9 +105,20 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
 
       <?php if ($headerCompanyId && !$headerIsPending): ?>
       <div class="header-user-actions">
-        <button class="header-bell" aria-label="Notificações" type="button">
+        <button
+          class="header-bell<?= $headerUnseenNotifications > 0 ? ' has-unread' : '' ?>"
+          id="notificationButton"
+          aria-label="Notificações"
+          aria-expanded="false"
+          aria-controls="notificationPanel"
+          type="button"
+          data-feed-url="<?= htmlspecialchars(app_url('/notificacoes'), ENT_QUOTES, 'UTF-8') ?>"
+          data-read-url="<?= htmlspecialchars(app_url('/notificacoes/marcar-lidas'), ENT_QUOTES, 'UTF-8') ?>"
+          data-csrf="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>"
+        >
           <i data-lucide="bell"></i>
           <span class="header-bell-dot"></span>
+          <span class="sr-only" id="notificationCount"><?= $headerUnseenNotifications ?></span>
         </button>
         <button
           type="button"
@@ -115,6 +143,16 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
         </button>
       </div>
       <?php endif; ?>
+
+      <aside class="notification-panel" id="notificationPanel" aria-label="Notificações" hidden>
+        <div class="notification-panel-head">
+          <strong>Notificações</strong>
+          <button type="button" id="markNotificationsRead">Marcar como lidas</button>
+        </div>
+        <div class="notification-panel-list" id="notificationList">
+          <p class="notification-empty">Carregando...</p>
+        </div>
+      </aside>
 
 
       <div class="dropdown-menu" id="dropdownMenu">
@@ -175,14 +213,14 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
           </button>
           
           <div class="category-dropdown" id="categoryDropdown">
-            <button type="button" onclick="selectCategory('Todas as categorias', '')">Todas as categorias</button>
-            <button type="button" onclick="selectCategory('Madeira', 4)">Madeira</button>
-            <button type="button" onclick="selectCategory('Plástico', 3)">Plástico</button>
-            <button type="button" onclick="selectCategory('Têxtil', 1)">Têxtil</button>
-            <button type="button" onclick="selectCategory('Metal', 2)">Metal</button>
-            <button type="button" onclick="selectCategory('Papelão', 5)">Papelão</button>
-            <button type="button" onclick="selectCategory('Borracha', 7)">Borracha</button>
-            <button type="button" onclick="selectCategory('Eletrônicos', 8)">Eletrônicos</button>
+            <button type="button" data-category-id="" data-category-name="Todas as categorias">Todas as categorias</button>
+            <?php foreach ($headerCategories as $headerCategory): ?>
+              <button
+                type="button"
+                data-category-id="<?= (int) $headerCategory['id'] ?>"
+                data-category-name="<?= htmlspecialchars($headerCategory['name'], ENT_QUOTES, 'UTF-8') ?>"
+              ><?= htmlspecialchars($headerCategory['name'], ENT_QUOTES, 'UTF-8') ?></button>
+            <?php endforeach; ?>
           </div>
           
           <input type="hidden" name="category_id" id="categoryIdInput" value="">

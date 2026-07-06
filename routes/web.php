@@ -181,6 +181,16 @@ return [
         'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
+    '/notificacoes' => [
+        'action'     => ['BaseController', 'notifications'],
+        'middleware' => [['UserAuth', 'required']],
+    ],
+
+    '/notificacoes/marcar-lidas' => [
+        'action'     => ['BaseController', 'markNotificationsRead'],
+        'middleware' => [['UserAuth', 'required']],
+    ],
+
     '/conversas/nao-lidas' => [
         'action'     => ['ChatController', 'unreadCount'],
         'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
@@ -349,6 +359,11 @@ return [
 
     '/admin/configuracoes' => [
         'action'     => ['AdminController', 'configuracoes_admin'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/configuracoes/salvar' => [
+        'action'     => ['AdminController', 'salvarConfiguracoesAdmin'],
         'middleware' => [['AdminAuth', 'required']],
     ],
 
