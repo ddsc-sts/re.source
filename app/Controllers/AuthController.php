@@ -374,6 +374,14 @@ class AuthController
         $cnpj      = preg_replace('/\D/', '', trim($_POST['cnpj']      ?? ''));
         $razao     = trim($_POST['razao_social'] ?? '');
 
+        $nomeFantasia = trim($_POST['nome_fantasia'] ?? '');
+        $cidade       = trim($_POST['cidade']        ?? '');
+        $segmento     = trim($_POST['segmento']      ?? '');
+        $cep          = preg_replace('/\D/', '', trim($_POST['cep']    ?? ''));
+        $endereco     = trim($_POST['endereco']      ?? '');
+        $numero       = trim($_POST['numero']        ?? '');
+        $complemento  = trim($_POST['complemento']   ?? ''); // opcional
+
         $erros  = [];
         $campos = [];
 
@@ -382,9 +390,15 @@ class AuthController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { $erros[] = 'E-mail inválido.'; $campos[] = ['field' => 'email', 'msg' => 'E-mail inválido.']; }
         if (strlen($cnpj) !== 14) { $erros[] = 'CNPJ inválido.';    $campos[] = ['field' => 'cnpj',  'msg' => 'CNPJ deve ter 14 dígitos.']; }
         if (!$razao)     { $erros[] = 'Razão social é obrigatória.'; $campos[] = ['field' => 'razao', 'msg' => 'Razão social é obrigatória.']; }
+        if (!$nomeFantasia) { $erros[] = 'Nome fantasia é obrigatório.'; $campos[] = ['field' => 'nomeFantasia', 'msg' => 'Informe o nome fantasia.']; }
+        if (strlen($cep) !== 8) { $erros[] = 'CEP inválido.'; $campos[] = ['field' => 'cep', 'msg' => 'CEP deve ter 8 dígitos.']; }
+        if (!$endereco)  { $erros[] = 'Endereço é obrigatório.'; $campos[] = ['field' => 'endereco', 'msg' => 'Informe o endereço.']; }
+        if (!$numero)    { $erros[] = 'Número é obrigatório.'; $campos[] = ['field' => 'numero', 'msg' => 'Informe o número.']; }
         if (strlen($senha) < 8) { $erros[] = 'Senha deve ter ao menos 8 caracteres.'; $campos[] = ['field' => 'senha', 'msg' => 'Senha deve ter ao menos 8 caracteres.']; }
         if ($senha !== $senhaConf) { $erros[] = 'As senhas não coincidem.'; $campos[] = ['field' => 'senhaConf', 'msg' => 'As senhas não coincidem.']; }
         if (!$estado)    { $erros[] = 'Estado é obrigatório.';       $campos[] = ['field' => 'estado', 'msg' => 'Selecione seu estado.']; }
+        if (!$cidade)    { $erros[] = 'Cidade é obrigatória.';       $campos[] = ['field' => 'cidade', 'msg' => 'Informe a cidade.']; }
+        if (!$segmento)  { $erros[] = 'Segmento é obrigatório.';     $campos[] = ['field' => 'segmento', 'msg' => 'Selecione o segmento.']; }
 
         if ($erros) voltarComErro(implode(' · ', $erros), $campos);
 
@@ -445,6 +459,13 @@ class AuthController
             'estado'        => $estado,
             'cnpj'          => $cnpj,
             'razao'         => $razao,
+            'nome_fantasia' => $nomeFantasia,
+            'cidade'        => $cidade,
+            'segmento'      => $segmento,
+            'cep'           => $cep,
+            'endereco'      => $endereco,
+            'numero'        => $numero,
+            'complemento'   => $complemento,
         ];
 
         $enviou = enviarEmailCodigo($email, $nome, $codigo);
@@ -764,19 +785,28 @@ class AuthController
         $pdo->beginTransaction();
         try {
             $pdo->prepare(
-                "INSERT INTO addresses (zip_code, street, number, district, city, state)
-                 VALUES ('','','','','',?)"
-            )->execute([$pendente['estado']]);
+                "INSERT INTO addresses (zip_code, street, number, complement, district, city, state)
+                 VALUES (?,?,?,?,'',?,?)"
+            )->execute([
+                $pendente['cep']         ?? '',
+                $pendente['endereco']    ?? '',
+                $pendente['numero']      ?? '',
+                $pendente['complemento'] ?? '', // opcional — pode ficar vazio
+                $pendente['cidade']      ?? '',
+                $pendente['estado'],
+            ]);
             $addressId = $pdo->lastInsertId();
 
             $nomeCompleto = $pendente['nome'] . ' ' . $pendente['sobrenome'];
 
             $pdo->prepare(
-                "INSERT INTO companies (cnpj, razao_social, email, phone, address_id, plan_id, responsible_name, status, email_verified_at)
-                 VALUES (?,?,?,?,?,1,?,'pending',NOW())"
+                "INSERT INTO companies (cnpj, razao_social, nome_fantasia, segment, email, phone, address_id, plan_id, responsible_name, status, email_verified_at)
+                 VALUES (?,?,?,?,?,?,?,1,?,'pending',NOW())"
             )->execute([
                 $pendente['cnpj'],
                 $pendente['razao'],
+                $pendente['nome_fantasia'] ?? '',
+                $pendente['segmento']      ?? '',
                 $pendente['email'],
                 $pendente['telefone'],
                 $addressId,

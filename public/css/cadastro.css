@@ -58,6 +58,18 @@ fieldset { border: none; padding: 0; margin: 0; }
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 2rem;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+.site-header.scrolled {
+  background: rgba(245,244,239,0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1.5px solid var(--border-color);
+  box-shadow: 0 4px 22px rgba(20,23,26,0.06);
+}
+.site-header.scrolled .logo-mark,
+.site-header.scrolled .header-nav a {
+  color: var(--ink);
 }
 .header-inner {
   width: 100%;
@@ -70,6 +82,11 @@ fieldset { border: none; padding: 0; margin: 0; }
   align-items: center;
   gap: 10px;
   color: var(--ink);
+}
+.logo-mark-img {
+  height: 30px;
+  width: auto;
+  display: block;
 }
 .logo-mark span {
   font-family: var(--font-display);
@@ -450,6 +467,14 @@ fieldset { border: none; padding: 0; margin: 0; }
   color: var(--ink);
 }
 .form-field label .req { color: var(--green); margin-left: 2px; }
+.form-field label .opt {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.7rem;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
 
 /* inputs e selects */
 .form-field input,

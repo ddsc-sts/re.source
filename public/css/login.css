@@ -56,6 +56,18 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 2rem;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+.login-header.scrolled {
+  background: rgba(245,244,239,0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1.5px solid var(--border-color);
+  box-shadow: 0 4px 22px rgba(20,23,26,0.06);
+}
+.login-header.scrolled .login-logo,
+.login-header.scrolled .link-login {
+  color: var(--ink);
 }
 
 .login-logo {

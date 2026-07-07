@@ -1,5 +1,15 @@
 lucide.createIcons();
 
+// ── Header fixo: aplica fundo sólido ao rolar ──
+const loginHeader = document.querySelector('.login-header');
+if (loginHeader) {
+  const onHeaderScroll = () => {
+    loginHeader.classList.toggle('scrolled', window.scrollY > 12);
+  };
+  window.addEventListener('scroll', onHeaderScroll, { passive: true });
+  onHeaderScroll();
+}
+
 // ── Telas ──
 function showScreen(id) {
   document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));

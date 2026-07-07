@@ -7,6 +7,16 @@
 (() => {
   'use strict';
 
+  /* ─── Header fixo: aplica fundo sólido ao rolar ─────────── */
+  const siteHeader = document.querySelector('.site-header');
+  if (siteHeader) {
+    const onHeaderScroll = () => {
+      siteHeader.classList.toggle('scrolled', window.scrollY > 12);
+    };
+    window.addEventListener('scroll', onHeaderScroll, { passive: true });
+    onHeaderScroll();
+  }
+
   /* ─── Seletores ─────────────────────────────────────────── */
   const form         = document.getElementById('formCadastro');
   const alertBox     = document.getElementById('alertBox');
@@ -130,14 +140,22 @@
     }
 
     if (step === 2) {
-      const cnpj     = $('cnpj').value.replace(/\D/g, '');
-      const razao    = $('razao').value.trim();
-      const estado   = $('estado').value;
-      const cidade   = $('cidade').value.trim();
-      const segmento = $('segmento').value;
+      const cnpj         = $('cnpj').value.replace(/\D/g, '');
+      const razao        = $('razao').value.trim();
+      const nomeFantasia = $('nomeFantasia').value.trim();
+      const cep          = $('cep').value.replace(/\D/g, '');
+      const endereco     = $('endereco').value.trim();
+      const numero       = $('numero').value.trim();
+      const estado       = $('estado').value;
+      const cidade       = $('cidade').value.trim();
+      const segmento     = $('segmento').value;
 
       if (cnpj.length !== 14) { setError('cnpj', 'CNPJ deve ter 14 dígitos.'); ok = false; }
       if (!razao)   { setError('razao', 'Razão social é obrigatória.'); ok = false; }
+      if (!nomeFantasia) { setError('nomeFantasia', 'Informe o nome fantasia.'); ok = false; }
+      if (cep.length !== 8) { setError('cep', 'CEP deve ter 8 dígitos.'); ok = false; }
+      if (!endereco) { setError('endereco', 'Informe o endereço.'); ok = false; }
+      if (!numero)   { setError('numero', 'Informe o número.'); ok = false; }
       if (!estado)  { setError('estado', 'Selecione o estado.'); ok = false; }
       if (!cidade)  { setError('cidade', 'Informe a cidade.'); ok = false; }
       if (!segmento){ setError('segmento', 'Selecione o segmento.'); ok = false; }
@@ -222,6 +240,27 @@
         clearError('razao');
       }
 
+      if (data.nome_fantasia && $('nomeFantasia') && !$('nomeFantasia').value) {
+        $('nomeFantasia').value = data.nome_fantasia;
+        clearError('nomeFantasia');
+      }
+
+      if (data.cep && $('cep') && !$('cep').value) {
+        const cepDigits = String(data.cep).replace(/\D/g, '').slice(0, 8);
+        $('cep').value = cepDigits.replace(/(\d{5})(\d)/, '$1-$2');
+        clearError('cep');
+      }
+
+      if (data.logradouro && $('endereco') && !$('endereco').value) {
+        $('endereco').value = toTitleCase(data.logradouro);
+        clearError('endereco');
+      }
+
+      if (data.numero && $('numero') && !$('numero').value) {
+        $('numero').value = data.numero;
+        clearError('numero');
+      }
+
       const uf = data.uf ? (UF_MAP[data.uf] ?? data.uf) : null;
       if (uf) {
         const sel = $('estado');
@@ -254,6 +293,14 @@
       .replace(/(\d{5})(\d{1,4})$/, '$1-$2');
     this.value = v;
     clearError('telefone');
+  });
+
+  /* ─── Máscara CEP ───────────────────────────────────────── */
+  $('cep')?.addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '').slice(0, 8);
+    v = v.replace(/(\d{5})(\d)/, '$1-$2');
+    this.value = v;
+    clearError('cep');
   });
 
   /* ─── Toggle senha ──────────────────────────────────────── */

@@ -16,6 +16,14 @@ return [
         'action' => ['BaseController', 'contato'],
     ],
 
+    '/termos' => [
+        'action' => ['BaseController', 'termos'],
+    ],
+
+    '/privacidade' => [
+        'action' => ['BaseController', 'privacidade'],
+    ],
+
     // ── Auth (páginas) ────────────────────────────────────
     '/login' => [
         'action' => ['AuthController', 'login'],

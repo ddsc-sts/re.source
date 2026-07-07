@@ -15,14 +15,8 @@
   <!-- ══ SITE HEADER (navbar fixa no topo) ══ -->
   <header class="site-header" id="siteHeader">
     <div class="header-inner">
-      <a href="#" class="logo-mark">
-        <svg width="34" height="34" viewBox="0 0 38 38" fill="none">
-          <rect x="2" y="2" width="13" height="13" rx="1" stroke="#157347" stroke-width="2" fill="none"/>
-          <rect x="2" y="23" width="13" height="13" rx="1" stroke="#157347" stroke-width="2" fill="none"/>
-          <path d="M19 8.5 C27 8.5 27 19 27 19 C27 19 27 29.5 19 29.5" stroke="#157347" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <circle cx="19" cy="8.5" r="2.5" fill="#157347"/>
-          <circle cx="19" cy="29.5" r="2.5" fill="#157347"/>
-        </svg>
+      <a href="/re.source/" class="logo-mark">
+        <img src="/re.source/public/img/logos/logo.png" alt="Re.Source" class="logo-mark-img" />
         <span>Re<span class="dot">.</span>Source</span>
       </a>
 
@@ -81,7 +75,7 @@
           </p>
 
           <div class="hero-actions">
-            <a href="#" class="btn-primary-lg">Cadastrar minha empresa</a>
+            <a href="/re.source/cadastro" class="btn-primary-lg">Cadastrar minha empresa</a>
             <a href="#como-funciona" class="btn-ghost-lg">
               Ver como funciona
               <i data-lucide="arrow-down" style="width:15px;height:15px;"></i>
@@ -172,18 +166,42 @@
           <p class="section-eyebrow">Categorias</p>
           <h2 class="section-title">Oito materiais.<br><em>Infinitas conexões.</em></h2>
           <p class="feat-body">Madeira, Plástico, Têxtil, Metal, Papelão, Borracha, Eletrônicos e Vidro. Cada resíduo encontra seu comprador — e cada comprador encontra sua matéria-prima.</p>
-          <a href="#" class="btn-primary-sm">Explorar categorias <i data-lucide="arrow-right" style="width:15px;height:15px;"></i></a>
+          <a href="/re.source/busca" class="btn-primary-sm">Explorar categorias <i data-lucide="arrow-right" style="width:15px;height:15px;"></i></a>
         </div>
         <div class="feat-visual reveal rd-1">
           <div class="cat-grid">
-            <div class="cat-tile"><span class="ct-emoji">🪵</span><span>Madeira</span></div>
-            <div class="cat-tile"><span class="ct-emoji">♻️</span><span>Plástico</span></div>
-            <div class="cat-tile"><span class="ct-emoji">🧵</span><span>Têxtil</span></div>
-            <div class="cat-tile"><span class="ct-emoji">⚙️</span><span>Metal</span></div>
-            <div class="cat-tile"><span class="ct-emoji">📦</span><span>Papelão</span></div>
-            <div class="cat-tile"><span class="ct-emoji">🔘</span><span>Borracha</span></div>
-            <div class="cat-tile"><span class="ct-emoji">💻</span><span>Eletrônicos</span></div>
-            <div class="cat-tile"><span class="ct-emoji">🍶</span><span>Vidro</span></div>
+            <div class="cat-tile">
+              <img src="https://images.unsplash.com/photo-1601058268499-e52658b8bb88?w=300&q=70&auto=format&fit=crop" alt="Madeira" loading="lazy" />
+              <span>Madeira</span>
+            </div>
+            <div class="cat-tile">
+              <img src="https://images.unsplash.com/photo-1591196611119-9a51fc74bf9e?w=300&q=70&auto=format&fit=crop" alt="Plástico" loading="lazy" />
+              <span>Plástico</span>
+            </div>
+            <div class="cat-tile">
+              <img src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&q=70&auto=format&fit=crop" alt="Têxtil" loading="lazy" />
+              <span>Têxtil</span>
+            </div>
+            <div class="cat-tile">
+              <img src="https://images.unsplash.com/photo-1605152276897-4f618f831968?w=300&q=70&auto=format&fit=crop" alt="Metal" loading="lazy" />
+              <span>Metal</span>
+            </div>
+            <div class="cat-tile">
+              <img src="https://images.unsplash.com/photo-1607166452427-7e4477079cb9?w=300&q=70&auto=format&fit=crop" alt="Papelão" loading="lazy" />
+              <span>Papelão</span>
+            </div>
+            <div class="cat-tile">
+              <img src="https://images.unsplash.com/photo-1615729947596-a598e5de0ab3?w=300&q=70&auto=format&fit=crop" alt="Borracha" loading="lazy" />
+              <span>Borracha</span>
+            </div>
+            <div class="cat-tile">
+              <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=300&q=70&auto=format&fit=crop" alt="Eletrônicos" loading="lazy" />
+              <span>Eletrônicos</span>
+            </div>
+            <div class="cat-tile">
+              <img src="https://images.unsplash.com/photo-1550963295-019d8a8a61c7?w=300&q=70&auto=format&fit=crop" alt="Vidro" loading="lazy" />
+              <span>Vidro</span>
+            </div>
           </div>
         </div>
       </div>
@@ -238,7 +256,7 @@
             <li><i data-lucide="check" style="width:14px;height:14px;color:#157347"></i> Dashboard de impacto em tempo real</li>
             <li><i data-lucide="check" style="width:14px;height:14px;color:#157347"></i> Dados para certificações ambientais</li>
           </ul>
-          <a href="#" class="btn-primary-sm">Saiba mais <i data-lucide="arrow-right" style="width:15px;height:15px;"></i></a>
+          <a href="/re.source/sobre" class="btn-primary-sm">Saiba mais <i data-lucide="arrow-right" style="width:15px;height:15px;"></i></a>
         </div>
       </div>
     </section>
@@ -256,7 +274,7 @@
             <li><i data-lucide="check" style="width:14px;height:14px;color:#157347"></i> Plataforma 100% restrita — sem PF</li>
             <li><i data-lucide="check" style="width:14px;height:14px;color:#157347"></i> Conformidade total com LGPD</li>
           </ul>
-          <a href="#" class="btn-primary-sm">Criar conta empresarial <i data-lucide="arrow-right" style="width:15px;height:15px;"></i></a>
+          <a href="/re.source/cadastro" class="btn-primary-sm">Criar conta empresarial <i data-lucide="arrow-right" style="width:15px;height:15px;"></i></a>
         </div>
 
         <div class="feat-visual reveal rd-1">
@@ -319,52 +337,78 @@
         <h2 class="cta-title reveal">Transforme resíduos em<br><em>oportunidade de negócio.</em></h2>
         <p class="cta-sub reveal">// Acesso exclusivo a empresas · Cadastro gratuito · Comece agora</p>
         <div class="cta-btns reveal">
-          <a href="#" class="btn-primary-lg">Cadastrar minha empresa</a>
-          <a href="#" class="btn-ghost-lg">Falar com a equipe</a>
+          <a href="/re.source/cadastro" class="btn-primary-lg">Cadastrar minha empresa</a>
+          <a href="/re.source/contato" class="btn-ghost-lg">Falar com a equipe</a>
         </div>
       </div>
     </section>
 
-    <!-- ══ FOOTER ══ -->
+    <!-- ══ FOOTER (mesmo padrão visual das páginas internas) ══ -->
     <footer class="site-footer">
-      <div class="wrap footer-inner">
-        <div class="footer-brand">
-          <a href="#" class="logo-mark footer-logo-mark">
-            <svg width="30" height="30" viewBox="0 0 38 38" fill="none">
-              <rect x="2" y="2" width="13" height="13" rx="1" stroke="#3CB371" stroke-width="2" fill="none"/>
-              <rect x="2" y="23" width="13" height="13" rx="1" stroke="#3CB371" stroke-width="2" fill="none"/>
-              <path d="M19 8.5 C27 8.5 27 19 27 19 C27 19 27 29.5 19 29.5" stroke="#3CB371" stroke-width="2" fill="none" stroke-linecap="round"/>
-              <circle cx="19" cy="8.5" r="2.5" fill="#3CB371"/>
-              <circle cx="19" cy="29.5" r="2.5" fill="#3CB371"/>
-            </svg>
-            <span>Re<span class="dot">.</span>Source</span>
-          </a>
-          <p>// Conectando a indústria circular</p>
-        </div>
-
-        <div class="footer-cols">
-          <div class="f-col">
-            <strong>Plataforma</strong>
-            <a href="#">Marketplace</a>
-            <a href="#">Categorias</a>
-            <a href="#">Como funciona</a>
+      <div class="footer-stats-bar">
+        <div class="footer-stats-inner">
+          <div>
+            <div class="footer-stat-value">+1,4 Bilhão</div>
+            <div class="footer-stat-label">KG de Resíduos</div>
           </div>
-          <div class="f-col">
-            <strong>Empresa</strong>
-            <a href="#">Sobre nós</a>
-            <a href="#">Contato</a>
-            <a href="#">SENAI — SA</a>
+          <div>
+            <div class="footer-stat-value">+1,3 Bilhão</div>
+            <div class="footer-stat-label">Reais Valorizados</div>
           </div>
-          <div class="f-col">
-            <strong>Legal</strong>
-            <a href="#">Termos de uso</a>
-            <a href="#">Privacidade</a>
-            <a href="#">LGPD</a>
+          <div>
+            <div class="footer-stat-value">+790 mil</div>
+            <div class="footer-stat-label">Usuários B2B</div>
+          </div>
+          <div>
+            <div class="footer-stat-value">+25 mil</div>
+            <div class="footer-stat-label">Empresas Homologadas</div>
           </div>
         </div>
       </div>
-      <div class="wrap footer-bottom">
-        <span>© 2025 Re.Source — Todos os direitos reservados</span>
+
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a href="/re.source/" class="logo-mark footer-logo-mark">
+            <img src="/re.source/public/img/logos/logo.png" alt="Re.Source" class="logo-mark-img" />
+            <span>Re<span class="dot">.</span>Source</span>
+          </a>
+          <p class="footer-desc">Conectando empresas para uma economia circular sustentável em Joinville.</p>
+        </div>
+
+        <div class="f-col">
+          <strong>O que você procura?</strong>
+          <a href="/re.source/busca?category_id=3">Plástico</a>
+          <a href="/re.source/busca?category_id=2">Metal</a>
+          <a href="/re.source/busca?category_id=4">Madeira</a>
+          <a href="/re.source/busca?category_id=1">Têxtil</a>
+          <a href="/re.source/busca?category_id=8">Eletrônicos</a>
+        </div>
+
+        <div class="f-col">
+          <strong>Na Re.Source</strong>
+          <a href="/re.source/">Início</a>
+          <a href="/re.source/sobre">Sobre Nós</a>
+          <a href="/re.source/contato">Contato</a>
+          <a href="/re.source/busca">Anúncios</a>
+        </div>
+
+        <div class="f-col">
+          <strong>Precisa de ajuda?</strong>
+          <div class="footer-contact">
+            <p>Entre em contato com a nossa equipe:</p>
+            <a href="mailto:contato@resource.com.br">contato@resource.com.br</a>
+          </div>
+          <a href="https://wa.me/5547999999999" class="whatsapp-contact-btn" target="_blank" rel="noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            Contato via WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Re.Source — Todos os direitos reservados</span>
         <span class="footer-project">Desenvolvido no SENAI · SA</span>
       </div>
     </footer>

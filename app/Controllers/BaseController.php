@@ -148,6 +148,22 @@ class BaseController
         ]);
     }
 
+    public static function termos(): void
+    {
+        $titulo_pagina = 'Termos de Uso — Re.Source';
+        view('home/termos', [
+            'titulo_pagina' => $titulo_pagina
+        ]);
+    }
+
+    public static function privacidade(): void
+    {
+        $titulo_pagina = 'Política de Privacidade — Re.Source';
+        view('home/privacidade', [
+            'titulo_pagina' => $titulo_pagina
+        ]);
+    }
+
     /**
      * Proxy robusto para busca de CNPJ com cache de 24h e múltiplos fallbacks (ReceitaWS, cnpj.ws, BrasilAPI)
      */

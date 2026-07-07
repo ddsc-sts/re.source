@@ -16,13 +16,7 @@
   <header class="site-header">
     <div class="header-inner">
       <a href="/re.source/" class="logo-mark">
-        <svg width="30" height="30" viewBox="0 0 38 38" fill="none">
-          <rect x="2" y="2" width="13" height="13" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
-          <rect x="2" y="23" width="13" height="13" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
-          <path d="M19 8.5 C27 8.5 27 19 27 19 C27 19 27 29.5 19 29.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <circle cx="19" cy="8.5" r="2.5" fill="currentColor"/>
-          <circle cx="19" cy="29.5" r="2.5" fill="currentColor"/>
-        </svg>
+        <img src="/re.source/public/img/logos/logo.png" alt="Re.Source" class="logo-mark-img" />
         <span>Re<span class="dot">.</span>Source</span>
       </a>
       <nav class="header-nav">
@@ -235,6 +229,51 @@
                        autocomplete="organization"
                        aria-required="true" />
                 <p class="field-error" id="err-razao" role="alert" aria-live="polite"></p>
+              </div>
+
+              <div class="form-field">
+                <label for="nomeFantasia">NOME FANTASIA <span class="req" aria-hidden="true">*</span></label>
+                <input type="text" id="nomeFantasia" name="nome_fantasia"
+                       placeholder="Como sua empresa é conhecida no mercado"
+                       autocomplete="organization"
+                       aria-required="true" />
+                <p class="field-error" id="err-nomeFantasia" role="alert" aria-live="polite"></p>
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="cep">CEP <span class="req" aria-hidden="true">*</span></label>
+                  <input type="text" id="cep" name="cep"
+                         placeholder="00000-000"
+                         maxlength="9"
+                         autocomplete="postal-code"
+                         aria-required="true" />
+                  <p class="field-error" id="err-cep" role="alert" aria-live="polite"></p>
+                </div>
+                <div class="form-field">
+                  <label for="numero">NÚMERO <span class="req" aria-hidden="true">*</span></label>
+                  <input type="text" id="numero" name="numero"
+                         placeholder="Ex.: 1200"
+                         autocomplete="address-line2"
+                         aria-required="true" />
+                  <p class="field-error" id="err-numero" role="alert" aria-live="polite"></p>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="endereco">ENDEREÇO (RUA/AV) <span class="req" aria-hidden="true">*</span></label>
+                <input type="text" id="endereco" name="endereco"
+                       placeholder="Ex.: Rua das Indústrias"
+                       autocomplete="address-line1"
+                       aria-required="true" />
+                <p class="field-error" id="err-endereco" role="alert" aria-live="polite"></p>
+              </div>
+
+              <div class="form-field">
+                <label for="complemento">COMPLEMENTO <span class="opt">(opcional)</span></label>
+                <input type="text" id="complemento" name="complemento"
+                       placeholder="Ex.: Galpão 3, Bloco B"
+                       autocomplete="address-line3" />
               </div>
 
               <div class="form-row">

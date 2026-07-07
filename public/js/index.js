@@ -38,6 +38,21 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
+  /* ── rolagem suave ao clicar em links internos (#âncora) ── */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    const targetId = link.getAttribute('href').slice(1);
+    if (!targetId) return;
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const headerOffset = (siteHeader ? siteHeader.offsetHeight : 76) + 24;
+      const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+      window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+    });
+  });
+
   /* ── reveal on scroll ── */
   const revealEls = document.querySelectorAll('.reveal');
   const revealObserver = new IntersectionObserver((entries) => {
