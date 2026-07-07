@@ -198,22 +198,6 @@ O último relatório registrado no projeto indica:
 OK (106 tests, 326 assertions)
 ```
 
-## Limitações conhecidas do MVP
-
-- Frete é simulado; não há integração real com transportadora.
-- Financeiro é interno; não há PIX, TED ou gateway bancário real.
-- Chat usa polling HTTP, não WebSocket.
-- ESG é estimativa acadêmica, não inventário ambiental auditado.
-- Troca de senha avançada, 2FA e gerenciamento real de sessões ficaram fora do escopo final por prazo.
-- O projeto é acadêmico e precisa de revisão de segurança antes de qualquer uso real.
-
-## Segurança e publicação
-
-- O arquivo `.env` não deve ser versionado.
-- Senhas SMTP e credenciais reais nunca devem ser commitadas.
-- As credenciais deste README são fictícias e voltadas à demonstração.
-- Antes de publicar como projeto aberto, revise o histórico Git em busca de segredos antigos.
-
 ## Licença
 
 Projeto acadêmico. Defina uma licença formal antes de reutilizar ou distribuir em contexto não acadêmico.
