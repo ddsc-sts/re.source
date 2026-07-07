@@ -1,0 +1,394 @@
+RELATORIO DE RESULTADO DOS TESTES - PROJETO re.source
+Data da execucao: 07/07/2026
+Ambiente: Windows / XAMPP / PHP 8.2.12
+Framework: PHPUnit 11.5.56
+Comando executado:
+C:\xampp\php\php.exe vendor\bin\phpunit
+
+RESULTADO GERAL
+Status final: OK
+Total de testes executados: 106
+Total de assertions: 326
+Falhas: 0
+Erros: 0
+Depreciacoes: 0
+
+Saida final do PHPUnit:
+OK (106 tests, 326 assertions)
+
+
+1. TESTES DE ESTATISTICAS E SAQUE
+Arquivo:
+tests/Controllers/EstatisticasControllerTest.php
+
+Cenarios cobertos:
+- Leitura correta do company_id e user_id a partir da sessao.
+- Tela de solicitacao de saque gera token unico withdrawal_request_token.
+- Tela de saque envia para a view os dados da empresa, saldo disponivel, token CSRF e request token.
+- Validacao bloqueia valor menor que R$ 10,00.
+- Validacao bloqueia metodo diferente de PIX ou TED.
+- Validacao bloqueia nome/documento do titular invalidos.
+- Validacao bloqueia ausencia de aceite dos termos.
+- Validacao bloqueia token ausente, diferente ou expirado, simulando reenvio duplicado.
+- PIX exige tipo de chave valido.
+- PIX com tipo email exige e-mail valido.
+- TED exige banco, agencia, conta, digito e tipo de conta.
+- Saque PIX valido normaliza telefone/documento e monta payload correto para o FinanceService.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+2. TESTES DE FRETE
+Arquivo:
+tests/Controllers/FreightControllerTest.php
+
+Cenarios cobertos:
+- company_id pode vir de $_SESSION["user"]["company_id"] ou de $_SESSION["company_id"].
+- user_id e lido corretamente da sessao.
+- canChoose respeita responsible_for_freight = buyer.
+- canChoose respeita responsible_for_freight = seller.
+- canChoose respeita responsible_for_freight = shared.
+- Empresa fora da negociacao nao pode escolher frete compartilhado.
+- Criacao de cotacoes expira cotacoes antigas antes de gerar novas.
+- Criacao de cotacoes gera exatamente 3 opcoes:
+  EcoLog Transportes / Economico
+  Rota Circular / Standard
+  Verde Express / Expresso
+- Quantidade em toneladas e convertida para kg.
+- Quantidade em kg e usada diretamente.
+- Outras unidades sao convertidas usando fator local do controller.
+- Negociacao nao encontrada ou sem acesso lanca DomainException.
+- Contratacao calcula taxa da plataforma em 5%.
+- Contratacao calcula total = valor da cotacao + taxa.
+- Tracking code segue o formato RS-AAMMDD-#####-XXXX.
+- Historico de status registra freight_id, status, descricao e usuario da sessao.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+3. TESTES DE ENTREGA / DELIVERY
+Arquivo:
+tests/Controllers/DeliveryControllerTest.php
+
+Cenarios cobertos:
+- company_id e user_id sao resolvidos corretamente da sessao.
+- company_id tem fallback direto em $_SESSION["company_id"].
+- Limite maximo de tentativas do codigo de entrega e 5.
+- Codigo de entrega possui exatamente 6 digitos.
+- Hash do codigo e validado com password_verify.
+- Codigo errado registra tentativa sem concluir a entrega.
+- Codigo errado incrementa contador de tentativas.
+- Codigo expirado bloqueia validacao.
+- Cinco tentativas ja usadas bloqueiam nova validacao.
+- Codigo correto conclui o frete.
+- Codigo correto conclui a negociacao.
+- Codigo correto conclui o anuncio.
+- Codigo correto cria transacao financeira de venda completed.
+- Codigo correto libera saldo do vendedor no valor da negociacao.
+- Codigo correto gera notificacoes para comprador e vendedor.
+- Validacao duplicada com transacao financeira ja criada bloqueia liberacao do saldo novamente.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+4. TESTES DE NEGOCIACAO
+Arquivo:
+tests/Controllers/NegotiationControllerTest.php
+
+Cenarios cobertos:
+- Anuncio do tipo offer define empresa logada como compradora.
+- Anuncio do tipo demand define empresa logada como vendedora.
+- Empresa dona do anuncio nao pode iniciar conversa consigo mesma.
+- Anuncio pausado/inativo bloqueia inicio de negociacao.
+- Fluxo completo de negociacao:
+  conversa iniciada
+  proposta enviada
+  comprador aceita
+  vendedor aceita
+  acordo mutuo confirmado
+  protocolo gerado
+  status final accepted
+- Proposta aceita pelas duas partes muda status da proposta para accepted.
+- Valor total proposto e calculado por quantidade x preco unitario.
+- Conversa existente e reaproveitada.
+- Condicao de corrida na criacao reaproveita negociacao criada por outra requisicao.
+- Recusar proposta volta a negociacao para open.
+- Recusa registra empresa que recusou e motivo.
+- Cancelar negociacao antes do acordo muda status para cancelled.
+- Cancelamento reativa anuncio que estava negotiating.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+5. TESTES DE ANUNCIOS / LISTING
+Arquivo:
+tests/Controllers/ListingControllerTest.php
+
+Cenarios cobertos:
+- company_id pode vir do usuario da sessao.
+- company_id pode vir diretamente da sessao.
+- Upload de imagem PNG real e aceito.
+- Upload com MIME invalido e rejeitado.
+- Upload acima de 5 MB e rejeitado.
+- Campos obrigatorios de anuncio sao validados.
+- Oferta sem preco e tratada como doacao, com preco 0.00.
+- Oferta com preco negativo e rejeitada.
+- Demanda sempre grava preco como null.
+- Edicao nao permite remover todas as imagens do anuncio.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+6. TESTES DO FINANCE SERVICE
+Arquivo:
+tests/Services/FinanceServiceTest.php
+
+Cenarios cobertos:
+- balances retorna saldo disponivel.
+- balances retorna saldo reservado em withdrawals pending.
+- balances retorna saldo sacado em withdrawals completed.
+- balances retorna saldo futuro vindo de negociacoes elegiveis.
+- requestWithdrawal com saldo suficiente cria saque pending.
+- requestWithdrawal debita saldo da empresa.
+- requestWithdrawal cria financial_transaction pending.
+- requestWithdrawal registra auditoria WITHDRAWAL_REQUESTED.
+- requestWithdrawal retorna o ID do saque criado.
+- requestWithdrawal bloqueia valor maior que o saldo disponivel.
+- requestWithdrawal faz rollback quando valor excede o saldo.
+- requestWithdrawal bloqueia request_token repetido.
+- requestWithdrawal faz rollback quando token ja existe.
+- requestWithdrawal bloqueia empresa inexistente.
+- requestWithdrawal faz rollback quando empresa nao existe.
+- review aprova saque pendente.
+- review altera saque aprovado para completed.
+- review altera transacao financeira para completed.
+- review cria notificacao withdrawal_approved.
+- review registra auditoria WITHDRAWAL_APPROVED.
+- review recusa saque pendente.
+- review devolve saldo para a empresa.
+- review altera saque recusado para rejected.
+- review altera transacao financeira para failed.
+- review cria notificacao withdrawal_rejected.
+- review registra auditoria WITHDRAWAL_REJECTED.
+- review bloqueia saque inexistente.
+- review bloqueia recusa sem motivo minimo.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+7. TESTES DE MIDDLEWARE E CONTROLE DE ACESSO
+Arquivos:
+tests/Middleware/AdminAuthTest.php
+tests/Middleware/ApprovedCompanyTest.php
+tests/Middleware/UserAuthTest.php
+
+Cenarios cobertos:
+- Admin possui permissoes financeiras, configuracoes, aprovacao e suspensao de empresas.
+- Staff possui apenas permissoes restritas de relatorio e aprovacao de anuncio.
+- Role ausente nao possui permissao.
+- isAdmin e isStaff retornam corretamente.
+- Empresa pending redireciona para /aguardando-aprovacao.
+- Empresa changes_requested redireciona para /aguardando-aprovacao com mensagem de revisao.
+- Empresa suspended, inactive ou rejected derruba sessao e redireciona para /login.
+- Empresa active libera acesso e atualiza company_status na sessao.
+- UserAuth bloqueia sessao sem company_id.
+- UserAuth libera acesso quando company_id esta no usuario ou direto na sessao.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+8. TESTES DE ADMINISTRACAO
+Arquivos:
+tests/Controllers/AdminControllerTest.php
+tests/Controllers/AdminFinanceControllerTest.php
+
+Cenarios cobertos:
+- Calculo de delta do dashboard para alta, baixa, estabilidade e ausencia de base anterior.
+- Formatacao de valores do dashboard em milhoes, milhares e valor simples.
+- Definicoes das acoes administrativas de empresa:
+  approve
+  request_changes
+  reject
+  suspend
+  reactivate
+- Validacao de motivo obrigatorio para acoes que exigem justificativa.
+- Bloqueio de motivo acima de 1.000 caracteres.
+- Filtros de saques aceitam apenas status pending, completed e rejected.
+- Filtros de saques aceitam apenas metodos pix e ted.
+- Busca textual de saque monta parametros LIKE para razao social, nome fantasia e CNPJ.
+- Metricas de saques agrupam pendentes, aprovados e rejeitados.
+- Cabecalho do CSV de exportacao de saques segue o roteiro.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+9. TESTES DE PROPOSTAS
+Arquivo:
+tests/Controllers/ProposalControllerTest.php
+
+Cenarios cobertos:
+- Proposta bloqueia quantidade invalida.
+- Proposta bloqueia valor unitario invalido.
+- Proposta bloqueia responsavel pelo frete invalido.
+- Proposta bloqueia prazo de entrega no passado.
+- Proposta bloqueia observacoes acima de 1.000 caracteres.
+- Proposta valida calcula total = quantidade x preco unitario.
+- Proposta valida muda negociacao para proposal_sent.
+- Proposta valida muda anuncio para negotiating.
+- Proposta nao pode ser alterada em status accepted, awaiting_freight, shipping, delivered, concluded ou cancelled.
+- otherCompany retorna corretamente a outra parte da negociacao.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+10. TESTES DE CHAT
+Arquivo:
+tests/Controllers/ChatControllerTest.php
+
+Cenarios cobertos:
+- company_id e user_id sao lidos da sessao.
+- Mensagem vazia e rejeitada.
+- Mensagem acima de 2.000 caracteres e rejeitada.
+- Mensagem valida e aceita.
+- Negociacao sem acesso retorna null.
+- unreadTotal conta mensagens recebidas nao lidas usando buyer/seller da empresa.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+11. TESTES DE BUSCA
+Arquivo:
+tests/Controllers/SearchControllerTest.php
+
+Cenarios cobertos:
+- Busca textual usa placeholders separados para titulo e descricao.
+- Filtro por categoria e aplicado.
+- Filtro por empresa e aplicado.
+- Filtro por tipo aceita offer/demand.
+- Tipo invalido e ignorado.
+- Estado e normalizado para maiusculo.
+- Cidade e aplicada como filtro.
+- Alias legado papelão resolve para Papel/Papelão.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+12. TESTES DE AUTENTICACAO E CADASTRO
+Arquivo:
+tests/Controllers/AuthControllerTest.php
+
+Cenarios cobertos:
+- Login de admin e staff redireciona para /admin.
+- Empresa pending ou changes_requested redireciona para /aguardando-aprovacao.
+- Empresa active redireciona para /base.
+- Empresa rejected, suspended ou inactive e bloqueada com mensagem especifica.
+- Cadastro valida nome, sobrenome, e-mail, CNPJ, razao social, nome fantasia, CEP, endereco, numero, senha, confirmacao, estado, cidade e segmento.
+- Dominio gratuito bloqueado e rejeitado.
+- CNPJ com numeros repetidos e invalido.
+- CNPJ valido passa na validacao.
+- Codigo de verificacao expirado e bloqueado.
+- Codigo de verificacao incorreto e bloqueado.
+- Codigo correto passa.
+- Reenvio de codigo respeita cooldown de 60 segundos.
+- Reset de senha valida token, tamanho minimo e confirmacao.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+13. TESTES DE HOME E BASE
+Arquivos:
+tests/Controllers/HomeControllerTest.php
+tests/Controllers/BaseControllerTest.php
+
+Cenarios cobertos:
+- HomeController existe e aponta para a view home/index.php.
+- Stubs de paginas em desenvolvimento continuam retornando "Em desenvolvimento".
+- Preferencias de conta normalizam tema e checkboxes de notificacao.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+14. TESTES MINIMOS DE CARREGAMENTO DOS OUTROS CONTROLLERS
+Arquivos:
+tests/Controllers/AuthControllerTest.php
+tests/Controllers/ChatControllerTest.php
+tests/Controllers/HomeControllerTest.php
+tests/Controllers/ProposalControllerTest.php
+tests/Controllers/SearchControllerTest.php
+
+Cenarios cobertos:
+- Confirmado que cada classe de controller existe e e carregada pelo autoload.
+- Corrigido conflito em AdminFinanceControllerTest, que declarava a classe errada.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+15. TESTES DE INTEGRACAO
+Arquivos:
+tests/Integration/FinanceServiceIntegrationTest.php
+tests/Integration/MelhorEnvioServiceIntegrationTest.php
+tests/Integration/RouteMapSmokeTest.php
+tests/Integration/FrontControllerSmokeTest.php
+
+Cenarios cobertos:
+- Banco MySQL temporario com schema isolado para testar o FinanceService sem mock.
+- balances calcula saldo disponivel, reservado, sacado e futuro em rows reais.
+- requestWithdrawal persiste saque pending, debita saldo e cria financial_transactions.
+- requestWithdrawal faz rollback real no MySQL quando o saldo e insuficiente.
+- requestWithdrawal rejeita request_token duplicado em banco real.
+- review aprova saque real e atualiza status/transacao/balance.
+- review recusa saque real e devolve saldo.
+- MelhorEnvioService quote responde com payload do servidor local mockado.
+- MelhorEnvioService propaga erro HTTP 422 com a mensagem da API.
+- MelhorEnvioService respeita URL encoding no endpoint de tracking.
+- MelhorEnvioService propaga erro de curl quando o destino esta inacessivel.
+- MelhorEnvioService sem access token recebe 401 do mock e expõe a mensagem.
+- Mapa de rotas critica aponta para os controllers certos.
+- Rotas protegidas carregam os middlewares esperados.
+- Front controller carrega as paginas publicas principais.
+- Front controller carrega a tela de aprovacao com sessao real.
+- Front controller carrega o chat com empresa ativa e schema temporario.
+
+Resultado:
+Todos os cenarios passaram.
+
+
+16. CONFIGURACAO DOS TESTES
+Arquivo:
+phpunit.xml
+
+Alteracoes e validacoes:
+- Configuracao migrada para o schema atual do PHPUnit 11.
+- A migracao removeu a depreciacao que aparecia na execucao anterior.
+- A execucao final nao apresenta falhas, erros ou depreciacoes.
+
+
+CONCLUSAO
+A suite automatizada atual cobre os principais pontos de prioridade altissima do roteiro:
+- Saque e regras financeiras.
+- Revisao/aprovacao/recusa de saque.
+- Negociacao ate acordo mutuo.
+- Contratacao e regras de frete.
+- Validacao de entrega e liberacao de saldo.
+- Validacoes iniciais de anuncios e uploads.
+- Middleware e controle de acesso por perfil/status da empresa.
+- Administracao de empresas e saques.
+- Propostas, chat, busca, autenticacao, cadastro, reset e home.
+- Integracao real com MySQL temporario e mock HTTP local.
+
+Resultado final confirmado:
+OK (106 tests, 326 assertions)

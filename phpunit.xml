@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php" colors="true" cacheResult="true" executionOrder="depends,defects" beStrictAboutOutputDuringTests="true" failOnWarning="false" failOnRisky="false" cacheDirectory=".phpunit.cache">
+  <testsuites>
+    <testsuite name="Controllers">
+      <directory suffix="Test.php">tests/Controllers</directory>
+    </testsuite>
+    <testsuite name="Services">
+      <directory suffix="Test.php">tests/Services</directory>
+    </testsuite>
+    <testsuite name="Integration">
+      <directory suffix="Test.php">tests/Integration</directory>
+    </testsuite>
+    <testsuite name="Middleware">
+      <directory suffix="Test.php">tests/Middleware</directory>
+    </testsuite>
+    <testsuite name="Helpers">
+      <directory suffix="Test.php">tests/Helpers</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <env name="APP_ENV" value="testing"/>
+  </php>
+  <source>
+    <include>
+      <directory suffix=".php">app</directory>
+    </include>
+    <exclude>
+      <directory>vendor</directory>
+      <directory>storage</directory>
+      <directory>public</directory>
+      <directory>views</directory>
+    </exclude>
+  </source>
+</phpunit>
