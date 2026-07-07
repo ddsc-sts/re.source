@@ -315,6 +315,16 @@ return [
         'middleware' => [['AdminAuth', 'required']],
     ],
 
+    '/admin/anuncios/ativar' => [
+        'action'     => ['AdminController', 'ativarAnuncio'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
+    '/admin/anuncios/pausar' => [
+        'action'     => ['AdminController', 'pausarAnuncio'],
+        'middleware' => [['AdminAuth', 'required']],
+    ],
+
     '/admin/negociacoes' => [
         'action'     => ['AdminController', 'negociacoes'],
         'middleware' => [['AdminAuth', 'required']],

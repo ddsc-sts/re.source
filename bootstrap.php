@@ -69,6 +69,28 @@ function asset_url(string $path = ''): string {
     return $url;
 }
 
+/** Le uma configuracao administrativa persistida em system_settings. */
+function app_setting(string $key, ?string $default = null): ?string {
+    static $settings = null;
+
+    if ($settings === null) {
+        $settings = [];
+        try {
+            global $pdo;
+            if ($pdo instanceof PDO) {
+                $stmt = $pdo->query('SELECT setting_key, setting_value FROM system_settings');
+                foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                    $settings[(string) $row['setting_key']] = (string) $row['setting_value'];
+                }
+            }
+        } catch (Throwable $e) {
+            error_log('Falha ao carregar system_settings: ' . $e->getMessage());
+        }
+    }
+
+    return $settings[$key] ?? $default;
+}
+
 /** Redireciona para uma rota interna e encerra a requisicao. */
 function redirect_to(string $path, int $status = 302): never {
     header('Location: ' . app_url($path), true, $status);

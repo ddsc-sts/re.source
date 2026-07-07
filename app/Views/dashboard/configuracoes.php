@@ -159,7 +159,10 @@ require_once __DIR__ . '/../components/header.php';
                 </div>
                 <form action="/re.source/conta/excluir" method="POST" onsubmit="return confirm('Tem certeza absoluta? Esta ação não pode ser desfeita.');">
                     <?= csrf_field() ?>
-                    <button type="submit" class="btn-danger">Excluir Conta</button>
+                    <button type="submit" class="btn-danger">
+                        <i data-lucide="trash-2"></i>
+                        Excluir Conta
+                    </button>
                 </form>
             </div>
         </div>
@@ -176,7 +179,10 @@ require_once __DIR__ . '/../components/header.php';
             <button type="button" class="btn-logout" onclick="toggleDeleteModal(false)">Cancelar</button>
             <form action="/re.source/conta/excluir" method="POST" style="display: inline;">
                 <?= csrf_field() ?>
-                <button type="submit" class="btn-danger">Sim, Excluir Tudo</button>
+                <button type="submit" class="btn-danger">
+                    <i data-lucide="trash-2"></i>
+                    Sim, Excluir Tudo
+                </button>
             </form>
         </div>
     </div>

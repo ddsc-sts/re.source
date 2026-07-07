@@ -19,7 +19,6 @@
   <header class="login-header">
     <a href="/re.source/" class="login-logo">
       <img src="/re.source/public/img/logos/logo.png" alt="Re.Source" />
-      <span>Re<span class="dot">.</span>Source</span>
     </a>
     <div class="login-header-ctas">
       <a href="/re.source/login" class="link-login active">Entrar</a>
@@ -169,7 +168,7 @@
 
   <footer class="login-footer">
     © 2026 Re.Source · Todos os direitos reservados ·
-    <a href="#">Política de Privacidade</a>
+    <a href="/re.source/privacidade">Política de Privacidade</a>
   </footer>
 
   <!-- 🚀 CORREÇÃO: Adicionado o '?v=2' para forçar o navegador a carregar o seu JavaScript novo sem usar o cache -->

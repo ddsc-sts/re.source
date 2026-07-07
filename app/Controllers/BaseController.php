@@ -295,6 +295,7 @@ class BaseController
         $street     = filter_input(INPUT_POST, 'street', FILTER_SANITIZE_SPECIAL_CHARS);
         $number     = filter_input(INPUT_POST, 'number', FILTER_SANITIZE_SPECIAL_CHARS);
         $complement = filter_input(INPUT_POST, 'complement', FILTER_SANITIZE_SPECIAL_CHARS);
+        $district   = filter_input(INPUT_POST, 'district', FILTER_SANITIZE_SPECIAL_CHARS);
         $city       = filter_input(INPUT_POST, 'city', FILTER_SANITIZE_SPECIAL_CHARS);
         $state      = filter_input(INPUT_POST, 'state', FILTER_SANITIZE_SPECIAL_CHARS);
 
@@ -346,13 +347,13 @@ class BaseController
             }
 
             if ($address_id) {
-                $sqlAddress = "UPDATE addresses SET zip_code = ?, street = ?, number = ?, complement = ?, city = ?, state = ? WHERE id = ?";
+                $sqlAddress = "UPDATE addresses SET zip_code = ?, street = ?, number = ?, complement = ?, district = ?, city = ?, state = ? WHERE id = ?";
                 $stmtAddress = $pdo->prepare($sqlAddress);
-                $stmtAddress->execute([$zip_code, $street, $number, $complement, $city, $state, $address_id]);
+                $stmtAddress->execute([$zip_code, $street, $number, $complement, $district, $city, $state, $address_id]);
             } else {
-                $sqlAddress = "INSERT INTO addresses (zip_code, street, number, complement, city, state) VALUES (?, ?, ?, ?, ?, ?)";
+                $sqlAddress = "INSERT INTO addresses (zip_code, street, number, complement, district, city, state) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmtAddress = $pdo->prepare($sqlAddress);
-                $stmtAddress->execute([$zip_code, $street, $number, $complement, $city, $state]);
+                $stmtAddress->execute([$zip_code, $street, $number, $complement, $district, $city, $state]);
                 $address_id = $pdo->lastInsertId();
             }
 

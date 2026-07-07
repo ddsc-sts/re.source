@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="/re.source/public/css/admin-dashboard.css" />
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <link rel="stylesheet" href="/re.source/public/css/empresas.css" />
+<link rel="stylesheet" href="/re.source/public/css/flash.css" />
 </head>
 <body>
 
@@ -19,6 +20,7 @@
     <?php require_once __DIR__ . '/../../components/topbar.php'; ?>
     <?php require_once __DIR__ . '/../../components/navbar.php'; ?>
 </header>
+<?php require_once __DIR__ . '/../../components/flash.php'; ?>
 
 <main class="admin-main">
   <div class="admin-content">
@@ -42,13 +44,13 @@
     <div class="card">
       <div class="card-header">
         <div>
-          <div class="card-title">Lista de empresas</div>
-          <div class="card-sub">Visualize, aprove e gerencie cadastros</div>
+          <div class="card-title">Lista de anuncios</div>
+          <div class="card-sub">Visualize, ative e pause anuncios cadastrados</div>
         </div>
         <a href="#" class="card-link">Exportar CSV →</a>
       </div>
       <div class="table-wrapper">
-        <table class="admin-table" id="empresasTable">
+        <table class="admin-table" id="anunciosTable">
         <thead>
             <tr>
                 <th>ID</th>
@@ -142,17 +144,29 @@
                 <td>
                     <div class="action-buttons" style="justify-content:flex-end">
 
-                        <button class="btn-icon success">
-                            <i data-lucide="check"></i>
-                        </button>
+                        <?php if ($a['status'] !== 'active' && AdminAuth::can('listing_approve')): ?>
+                            <form method="POST" action="/re.source/admin/anuncios/ativar">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="listing_id" value="<?= (int) $a['id'] ?>">
+                                <button class="btn-icon success" type="submit" title="Ativar anuncio" aria-label="Ativar anuncio">
+                                    <i data-lucide="check"></i>
+                                </button>
+                            </form>
+                        <?php endif; ?>
 
-                        <button class="btn-icon danger">
-                            <i data-lucide="trash-2"></i>
-                        </button>
+                        <?php if ($a['status'] !== 'paused' && AdminAuth::can('listing_delete')): ?>
+                            <form method="POST" action="/re.source/admin/anuncios/pausar" onsubmit="return confirm('Pausar este anuncio? Ele deixa de aparecer nas buscas publicas.');">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="listing_id" value="<?= (int) $a['id'] ?>">
+                                <button class="btn-icon danger" type="submit" title="Pausar anuncio" aria-label="Pausar anuncio">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </form>
+                        <?php endif; ?>
 
-                        <button class="btn-icon">
+                        <a class="btn-icon" href="/re.source/anuncio?id=<?= (int) $a['id'] ?>" title="Visualizar anuncio" aria-label="Visualizar anuncio">
                             <i data-lucide="eye"></i>
-                        </button>
+                        </a>
 
                     </div>
                 </td>

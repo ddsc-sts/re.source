@@ -174,7 +174,7 @@ Daniel — Dia 6:
 
 Geder/equipe — Dia 6:
 
-[ ] Executar roteiro_teste_dia3.txt completo em navegadores diferentes.
+[ ] Executar roteiro_definitivo_para_apresentacao.txt completo em navegadores diferentes.
 [ ] Repetir o roteiro tres vezes a partir de banco novo.
 [ ] Confirmar visualmente saldo, reserva, recusa e aprovacao.
 [ ] Confirmar recebimento SMTP com contas de teste reais.
@@ -183,8 +183,8 @@ Geder/equipe — Dia 6:
 [ ] Gravar uma execucao completa como seguranca.
 [ ] Registrar limitacoes finais do MVP.
 
-O arquivo roteiro_teste_dia3.txt manteve o nome antigo por solicitacao, mas seu
-conteudo agora e o roteiro manual final de todo o MVP.
+O arquivo roteiro_definitivo_para_apresentacao.txt substitui o antigo
+roteiro_teste_dia3.txt e contem o roteiro manual final de todo o MVP.
 
 ===============================================================================
 6. CRIAR O BANCO DO ZERO NO OUTRO COMPUTADOR
@@ -322,7 +322,7 @@ Alteracoes locais que precisam de commit/push antes da troca de computador:
 - database/inserts/promover_admin.sql (novo)
 - database/seeders/re.sourcebanco.sql
 - planejamento.txt
-- roteiro_teste_dia3.txt
+- roteiro_definitivo_para_apresentacao.txt
 - Docs/ESCOPO_CONGELADO_MVP.md (novo)
 - scripts/ (novo; ferramentas opcionais, nao executar sem pedido)
 
@@ -367,7 +367,7 @@ arquivo, leia integralmente:
 1. contexto_projeto.txt
 2. planejamento.txt
 3. melhorias.txt
-4. roteiro_teste_dia3.txt
+4. roteiro_definitivo_para_apresentacao.txt
 5. Docs/ESCOPO_CONGELADO_MVP.md
 6. Docs/FORMULAS_ESG_MVP.md
 7. routes/web.php e o codigo relacionado a tarefa atual

@@ -7,6 +7,8 @@
 .my-listings-content { gap: 2rem; }
 
 .my-listings-header {
+  position: static;
+  z-index: auto;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;

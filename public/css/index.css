@@ -258,7 +258,7 @@ h1, h2, h3 { font-family: var(--font-display); text-transform: uppercase; letter
   flex-shrink: 0;
 }
 .logo-mark-img {
-  height: 32px;
+  height: 46px;
   width: auto;
   display: block;
 }
@@ -962,7 +962,7 @@ h1, h2, h3 { font-family: var(--font-display); text-transform: uppercase; letter
   max-width: 1200px; margin: 0 auto;
   padding: 3.75rem 1.5rem 2.75rem;
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  grid-template-columns: 1.3fr 1fr 1fr 0.9fr 1.1fr;
   gap: 3rem;
 }
 .footer-brand p { font-family: var(--font-mono); font-size: 0.78rem; color: var(--footer-muted); margin-top: 0.7rem; line-height: 1.6; }
@@ -1077,3 +1077,5 @@ h1, h2, h3 { font-family: var(--font-display); text-transform: uppercase; letter
   .hn-sep { display: none; }
   .hero-numbers { gap: 1.1rem; }
 }
+.site-header .logo-mark { min-width: 205px; }
+.footer-logo-mark .logo-mark-img { height: 52px; filter: brightness(0) invert(1); }

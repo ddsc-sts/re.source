@@ -5,6 +5,8 @@
 global $pdo;
 
 $theme = 'light';
+$platformName = app_setting('platform_name', 'Re.Source') ?: 'Re.Source';
+$maintenanceMessage = trim((string) app_setting('maintenance_message', ''));
 $headerCompanyName = 'Minha Conta';
 $headerCompanyId = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
 $headerCompanyStatus = $_SESSION['user']['company_status'] ?? null;
@@ -87,13 +89,20 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
 <script>window.APP_BASE_PATH = <?= json_encode(APP_BASE_PATH, JSON_UNESCAPED_SLASHES) ?>;</script>
 <?php require __DIR__ . '/flash.php'; ?>
 
+<?php if ($maintenanceMessage !== ''): ?>
+  <div class="system-alert" role="status">
+    <i data-lucide="wrench"></i>
+    <span><?= htmlspecialchars($maintenanceMessage, ENT_QUOTES, 'UTF-8') ?></span>
+  </div>
+<?php endif; ?>
+
 <header>
   <div class="header-top">
     <div class="header-top-inner">
 
       <div class="logo">
         <a href="<?= $headerHomeUrl ?>">
-          <img src="/re.source/public/img/logos/logo.png" alt="Re.Source" />
+          <img src="/re.source/public/img/logos/logo.png" alt="<?= htmlspecialchars($platformName, ENT_QUOTES, 'UTF-8') ?>" />
         </a>
       </div>
 
@@ -196,7 +205,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
     </div>
   </div>
 
-  <div class="search-bar-wrap" <?= !empty($hideSearchBar) ? 'style="display:none"' : '' ?>>
+  <div<?= !empty($hideSearchBar) ? ' style="display:none"' : '' ?>>
     <div class="search-bar-inner">
       <form action="/re.source/busca" method="GET" class="search-pill">
         

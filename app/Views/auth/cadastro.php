@@ -17,7 +17,6 @@
     <div class="header-inner">
       <a href="/re.source/" class="logo-mark">
         <img src="/re.source/public/img/logos/logo.png" alt="Re.Source" class="logo-mark-img" />
-        <span>Re<span class="dot">.</span>Source</span>
       </a>
       <nav class="header-nav">
         <a href="/re.source/">← Voltar ao site</a>
@@ -269,11 +268,21 @@
                 <p class="field-error" id="err-endereco" role="alert" aria-live="polite"></p>
               </div>
 
-              <div class="form-field">
-                <label for="complemento">COMPLEMENTO <span class="opt">(opcional)</span></label>
-                <input type="text" id="complemento" name="complemento"
-                       placeholder="Ex.: Galpão 3, Bloco B"
-                       autocomplete="address-line3" />
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="bairro">BAIRRO <span class="req" aria-hidden="true">*</span></label>
+                  <input type="text" id="bairro" name="bairro"
+                         placeholder="Ex.: Distrito Industrial"
+                         autocomplete="address-level3"
+                         aria-required="true" />
+                  <p class="field-error" id="err-bairro" role="alert" aria-live="polite"></p>
+                </div>
+                <div class="form-field">
+                  <label for="complemento">COMPLEMENTO <span class="opt">(opcional)</span></label>
+                  <input type="text" id="complemento" name="complemento"
+                         placeholder="Ex.: Galpão 3, Bloco B"
+                         autocomplete="address-line3" />
+                </div>
               </div>
 
               <div class="form-row">
@@ -415,8 +424,8 @@
             </div>
             <h2>Conta criada com sucesso!</h2>
             <p>Verifique seu e-mail para ativar o acesso e começar a usar a plataforma.</p>
-            <a href="/re.source/marketplace" class="btn-next" style="display:inline-flex; margin-top:0.5rem;">
-              Ir para o marketplace
+            <a href="/re.source/pendente" class="btn-next" style="display:inline-flex; margin-top:0.5rem;">
+              Confirmar meu e-mail
               <i data-lucide="arrow-right" aria-hidden="true"></i>
             </a>
           </div>

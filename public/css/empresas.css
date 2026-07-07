@@ -119,7 +119,7 @@ button { cursor:pointer; border:none; background:none; font-family:inherit; }
 .no-actions { display:inline-grid; place-items:center; width:36px; height:36px; color:#98a2b3; }
 .no-actions i { width:16px; }
 
-.company-action-dialog { width:min(480px,calc(100% - 2rem)); padding:0; color:var(--dark); background:#fff; border:0; border-radius:1rem; box-shadow:0 24px 70px rgba(15,23,42,.25); }
+.company-action-dialog { position:fixed; inset:0; margin:auto; width:min(480px,calc(100% - 2rem)); max-height:min(86vh,620px); padding:0; color:var(--dark); background:#fff; border:0; border-radius:1rem; box-shadow:0 24px 70px rgba(15,23,42,.25); overflow:auto; }
 .company-action-dialog::backdrop { background:rgba(15,23,42,.55); backdrop-filter:blur(2px); }
 .company-action-dialog form { display:grid; gap:.75rem; padding:1.5rem; }
 .company-action-dialog h2 { margin:0; font:700 1.2rem var(--font-main); }
@@ -132,6 +132,10 @@ button { cursor:pointer; border:none; background:none; font-family:inherit; }
 .dialog-icon i { width:20px; }
 .dialog-actions { display:flex; justify-content:flex-end; gap:.65rem; margin-top:.5rem; }
 .dialog-cancel { padding:.7rem 1rem; color:var(--muted); border:1px solid var(--border); border-radius:.65rem; background:#fff; font-weight:600; }
+.review-note-dialog-content { display:grid; gap:.85rem; padding:1.5rem; }
+.review-note-dialog-content h2 { margin:0; font:700 1.2rem var(--font-main); }
+.review-note-dialog-content p { margin:0; color:var(--muted); font-size:.86rem; }
+.review-note-text { padding:1rem; min-height:110px; white-space:pre-wrap; line-height:1.6; background:#fafbfc; border:1px solid var(--border); color:var(--dark); }
 
 .table-wrapper { overflow-x:auto; }
 .admin-table { width:100%; border-collapse:collapse; }

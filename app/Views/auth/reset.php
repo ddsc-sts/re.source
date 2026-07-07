@@ -160,7 +160,7 @@
 
   <footer style="text-align:center;padding:1.5rem;font-size:0.8rem;color:#6C757D;background:var(--white);border-top:1px solid var(--border-color);">
     © 2026 Re.Source · Todos os direitos reservados ·
-    <a href="#" style="color:var(--green);">Política de Privacidade</a>
+    <a href="/re.source/privacidade" style="color:var(--green);">Política de Privacidade</a>
   </footer>
 
   <script src="/re.source/public/js/reset.js?v=2"></script>

@@ -49,3 +49,48 @@
 .category-card:hover img { filter: saturate(1.08) contrast(1.02); }
 .listings-section .ad-image { filter: saturate(.92) contrast(1.03); }
 .listings-section .ad-card:hover .ad-image { filter: saturate(1.08) contrast(1.02); }
+
+[data-theme="dark"] .category-section {
+  background-color: #0e1114;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+}
+[data-theme="dark"] .base-section-heading .section-title {
+  color: #f3f4f6;
+}
+[data-theme="dark"] .base-section-heading>a {
+  color: #8ee6ad;
+}
+[data-theme="dark"] .category-card {
+  color: #f3f4f6;
+  background: #171c20;
+  border-color: #323a42;
+}
+[data-theme="dark"] .category-card:hover {
+  border-color: #5fbf86;
+}
+[data-theme="dark"] .category-card-media {
+  background: #11161a;
+}
+[data-theme="dark"] .category-card-copy p {
+  color: #a0aec0;
+}
+[data-theme="dark"] .category-card-copy>div {
+  color: #8ee6ad;
+}
+[data-theme="dark"] .base-hero-search {
+  background: #171c20;
+  border-color: #323a42;
+  box-shadow: 8px 8px 0 rgba(0,0,0,.45);
+}
+[data-theme="dark"] .base-hero-search label {
+  border-color: #323a42;
+}
+[data-theme="dark"] .base-hero-search label span {
+  color: #a0aec0;
+}
+[data-theme="dark"] .base-hero-search input,
+[data-theme="dark"] .base-hero-search select {
+  color: #f3f4f6;
+}

@@ -370,6 +370,116 @@ class AdminController
         require_once __DIR__ . '/../Views/dashboard/admin/anuncios.php';
     }
 
+    public static function ativarAnuncio(): void
+    {
+        self::processListingAction('activate');
+    }
+
+    public static function pausarAnuncio(): void
+    {
+        self::processListingAction('pause');
+    }
+
+    private static function processListingAction(string $action): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+            http_response_code(405);
+            exit('Metodo nao permitido.');
+        }
+
+        $definitions = [
+            'activate' => [
+                'permission' => 'listing_approve',
+                'allowed' => ['draft', 'paused', 'expired'],
+                'target' => 'active',
+                'audit' => 'LISTING_ACTIVATED_BY_ADMIN',
+                'severity' => 'info',
+                'message' => 'Anuncio ativado com sucesso.',
+            ],
+            'pause' => [
+                'permission' => 'listing_delete',
+                'allowed' => ['draft', 'active', 'paused', 'negotiating', 'expired'],
+                'target' => 'paused',
+                'audit' => 'LISTING_PAUSED_BY_ADMIN',
+                'severity' => 'warning',
+                'message' => 'Anuncio pausado com sucesso.',
+            ],
+        ];
+
+        $definition = $definitions[$action] ?? null;
+        if (!$definition) {
+            http_response_code(400);
+            exit('Acao administrativa invalida.');
+        }
+        if (!AdminAuth::can($definition['permission'])) {
+            http_response_code(403);
+            exit('Voce nao possui permissao para executar esta acao.');
+        }
+        if (!csrf_validate()) {
+            flash('error', 'A sessao do formulario expirou. Tente novamente.');
+            redirect_to('/admin/anuncios');
+        }
+
+        $listingId = filter_input(INPUT_POST, 'listing_id', FILTER_VALIDATE_INT);
+        if (!$listingId) {
+            flash('error', 'Anuncio invalido.');
+            redirect_to('/admin/anuncios');
+        }
+
+        global $pdo;
+        $adminUser = AdminAuth::user();
+        $adminId = (int) ($adminUser['id'] ?? 0);
+
+        try {
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare(
+                'SELECT id, company_id, title, status FROM listings
+                 WHERE id = ? AND deleted_at IS NULL LIMIT 1 FOR UPDATE'
+            );
+            $stmt->execute([$listingId]);
+            $listing = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$listing) {
+                throw new DomainException('Anuncio nao encontrado.');
+            }
+            if (!in_array($listing['status'], $definition['allowed'], true)) {
+                throw new DomainException('O status atual do anuncio nao permite esta acao.');
+            }
+
+            $target = $definition['target'];
+            if ($listing['status'] !== $target) {
+                $pdo->prepare('UPDATE listings SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+                    ->execute([$target, $listingId]);
+            }
+
+            $pdo->prepare(
+                'INSERT INTO audit_logs
+                    (user_id, company_id, action, severity, entity_type, entity_id,
+                     old_values_json, new_values_json, ip_address, user_agent)
+                 VALUES (?, ?, ?, ?, \'listing\', ?, ?, ?, ?, ?)'
+            )->execute([
+                $adminId,
+                (int) $listing['company_id'],
+                $definition['audit'],
+                $definition['severity'],
+                $listingId,
+                json_encode(['status' => $listing['status']], JSON_UNESCAPED_UNICODE),
+                json_encode(['status' => $target], JSON_UNESCAPED_UNICODE),
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+            ]);
+
+            $pdo->commit();
+            flash('success', $definition['message']);
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            flash('error', $e instanceof DomainException ? $e->getMessage() : 'Nao foi possivel atualizar o anuncio.');
+        }
+
+        redirect_to('/admin/anuncios');
+    }
+
     public static function negociacoes(): void
     {
         global $pdo;
@@ -583,6 +693,7 @@ class AdminController
              FROM audit_logs WHERE severity IN ('warning','critical')
              ORDER BY created_at DESC LIMIT 10"
         )->fetchAll(PDO::FETCH_ASSOC);
+        $_SESSION['admin_support_seen_at'] = $supportActivity[0]['created_at'] ?? date('Y-m-d H:i:s');
 
         require_once __DIR__ . '/../Views/dashboard/admin/suporte.php';
     }

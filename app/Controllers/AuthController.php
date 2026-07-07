@@ -373,13 +373,13 @@ class AuthController
         $estado    = trim($_POST['estado']       ?? '');
         $cnpj      = preg_replace('/\D/', '', trim($_POST['cnpj']      ?? ''));
         $razao     = trim($_POST['razao_social'] ?? '');
-
         $nomeFantasia = trim($_POST['nome_fantasia'] ?? '');
         $cidade       = trim($_POST['cidade']        ?? '');
         $segmento     = trim($_POST['segmento']      ?? '');
         $cep          = preg_replace('/\D/', '', trim($_POST['cep']    ?? ''));
         $endereco     = trim($_POST['endereco']      ?? '');
         $numero       = trim($_POST['numero']        ?? '');
+        $bairro       = trim($_POST['bairro']        ?? '');
         $complemento  = trim($_POST['complemento']   ?? ''); // opcional
 
         $erros  = [];
@@ -394,6 +394,7 @@ class AuthController
         if (strlen($cep) !== 8) { $erros[] = 'CEP inválido.'; $campos[] = ['field' => 'cep', 'msg' => 'CEP deve ter 8 dígitos.']; }
         if (!$endereco)  { $erros[] = 'Endereço é obrigatório.'; $campos[] = ['field' => 'endereco', 'msg' => 'Informe o endereço.']; }
         if (!$numero)    { $erros[] = 'Número é obrigatório.'; $campos[] = ['field' => 'numero', 'msg' => 'Informe o número.']; }
+        if (!$bairro)    { $erros[] = 'Bairro é obrigatório.'; $campos[] = ['field' => 'bairro', 'msg' => 'Informe o bairro.']; }
         if (strlen($senha) < 8) { $erros[] = 'Senha deve ter ao menos 8 caracteres.'; $campos[] = ['field' => 'senha', 'msg' => 'Senha deve ter ao menos 8 caracteres.']; }
         if ($senha !== $senhaConf) { $erros[] = 'As senhas não coincidem.'; $campos[] = ['field' => 'senhaConf', 'msg' => 'As senhas não coincidem.']; }
         if (!$estado)    { $erros[] = 'Estado é obrigatório.';       $campos[] = ['field' => 'estado', 'msg' => 'Selecione seu estado.']; }
@@ -465,6 +466,7 @@ class AuthController
             'cep'           => $cep,
             'endereco'      => $endereco,
             'numero'        => $numero,
+            'bairro'        => $bairro,
             'complemento'   => $complemento,
         ];
 
@@ -786,12 +788,13 @@ class AuthController
         try {
             $pdo->prepare(
                 "INSERT INTO addresses (zip_code, street, number, complement, district, city, state)
-                 VALUES (?,?,?,?,'',?,?)"
+                 VALUES (?,?,?,?,?,?,?)"
             )->execute([
                 $pendente['cep']         ?? '',
                 $pendente['endereco']    ?? '',
                 $pendente['numero']      ?? '',
                 $pendente['complemento'] ?? '', // opcional — pode ficar vazio
+                $pendente['bairro']      ?? '',
                 $pendente['cidade']      ?? '',
                 $pendente['estado'],
             ]);
