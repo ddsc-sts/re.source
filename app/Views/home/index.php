@@ -178,7 +178,7 @@ $homeSupportWhatsApp = preg_replace('/\D+/', '', app_setting('support_whatsapp',
               <span>Madeira</span>
             </div>
             <div class="cat-tile">
-              <img src="https://images.unsplash.com/photo-1591196611119-9a51fc74bf9e?w=300&q=70&auto=format&fit=crop" alt="Plástico" loading="lazy" />
+              <img src="<?= htmlspecialchars(asset_url('/img/base-carousel/materiais-reutilizaveis.png'), ENT_QUOTES, 'UTF-8') ?>" alt="Plástico" loading="lazy" />
               <span>Plástico</span>
             </div>
             <div class="cat-tile">
@@ -202,7 +202,7 @@ $homeSupportWhatsApp = preg_replace('/\D+/', '', app_setting('support_whatsapp',
               <span>Eletrônicos</span>
             </div>
             <div class="cat-tile">
-              <img src="https://images.unsplash.com/photo-1550963295-019d8a8a61c7?w=300&q=70&auto=format&fit=crop" alt="Vidro" loading="lazy" />
+              <img src="<?= htmlspecialchars(asset_url('/img/base-carousel/triagem-industrial.png'), ENT_QUOTES, 'UTF-8') ?>" alt="Vidro" loading="lazy" />
               <span>Vidro</span>
             </div>
           </div>

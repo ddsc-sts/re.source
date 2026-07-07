@@ -205,7 +205,8 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
     </div>
   </div>
 
-  <div<?= !empty($hideSearchBar) ? ' style="display:none"' : '' ?>>
+  <?php if (empty($hideSearchBar)): ?>
+  <div>
     <div class="search-bar-inner">
       <form action="/re.source/busca" method="GET" class="search-pill">
         
@@ -240,6 +241,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
       </form>
     </div>
   </div>
+  <?php endif; ?>
 </header>
 
 <?php if (!$headerIsPending && $headerCompanyStatus === 'active'): ?>

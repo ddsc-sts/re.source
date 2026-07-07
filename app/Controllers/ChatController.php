@@ -270,9 +270,7 @@ class ChatController
             json_encode(['negotiation_id' => (int) $negotiationId], JSON_UNESCAPED_UNICODE),
         ]);
 
-        self::sendNewMessageEmail($pdo, $otherCompanyId, $content, (int) $negotiationId);
-
-        self::json([
+        self::jsonThen([
             'success' => true,
             'message' => [
                 'id' => $messageId,
@@ -282,7 +280,9 @@ class ChatController
                 'content' => $content,
                 'created_at' => $createdAt,
             ],
-        ]);
+        ], static function () use ($pdo, $otherCompanyId, $content, $negotiationId): void {
+            self::sendNewMessageEmail($pdo, $otherCompanyId, $content, (int) $negotiationId);
+        });
     }
 
     public static function messages(): void
@@ -367,6 +367,34 @@ class ChatController
         header('Content-Type: application/json; charset=utf-8');
         header('Cache-Control: no-store, no-cache, must-revalidate');
         echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    private static function jsonThen(array $data, callable $after): never
+    {
+        $payload = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        header('Content-Length: ' . strlen($payload));
+        header('Connection: close');
+        echo $payload;
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+        while (ob_get_level() > 0) {
+            @ob_end_flush();
+        }
+        flush();
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+
+        try {
+            $after();
+        } catch (Throwable $error) {
+            error_log('Falha em tarefa apos resposta JSON: ' . $error->getMessage());
+        }
         exit;
     }
 }

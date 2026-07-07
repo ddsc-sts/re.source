@@ -402,8 +402,9 @@
 .acceptance-grid svg { width: 15px; }
 .proposal-actions { display: flex; align-items: flex-start; gap: 0.7rem; margin-top: 0.9rem; flex-wrap: wrap; }
 .proposal-actions form { margin: 0; }
-.proposal-accept, .proposal-editor button { display: flex; align-items: center; gap: 0.4rem; padding: 0.75rem 1.1rem; color: #fff; background: var(--green); border: none; cursor: pointer; font-family: var(--font-main); font-weight: 400; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.03em; }
-.proposal-accept svg, .proposal-editor button svg { width: 16px; }
+.proposal-accept, .proposal-editor button, .reopen-negotiation button { display: flex; align-items: center; gap: 0.4rem; padding: 0.75rem 1.1rem; color: #fff; background: var(--green); border: none; cursor: pointer; font-family: var(--font-main); font-weight: 400; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.03em; }
+.proposal-accept svg, .proposal-editor button svg, .reopen-negotiation button svg { width: 16px; }
+.reopen-negotiation { margin-top: 0.85rem; }
 .waiting-other { padding: 0.65rem; color: #166534; font-size: 0.8rem; font-weight: 700; }
 .reason-action summary, .proposal-editor summary { cursor: pointer; color: var(--muted); font-size: 0.78rem; font-weight: 700; }
 .reason-action form { display: grid; gap: 0.5rem; margin-top: 0.55rem; }
@@ -450,6 +451,8 @@
     border-color: var(--green);
     background: var(--green);
 }
+
+.message-pending { opacity: 0.7; }
 
 .message-sender { display: block; margin-bottom: 0.25rem; font-size: 0.72rem; font-weight: 700; opacity: 0.8; }
 .message p { margin: 0; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-wrap; }

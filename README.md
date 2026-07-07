@@ -12,7 +12,7 @@
 
 O Re.Source é um sistema desenvolvido como MVP acadêmico para apresentação de curso. A proposta é simular uma plataforma B2B onde empresas podem anunciar, buscar e negociar resíduos industriais, incentivando economia circular e reaproveitamento de materiais.
 
-O projeto não executa operações financeiras reais, não integra transportadoras reais e não deve ser tratado como sistema pronto para produção. O foco atual é demonstrar o fluxo principal de ponta a ponta de forma funcional e apresentável.
+O foco atual é demonstrar o fluxo principal de ponta a ponta de forma funcional e apresentável.
 
 ## Funcionalidades principais
 
@@ -55,7 +55,6 @@ config/             Configurações auxiliares, incluindo envio de e-mail
 database/
   seeders/          Schema consolidado do banco
   inserts/          Dados acadêmicos/demonstração
-  migrations/       Migrations históricas para bancos antigos
 
 public/
   css/              Estilos
@@ -104,12 +103,7 @@ Para testar envio de e-mails, preencha também as variáveis SMTP no `.env`.
 
 ### 3. Preparar o banco de dados
 
-No phpMyAdmin:
-
-1. Crie um banco vazio chamado `resource`.
-2. Use collation `utf8mb4_unicode_ci`.
-3. Selecione o banco.
-4. Importe os arquivos SQL nesta ordem:
+No phpMyAdmin, importe os arquivos SQL nesta ordem:
 
 ```text
 1. database/seeders/re.sourcebanco.sql
@@ -119,7 +113,7 @@ No phpMyAdmin:
 5. database/inserts/saldo_demo.sql     (opcional, depende dos itens 3 e 4)
 ```
 
-Em banco novo, não é necessário executar as migrations. Elas existem para atualização de bancos antigos.
+O arquivo `re.sourcebanco.sql` cria e seleciona automaticamente o banco `resource` e já contém a estrutura consolidada do MVP.
 
 ### 4. Acessar o sistema
 

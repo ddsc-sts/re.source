@@ -80,7 +80,11 @@ class ProposalController
         $stmt = $pdo->prepare(
             "SELECT u.email, u.name
              FROM users u
-             WHERE u.company_id = ? AND u.is_active = 1 AND u.deleted_at IS NULL
+             INNER JOIN companies c ON c.id = u.company_id
+             WHERE u.company_id = ?
+               AND u.is_active = 1
+               AND u.deleted_at IS NULL
+               AND c.notify_proposals = 1
              ORDER BY (u.role = 'admin_company') DESC, u.id ASC LIMIT 1"
         );
         $stmt->execute([$companyId]);
@@ -275,6 +279,45 @@ class ProposalController
     public static function cancel(): void
     {
         self::respondWithReason('cancel');
+    }
+
+    public static function reopen(): void
+    {
+        self::requirePost();
+        $negotiationId = filter_input(INPUT_POST, 'negotiation_id', FILTER_VALIDATE_INT);
+        if (!$negotiationId) {
+            flash('error', 'Negociacao invalida.');
+            redirect_to('/conversas');
+        }
+
+        global $pdo;
+        $companyId = self::companyId();
+        try {
+            $pdo->beginTransaction();
+            $negotiation = self::negotiation($pdo, (int) $negotiationId, $companyId, true);
+            if ($negotiation['status'] !== 'cancelled') {
+                throw new DomainException('Somente negociacoes canceladas podem ser reabertas.');
+            }
+
+            $pdo->prepare(
+                "UPDATE negotiations
+                 SET status = 'open', cancelled_by = NULL, cancel_reason = NULL,
+                     protocol_number = NULL, agreement_at = NULL, updated_at = CURRENT_TIMESTAMP
+                 WHERE id = ?"
+            )->execute([$negotiationId]);
+
+            self::systemMessage($pdo, (int) $negotiationId, 'Negociacao reaberta. As empresas podem enviar uma nova proposta.');
+            self::notify($pdo, self::otherCompany($negotiation, $companyId), 'negotiation_reopened', 'Negociacao reaberta',
+                'A conversa foi reaberta para uma nova proposta.', (int) $negotiationId);
+
+            $pdo->commit();
+            flash('success', 'Negociacao reaberta. Voces ja podem enviar uma nova proposta.');
+        } catch (Throwable $error) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            flash('error', $error instanceof DomainException ? $error->getMessage() : 'Nao foi possivel reabrir a negociacao.');
+        }
+
+        self::redirectToChat((int) $negotiationId);
     }
 
     private static function respondWithReason(string $action): never

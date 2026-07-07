@@ -121,6 +121,11 @@
           <button type="submit">Confirmar cancelamento</button>
         </form>
       </details>
+    <?php elseif ($negotiationStatus === 'cancelled'): ?>
+      <form class="reopen-negotiation" method="POST" action="<?= htmlspecialchars(app_url('/negociacoes/reabrir'), ENT_QUOTES, 'UTF-8') ?>" onsubmit="return confirm('Reabrir esta negociacao para uma nova proposta?')">
+        <?= csrf_field() ?><input type="hidden" name="negotiation_id" value="<?= (int) $negotiation['id'] ?>">
+        <button type="submit"><i data-lucide="rotate-ccw"></i> Reabrir negociacao</button>
+      </form>
     <?php endif; ?>
     </section>
   </details>

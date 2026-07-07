@@ -430,8 +430,13 @@ body {
             <?php
             $viewerCompanyId = (int) ($_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 0);
             $isOwnListing = $viewerCompanyId > 0 && $viewerCompanyId === (int) $anuncio['company_id'];
+            $listingPaused = ($anuncio['status'] ?? '') === 'paused';
             ?>
-            <?php if ($isOwnListing): ?>
+            <?php if ($listingPaused): ?>
+                <p role="status" style="margin:10px 0 0;color:#b45309;font-size:.84rem;line-height:1.5;">
+                    Este anúncio foi pausado pela administração. Para mais informações, entre em contato com o suporte da plataforma.
+                </p>
+            <?php elseif ($isOwnListing): ?>
                 <button class="btn-acao btn-chat" type="button" disabled title="Este anúncio pertence à sua empresa">
                     <i data-lucide="message-circle"></i> Anúncio da sua empresa
                 </button>

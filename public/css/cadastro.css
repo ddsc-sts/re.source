@@ -80,16 +80,43 @@ fieldset { border: none; padding: 0; margin: 0; }
 .logo-mark {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
   color: var(--ink);
-  padding: .5rem .75rem;
-  background: rgba(255,255,255,.94);
-  border: 1px solid rgba(255,255,255,.65);
+  width: 156px;
+  min-height: 52px;
+  padding: .52rem .9rem;
+  background:
+    linear-gradient(135deg, rgba(12,22,18,.86), rgba(18,30,25,.62));
+  border: 1px solid rgba(60,179,113,.38);
+  border-radius: 999px;
+  box-shadow: 0 16px 38px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.10);
+  backdrop-filter: blur(16px) saturate(1.18);
+  -webkit-backdrop-filter: blur(16px) saturate(1.18);
+  transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
+}
+.logo-mark:hover {
+  transform: translateY(-1px);
+  background:
+    linear-gradient(135deg, rgba(10,36,25,.92), rgba(18,49,34,.72));
+  border-color: rgba(60,179,113,.62);
+  box-shadow: 0 18px 44px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.14);
 }
 .logo-mark-img {
-  height: 43px;
-  width: auto;
+  width: 100%;
+  height: 32px;
+  object-fit: contain;
   display: block;
+  filter: brightness(0) invert(1) drop-shadow(0 1px 8px rgba(255,255,255,.16));
+  opacity: .96;
+}
+.site-header.scrolled .logo-mark {
+  background: rgba(255,255,255,.92);
+  border-color: rgba(20,23,26,.10);
+  box-shadow: 0 10px 28px rgba(20,23,26,.12);
+}
+.site-header.scrolled .logo-mark-img {
+  filter: none;
+  opacity: 1;
 }
 .logo-mark span {
   font-family: var(--font-display);
@@ -852,6 +879,8 @@ fieldset { border: none; padding: 0; margin: 0; }
 
 @media (max-width: 600px) {
   .site-header { padding: 1.1rem 1.25rem; }
+  .logo-mark { width: 138px; min-height: 46px; padding: .45rem .76rem; }
+  .logo-mark-img { height: 28px; }
   .header-nav a { font-size: 0.68rem; }
   .panel-inner { padding: 1.5rem 1.25rem; }
   .form-row { grid-template-columns: 1fr; }

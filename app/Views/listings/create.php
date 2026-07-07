@@ -298,6 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let loadedImagesArray  = [];
     let currentLightboxIndex = 0;
     let selectedFiles = []; // to keep track of files
+    let previewObjectUrls = [];
 
     const form = document.getElementById('createListingForm');
     const feedback = document.getElementById('formFeedback');
@@ -348,6 +349,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function renderPreview() {
+        previewObjectUrls.forEach(url => URL.revokeObjectURL(url));
+        previewObjectUrls = [];
         olxGrid.innerHTML = '';
         loadedImagesArray = [];
         if (selectedFiles.length === 0) { 
@@ -370,51 +373,52 @@ document.addEventListener('DOMContentLoaded', function() {
         else                         olxGrid.classList.add('count-default');
 
         const maxVisivel = 4;
+        loadedImagesArray = selectedFiles.map(file => {
+            const url = URL.createObjectURL(file);
+            previewObjectUrls.push(url);
+            return url;
+        });
 
-        selectedFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64Url = e.target.result;
-                loadedImagesArray[index] = base64Url;
+        loadedImagesArray.slice(0, maxVisivel).forEach((imageUrl, index) => {
+            const item = document.createElement('div');
+            item.className = 'olx-item';
+            item.setAttribute('data-index', index);
 
-                if (index < maxVisivel) {
-                    const item = document.createElement('div');
-                    item.className = 'olx-item';
-                    item.setAttribute('data-index', index);
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = `Pré-visualização ${index + 1}`;
+            item.appendChild(img);
 
-                    const img = document.createElement('img');
-                    img.src = base64Url;
-                    item.appendChild(img);
+            const btnRemove = document.createElement('button');
+            btnRemove.type = 'button';
+            btnRemove.className = 'btn-remove-preview';
+            btnRemove.innerHTML = '&times;';
+            btnRemove.title = 'Remover imagem';
+            btnRemove.addEventListener('click', function(evt) {
+                evt.stopPropagation();
+                selectedFiles.splice(index, 1);
+                renderPreview();
+            });
+            item.appendChild(btnRemove);
 
-                    const btnRemove = document.createElement('button');
-                    btnRemove.type = 'button';
-                    btnRemove.className = 'btn-remove-preview';
-                    btnRemove.innerHTML = '&times;';
-                    btnRemove.title = 'Remover Imagem';
-                    btnRemove.addEventListener('click', function(evt) {
-                        evt.stopPropagation();
-                        selectedFiles.splice(index, 1);
-                        renderPreview();
-                    });
-                    item.appendChild(btnRemove);
+            if (index === maxVisivel - 1 && selectedFiles.length > maxVisivel) {
+                const overlay = document.createElement('div');
+                overlay.className = 'olx-overlay-more';
+                overlay.innerText = `+${selectedFiles.length - maxVisivel}`;
+                item.appendChild(overlay);
+            }
 
-                    if (index === maxVisivel - 1 && selectedFiles.length > maxVisivel) {
-                        const overlay = document.createElement('div');
-                        overlay.className = 'olx-overlay-more';
-                        overlay.innerText = `+${selectedFiles.length - maxVisivel + 1}`;
-                        item.appendChild(overlay);
-                    }
+            item.addEventListener('click', function() {
+                openLightbox(index);
+            });
 
-                    item.addEventListener('click', function() {
-                        openLightbox(index);
-                    });
-
-                    olxGrid.appendChild(item);
-                }
-            };
-            reader.readAsDataURL(file);
+            olxGrid.appendChild(item);
         });
     }
+
+    window.addEventListener('beforeunload', () => {
+        previewObjectUrls.forEach(url => URL.revokeObjectURL(url));
+    });
 
     // Lightbox
     const lightbox      = document.getElementById('lightbox');

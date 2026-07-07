@@ -21,5 +21,4 @@
       <?php foreach ($supportActivity as $activity): ?><div class="support-alert"><i data-lucide="alert-triangle"></i><div><strong><?= htmlspecialchars($activity['action'],ENT_QUOTES,'UTF-8') ?></strong><span><?= htmlspecialchars(($activity['entity_type'] ?: 'registro').' #'.($activity['entity_id'] ?: '—'),ENT_QUOTES,'UTF-8') ?></span><time><?= htmlspecialchars($activity['created_at'],ENT_QUOTES,'UTF-8') ?></time></div></div><?php endforeach; ?>
     </div></aside>
   </div>
-  <p class="admin-scope-note"><i data-lucide="info"></i> Chamados completos foram mantidos fora do MVP acadêmico; esta tela usa dados reais da operação para facilitar a demonstração e o diagnóstico.</p>
 </main><script>window.lucide?.createIcons();document.getElementById('navToggle')?.addEventListener('click',()=>document.getElementById('navbar')?.classList.toggle('mobile-open'));</script></body></html>

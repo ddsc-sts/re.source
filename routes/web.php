@@ -229,6 +229,11 @@ return [
         'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
     ],
 
+    '/negociacoes/reabrir' => [
+        'action'     => ['ProposalController', 'reopen'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
     '/logistica' => [
         'action'     => ['DeliveryController', 'history'],
         'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],

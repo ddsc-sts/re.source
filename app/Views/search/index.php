@@ -1,5 +1,6 @@
 <?php
 $titulo_pagina = "Buscar Resíduos — Re.Source";
+$hideSearchBar = true;
 require_once __DIR__ . '/../components/header.php';
 ?>
 

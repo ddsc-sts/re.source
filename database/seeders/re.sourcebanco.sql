@@ -8,9 +8,14 @@
 --  Re.Source — Marketplace B2B de Materiais Industriais
 --  SQL FINAL CONSOLIDADO — v4.0 (MVP academico)
 --  MariaDB 10.4+ / MySQL 8.0+
---  Importe este arquivo dentro do banco configurado em DB_DATABASE.
---  O banco precisa existir antes da importacao.
+--  Script autocontido para criacao do banco academico local.
 -- ============================================================
+
+CREATE DATABASE IF NOT EXISTS `resource`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE `resource`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 SET SQL_MODE = 'STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO';

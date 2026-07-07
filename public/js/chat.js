@@ -46,6 +46,10 @@
     time.textContent = Number.isNaN(parsedDate.getTime())
       ? message.created_at
       : parsedDate.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    if (message.pending) {
+      article.classList.add('message-pending');
+      time.textContent = 'Enviando...';
+    }
 
     article.append(sender, content, time);
     list.appendChild(article);
@@ -98,18 +102,36 @@
     event.preventDefault();
     errorBox.textContent = '';
     button.disabled = true;
+    const content = input.value.trim();
+    if (!content) {
+      button.disabled = false;
+      return;
+    }
+    const formData = new FormData(form);
+    const tempId = -Date.now();
+    appendMessage({
+      id: tempId,
+      sender_company_id: companyId,
+      sender_name: 'Você',
+      content,
+      created_at: new Date().toISOString(),
+      pending: true
+    });
+    input.value = '';
     try {
       const response = await fetch(room.dataset.sendUrl, {
         method: 'POST',
-        body: new FormData(form),
+        body: formData,
         headers: { Accept: 'application/json' }
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || 'Não foi possível enviar.');
+      list.querySelector(`[data-message-id="${tempId}"]`)?.remove();
       appendMessage(data.message);
-      input.value = '';
       input.focus();
     } catch (error) {
+      list.querySelector(`[data-message-id="${tempId}"]`)?.remove();
+      input.value = content;
       errorBox.textContent = error.message;
     } finally {
       button.disabled = false;

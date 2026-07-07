@@ -93,8 +93,24 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok || !data.success) throw new Error(data.message || 'Falha ao carregar.');
       renderNotifications(data.notifications || []);
       notificationButton.classList.toggle('has-unread', Number(data.unseen_count) > 0);
+      if (Number(data.unseen_count) > 0) {
+        await markAllNotificationsRead();
+      }
     } catch (_) {
       if (notificationList) notificationList.innerHTML = '<p class="notification-empty">Não foi possível carregar as notificações.</p>';
+    }
+  }
+
+  async function markAllNotificationsRead() {
+    if (!notificationButton?.dataset.readUrl) return;
+    const body = new URLSearchParams({ csrf_token: notificationButton.dataset.csrf || '' });
+    const response = await fetch(notificationButton.dataset.readUrl, {
+      method: 'POST', body, headers: { Accept: 'application/json' }
+    });
+    if (response.ok) {
+      notificationButton.classList.remove('has-unread');
+      document.getElementById('notificationCount')?.replaceChildren(document.createTextNode('0'));
+      notificationList?.querySelectorAll('.is-unseen').forEach((item) => item.classList.remove('is-unseen'));
     }
   }
 
@@ -110,14 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   markNotificationsRead?.addEventListener('click', async () => {
-    const body = new URLSearchParams({ csrf_token: notificationButton.dataset.csrf || '' });
-    const response = await fetch(notificationButton.dataset.readUrl, {
-      method: 'POST', body, headers: { Accept: 'application/json' }
-    });
-    if (response.ok) {
-      notificationButton.classList.remove('has-unread');
-      notificationList?.querySelectorAll('.is-unseen').forEach((item) => item.classList.remove('is-unseen'));
-    }
+    await markAllNotificationsRead();
   });
 
   document.addEventListener('click', (event) => {
