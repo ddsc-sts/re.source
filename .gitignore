@@ -23,6 +23,14 @@
 /.phpunit.result.cache
 /coverage/
 
+# Arquivos internos de planejamento/handoff local
+/contexto_projeto.txt
+/planejamento.txt
+/melhorias.txt
+
+# Referencias temporarias usadas durante desenvolvimento visual
+/.codex_ref*/
+
 # IDE e sistema operacional
 /.idea/
 /.vscode/
