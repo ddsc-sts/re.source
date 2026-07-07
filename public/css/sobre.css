@@ -537,3 +537,80 @@
 .team-card:nth-child(2).reveal { transition-delay: 0.1s; }
 .team-card:nth-child(3).reveal { transition-delay: 0.2s; }
 .team-card:nth-child(4).reveal { transition-delay: 0.3s; }
+
+/* Stark Industrial alignment */
+body {
+  background-color: #fbf9f8;
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.about-hero {
+  max-width: 1200px;
+}
+.hero-title,
+.section-heading,
+.cta-content h2 {
+  font-family: 'Bebas Neue', var(--font-main);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+.hero-title { font-size: clamp(3rem, 7vw, 5rem); }
+.hero-eyebrow,
+.section-tag,
+.team-info span {
+  border-radius: 0;
+  letter-spacing: .08em;
+}
+.eyebrow-dot,
+.badge-dot {
+  border-radius: 0;
+}
+.hero-img-wrap,
+.mvv-card,
+.story-highlight,
+.img-back,
+.img-front,
+.img-stat-chip,
+.how-step,
+.step-icon,
+.team-card,
+.team-avatar,
+.cta-inner,
+.cta-btn-primary,
+.cta-btn-secondary {
+  border-radius: 0;
+}
+.hero-img-wrap,
+.story-highlight,
+.how-step,
+.team-card,
+.cta-inner {
+  border: 1px solid #1b1c1c;
+  box-shadow: 6px 6px 0 #005131;
+}
+.hero-img-wrap img,
+.img-back,
+.img-front {
+  filter: grayscale(.35) contrast(1.08);
+}
+.mvv-section,
+.cta-inner {
+  background: #1b1c1c;
+}
+.mvv-card {
+  background: rgba(255,255,255,.06);
+}
+.mvv-card.featured {
+  background: rgba(134,215,167,.14);
+}
+.how-step {
+  background: #fff;
+}
+.cta-btn-primary,
+.cta-btn-secondary {
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}

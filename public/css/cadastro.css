@@ -82,9 +82,12 @@ fieldset { border: none; padding: 0; margin: 0; }
   align-items: center;
   gap: 10px;
   color: var(--ink);
+  padding: .5rem .75rem;
+  background: rgba(255,255,255,.94);
+  border: 1px solid rgba(255,255,255,.65);
 }
 .logo-mark-img {
-  height: 30px;
+  height: 43px;
   width: auto;
   display: block;
 }

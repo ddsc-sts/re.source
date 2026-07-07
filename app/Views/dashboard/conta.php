@@ -15,6 +15,7 @@ $zip_code        = $empresa['zip_code']        ?? '';
 $street          = $empresa['street']          ?? '';
 $number          = $empresa['number']          ?? '';
 $complement      = $empresa['complement']      ?? '';
+$district        = $empresa['district']        ?? '';
 $city            = $empresa['city']            ?? '';
 $state           = $empresa['state']           ?? '';
 $admin_email     = $admin['email']             ?? 'seu e-mail';
@@ -108,6 +109,10 @@ require_once __DIR__ . '/../components/header.php';
                         <input type="text" name="complement" value="<?= htmlspecialchars($complement) ?>">
                     </div>
                     <div class="form-group">
+                        <label>Bairro</label>
+                        <input type="text" name="district" value="<?= htmlspecialchars($district) ?>">
+                    </div>
+                    <div class="form-group">
                         <label>Cidade</label>
                         <input type="text" name="city" value="<?= htmlspecialchars($city) ?>">
                     </div>
@@ -145,7 +150,7 @@ require_once __DIR__ . '/../components/header.php';
             </div>
         </form>
 
-        <div class="account-panel" style="border-color:#fca5a5;">
+        <div class="account-panel" style="border-color:#fca5a5;display:none;" aria-hidden="true">
             <div class="panel-header">
                 <i data-lucide="shield" style="color:#ef4444;"></i>
                 <h2>Central de Segurança</h2>

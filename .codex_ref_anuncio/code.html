@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Item Detail | RE.SOURCE Industrial Marketplace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Work+Sans:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#fbf9f8",
+                        "surface-container-high": "#e9e8e7",
+                        "surface-variant": "#e4e2e2",
+                        "primary": "#005131",
+                        "on-background": "#1b1c1c",
+                        "tertiary-container": "#5c5e5e",
+                        "surface-container-highest": "#e4e2e2",
+                        "inverse-surface": "#303031",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "outline-variant": "#bec9bf",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#5f5e5e",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#454647",
+                        "on-primary-fixed-variant": "#005232",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container": "#efeded",
+                        "background": "#fbf9f8",
+                        "secondary-container": "#e2dfde",
+                        "on-primary-fixed": "#002111",
+                        "on-secondary-container": "#636262",
+                        "on-surface": "#1b1c1c",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "primary-fixed": "#a1f4c2",
+                        "on-tertiary-container": "#d7d7d7",
+                        "on-primary-container": "#96e9b7",
+                        "inverse-primary": "#86d7a7",
+                        "surface-tint": "#126c45",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface": "#fbf9f8",
+                        "primary-container": "#106b44",
+                        "on-error-container": "#93000a",
+                        "outline": "#6f7a71",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-surface-variant": "#3f4942",
+                        "inverse-on-surface": "#f2f0f0",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f5f3f3",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#86d7a7",
+                        "surface-dim": "#dbdad9",
+                        "on-secondary-fixed-variant": "#474746",
+                        "on-secondary-fixed": "#1c1b1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "unit": "4px",
+                        "margin-desktop": "64px",
+                        "grid-pattern-size": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Bebas Neue"],
+                        "body-md": ["Work Sans"],
+                        "body-lg": ["Work Sans"],
+                        "headline-sm": ["Work Sans"],
+                        "label-caps": ["Work Sans"],
+                        "display-lg": ["Bebas Neue"],
+                        "headline-md": ["Bebas Neue"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["48px", {"lineHeight": "1.1", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "700"}],
+                        "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "display-lg": ["64px", {"lineHeight": "1.0", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "headline-md": ["32px", {"lineHeight": "1.1", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .stark-border { border: 1px solid #1b1c1c; }
+        .stark-border-light { border: 1px solid #bec9bf; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fbf9f8; }
+        ::-webkit-scrollbar-thumb { background: #1b1c1c; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md grid-bg min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-full mx-auto">
+<div class="text-headline-md font-headline-md text-on-surface tracking-tighter">RE.SOURCE</div>
+<nav class="hidden md:flex gap-8">
+<a class="text-secondary hover:text-primary transition-colors duration-200 text-label-caps font-label-caps border-b-2 border-primary pb-1" href="#">Marketplace</a>
+<a class="text-secondary hover:text-primary transition-colors duration-200 text-label-caps font-label-caps" href="#">Materials</a>
+<a class="text-secondary hover:text-primary transition-colors duration-200 text-label-caps font-label-caps" href="#">Suppliers</a>
+<a class="text-secondary hover:text-primary transition-colors duration-200 text-label-caps font-label-caps" href="#">Logistics</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hidden md:block text-label-caps font-label-caps text-secondary hover:text-primary">Login</button>
+<button class="bg-primary text-on-primary px-6 py-2 text-label-caps font-label-caps hover:scale-95 duration-100 uppercase tracking-widest">
+                    Register Company
+                </button>
+</div>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto px-margin-desktop py-12">
+<!-- Breadcrumb & Back -->
+<div class="mb-8 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm">arrow_back</span>
+<span class="text-label-caps font-label-caps text-secondary uppercase">Back to Wood Marketplace</span>
+</div>
+<div class="grid grid-cols-12 gap-gutter items-start">
+<!-- Left: Hero Section & Details -->
+<div class="col-span-12 lg:col-span-8 space-y-12">
+<!-- Main Product Image -->
+<div class="relative w-full aspect-[2.09] stark-border bg-surface-container-high overflow-hidden group">
+<img alt="Serragem de Pinus Seca" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUV0fBbJzWYAlp2gqHLi7kkh_UHx2K34rpn7ncQGNWpth-K4mX7y16XZnhoFcfqBUPBAadwwdHKVrXQ9v6lFu6sZnwVU1IPNdAam5-f03nXJn6PzjVgWFmXfKGjzPoHzLj5sJnkzQ2yOCT9HfuWorpOAwrZAYGz94EWytWVGWHXnOmsxmo41-SOEbleq50UfasH_-4tSqnI_BMolDspgCqG6OFK58r4mKAfxtNxeqJkbqAyPo2XqoPA8ROKQZyCGuxOs8"/>
+<div class="absolute bottom-4 left-4 bg-on-surface text-surface px-4 py-2 text-label-caps font-label-caps uppercase tracking-widest">
+                        Ref: RES-WD-2024-089
+                    </div>
+</div>
+<!-- Technical Specs Grid -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-0 stark-border border-collapse bg-surface-container-lowest">
+<div class="p-6 border-r border-b md:border-b-0 border-outline-variant">
+<p class="text-label-caps font-label-caps text-secondary mb-1">Category</p>
+<p class="font-bold text-on-surface uppercase">Wood</p>
+</div>
+<div class="p-6 border-r md:border-r border-b md:border-b-0 border-outline-variant">
+<p class="text-label-caps font-label-caps text-secondary mb-1">Quantity</p>
+<p class="font-bold text-on-surface uppercase">1,200 KG</p>
+</div>
+<div class="p-6 border-r border-outline-variant">
+<p class="text-label-caps font-label-caps text-secondary mb-1">Listing Type</p>
+<p class="font-bold text-on-surface uppercase text-primary">For Sale</p>
+</div>
+<div class="p-6">
+<p class="text-label-caps font-label-caps text-secondary mb-1">Published</p>
+<p class="font-bold text-on-surface uppercase">12 OCT 2024</p>
+</div>
+</section>
+<!-- Description Section -->
+<section class="space-y-6">
+<h2 class="font-headline-md text-headline-md border-l-4 border-primary pl-4 uppercase">Residue Description</h2>
+<div class="bg-surface-container-low p-8 stark-border-light">
+<p class="font-body-lg text-on-surface leading-relaxed max-w-3xl">
+                            High-quality kiln-dried pine sawdust (Serragem de Pinus Seca), sourced from sustainable forestry operations in Santa Catarina. This industrial byproduct is screened for consistency, ensuring a moisture content below 12%. Ideal for biomass pellet production, high-efficiency briquetting, or industrial absorbent applications.
+                        </p>
+<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-label-caps text-secondary">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-weight="fill">check_circle</span>
+                                LOW MOISTURE CONTENT (&lt;12%)
+                            </div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-weight="fill">check_circle</span>
+                                UNIFORM PARTICLE SIZE
+                            </div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-weight="fill">check_circle</span>
+                                NO CHEMICAL ADDITIVES
+                            </div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-weight="fill">check_circle</span>
+                                FSC CERTIFIED SOURCE
+                            </div>
+</div>
+</div>
+</section>
+<!-- Location Section -->
+<section class="space-y-6">
+<h2 class="font-headline-md text-headline-md border-l-4 border-primary pl-4 uppercase">Origin &amp; Logistics</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 stark-border bg-surface-container-lowest">
+<div class="md:col-span-1 p-8 border-r border-outline-variant space-y-4">
+<div>
+<p class="text-label-caps font-label-caps text-secondary mb-1">Location</p>
+<p class="font-bold text-on-surface text-lg uppercase">Joinville - SC</p>
+</div>
+<div>
+<p class="text-label-caps font-label-caps text-secondary mb-1">Region</p>
+<p class="text-on-surface">Southern Industrial Hub</p>
+</div>
+<button class="text-label-caps font-label-caps text-primary underline hover:text-on-surface transition-colors">
+                                Calculate Freight →
+                            </button>
+</div>
+<div class="md:col-span-2 h-64 grayscale contrast-125">
+<div class="w-full h-full bg-surface-variant flex items-center justify-center relative overflow-hidden" data-location="Joinville, Brazil" style="">
+<div class="absolute inset-0 grid-bg opacity-30"></div>
+<div class="z-10 flex flex-col items-center">
+<span class="material-symbols-outlined text-4xl text-primary">location_on</span>
+<span class="text-label-caps font-label-caps mt-2">Interactive Map Unavailable</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right: Action Card -->
+<aside class="col-span-12 lg:col-span-4 sticky top-24 space-y-gutter">
+<div class="bg-on-surface text-surface p-8 stark-border shadow-[8px_8px_0px_0px_#005131]">
+<h1 class="font-headline-lg text-headline-lg leading-none uppercase mb-2">Serragem de Pinus Seca</h1>
+<div class="flex items-baseline gap-2 mb-6">
+<span class="text-headline-md font-headline-md text-primary">R$ 0,30</span>
+<span class="text-label-caps font-label-caps opacity-70">/ KG</span>
+</div>
+<hr class="border-surface-variant/20 mb-8"/>
+<div class="space-y-6 mb-8">
+<div class="flex items-center justify-between">
+<p class="text-label-caps font-label-caps opacity-60">Vendedor</p>
+<p class="font-bold uppercase">MadeiraSul</p>
+</div>
+<div class="flex items-center justify-between">
+<p class="text-label-caps font-label-caps opacity-60">Verified Status</p>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm" data-weight="fill">verified</span>
+<p class="font-bold text-xs">ELITE SUPPLIER</p>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<button class="w-full bg-primary text-on-primary py-5 text-label-caps font-label-caps hover:bg-surface hover:text-on-surface transition-all duration-300 flex items-center justify-center gap-2 group">
+                            Contact Seller <span class="group-hover:translate-x-1 transition-transform">→</span>
+</button>
+<button class="w-full border border-surface-variant/30 py-5 text-label-caps font-label-caps hover:bg-surface-variant/10 transition-all uppercase">
+                            Reserve Batch
+                        </button>
+</div>
+<p class="text-[10px] text-center mt-6 text-surface-variant/50 font-label-caps uppercase tracking-tighter">
+                        Transactions are secured by RE.SOURCE Industrial Protocol
+                    </p>
+</div>
+<!-- Seller Info Extended -->
+<div class="bg-surface stark-border p-6 space-y-4">
+<p class="text-label-caps font-label-caps text-secondary border-b border-outline-variant pb-2">Seller Metrics</p>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-xs text-secondary uppercase font-bold">Reliability</p>
+<p class="text-lg font-headline-md">99.2%</p>
+</div>
+<div>
+<p class="text-xs text-secondary uppercase font-bold">Response</p>
+<p class="text-lg font-headline-md">&lt; 2H</p>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<!-- Similar Items Carousel -->
+<section class="mt-24 space-y-8">
+<div class="flex justify-between items-end border-b-2 border-on-surface pb-4">
+<h2 class="font-headline-md text-headline-md uppercase">More from this seller</h2>
+<a class="text-label-caps font-label-caps text-primary hover:underline" href="#">View All Listings →</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<!-- Related Item 1 -->
+<div class="bg-surface-container-lowest stark-border group cursor-pointer overflow-hidden">
+<div class="h-48 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500" data-alt="Close up high-contrast industrial photograph of clean, compressed wood briquettes for fuel. The lighting is harsh and direct, emphasizing the texture and structural integrity of the biomass. Minimalist grey and charcoal tones dominate the frame." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDmSr5nzsNV2ZtympNydYksgnJUcofn-ajQDBAuLZfnV4bNj2HjNaqZ0xk7WG2rSxLgPwBavFNcYHt_ZCX6hdP0ny-2vTAonbiF4bUwG6ksS-WQjmKbWQBe4HTLpHSehRd_DBeQbM4mRxbbdhZuNwnZ2_E0tuYCa1Aj2u1CHgzrIZYIp-TyqrHPIFgkHyEPXbKysVqRKlRSD0jW7khESJg7BwmF751NDLT6ziWwwDiLMs65JxN2rN8KCg')"></div>
+</div>
+<div class="p-4 border-t border-outline-variant">
+<p class="text-label-caps font-label-caps text-secondary">WOOD / ENERGY</p>
+<h3 class="font-bold text-on-surface uppercase mt-1">Industrial Briquettes</h3>
+<p class="text-primary font-bold mt-2">R$ 0,85 / KG</p>
+</div>
+</div>
+<!-- Related Item 2 -->
+<div class="bg-surface-container-lowest stark-border group cursor-pointer overflow-hidden">
+<div class="h-48 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500" data-alt="A monochromatic, stark B2B product shot of stacked pine lumber pieces in a warehouse. The composition is geometric and follows a strict grid, highlighting engineering precision. Cold, professional lighting with deep black shadows." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDM0_6wiW38eVYjIyuloDck6JoDPYAK_WV6776Jfl74XZoRc25QCkxYvuCO3sKfhjZY4t_kqsAd01VxprNy_wh-5YEQs960haVQJZMS7ss6dWzt5TRK71Ycce_wpxxI78UfwnA-S7IWVnR1xjAzNyVP3AkWZcgYwqHfqHTetUNqbsuIa9YIgeSL7LkKY0i9p5j1QSOXyql7XNZ4Gt-LgTWCoK6re4eaTWt0ErIqZdEJcdhJUwP2YBU5rA')"></div>
+</div>
+<div class="p-4 border-t border-outline-variant">
+<p class="text-label-caps font-label-caps text-secondary">WOOD / LUMBER</p>
+<h3 class="font-bold text-on-surface uppercase mt-1">Pine Offcuts (Class A)</h3>
+<p class="text-primary font-bold mt-2">R$ 12,00 / M²</p>
+</div>
+</div>
+<!-- Related Item 3 -->
+<div class="bg-surface-container-lowest stark-border group cursor-pointer overflow-hidden">
+<div class="h-48 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500" data-alt="Technical macro photography of recycled wood chips used for industrial landscaping and bio-filters. High detail on the wood fiber. Stark, brutalist aesthetic with high contrast and neutral color palette, accented by a deep emerald green light in the background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDdfEpVAUjcIVhnKtfGL5l1Wj6m5QV98ANLvzIJ-pxx4dWW1CSBeChfc1YDa_1tMI_CmTdZYYGSiKYB8kCOw7fhX1cdw020LaO96GY-a2NBDyDsM0Q49uFB6CNFE3-Uw9gsRi2MwvEnpg5It834qExkdrlt_icIsEEm51aZNPy-SmCh5gJIRYtTYvz1kaozx0VB4oyzyYwTSkOJKa8AwswdXdWMVTYr6sg_J-sbEBdTISxao4hyWvofAQ')"></div>
+</div>
+<div class="p-4 border-t border-outline-variant">
+<p class="text-label-caps font-label-caps text-secondary">WOOD / MULCH</p>
+<h3 class="font-bold text-on-surface uppercase mt-1">Screened Wood Chips</h3>
+<p class="text-primary font-bold mt-2">R$ 0,15 / KG</p>
+</div>
+</div>
+<!-- Related Item 4 -->
+<div class="bg-surface-container-lowest stark-border group cursor-pointer overflow-hidden">
+<div class="h-48 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500" data-alt="Architectural B2B photography of large industrial storage silos in a processing plant. The building is made of corrugated metal and steel beams. The lighting is gloomy and atmospheric, suggesting a hardworking industrial environment." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAwjaAMqZZZtZHuMu6uDktQM0d2kRzn9eX-G3jqkOog-MwOzuXvWsgHyrOYBFX2gderKtCHuWaQZ4ytEZyeS1qxGnFoikNnoHJpE4MPRBb2t4ouAHmHdi1lF37weuIbddYQrq9VQqudHj3wuy34DDk0NBVBw2zHK-Xeqh8o2kQfYN0fSFj87ZYzsVJUVnF1x_jXZS4qupytqjftrA5W5muLjIK-pESs28_Xpq_g-iibfLprNwy66g6W9g')"></div>
+</div>
+<div class="p-4 border-t border-outline-variant">
+<p class="text-label-caps font-label-caps text-secondary">SERVICE / LOGISTICS</p>
+<h3 class="font-bold text-on-surface uppercase mt-1">Bulk Storage Hire</h3>
+<p class="text-primary font-bold mt-2">POA</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-on-surface text-surface mt-24">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-desktop py-12 gap-gutter max-w-[1440px] mx-auto">
+<div class="space-y-4">
+<div class="text-headline-sm font-headline-sm text-surface">RE.SOURCE</div>
+<p class="text-body-md font-body-md text-surface-variant max-w-sm opacity-60">
+                    © 2024 RE.SOURCE Industrial Marketplace. Precision Engineering for Circular Economy.
+                </p>
+</div>
+<nav class="flex flex-wrap gap-6 justify-center md:justify-end">
+<a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed underline transition-all" href="#">Terms of Service</a>
+<a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed underline transition-all" href="#">Privacy Policy</a>
+<a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed underline transition-all" href="#">Institutional</a>
+<a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed underline transition-all" href="#">Technical Support</a>
+<a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed underline transition-all" href="#">Compliance</a>
+</nav>
+</div>
+</footer>
+<script>
+        // Simple Micro-interactions
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+
+        // Sticky header opacity effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-md');
+            } else {
+                header.classList.remove('shadow-md');
+            }
+        });
+    </script>
+</body></html>

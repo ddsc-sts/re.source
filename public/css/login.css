@@ -75,8 +75,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   align-items: center;
   gap: 10px;
   color: var(--ink); /* padrão: escuro (sobre o painel claro no mobile) */
+  padding: .5rem .75rem;
+  background: rgba(255,255,255,.94);
+  border: 1px solid rgba(255,255,255,.65);
 }
-.login-logo img { height: 30px; width: auto; display: block; }
+.login-logo img { height: 43px; width: auto; display: block; }
 .login-logo span {
   font-family: var(--font-display);
   font-size: 1.3rem;

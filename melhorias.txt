@@ -241,7 +241,7 @@ Preferencia atual do responsavel:
 10. PENDENCIAS OBRIGATORIAS ANTES DA APRESENTACAO
 ================================================================================
 
-[ ] Executar roteiro_teste_dia3.txt completo em dois navegadores.
+[ ] Executar roteiro_definitivo_para_apresentacao.txt completo em dois navegadores.
 [ ] Repetir o fluxo principal tres vezes a partir de banco novo.
 [ ] Confirmar recebimento SMTP com contas reais de teste.
 [ ] Conferir valores exibidos contra o banco depois de entrega e saque.

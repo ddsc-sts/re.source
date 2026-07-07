@@ -139,7 +139,13 @@ $counts = $companyStatusCounts ?? [];
                     <?= htmlspecialchars($statusLabels[$status] ?? ucfirst($status), ENT_QUOTES, 'UTF-8') ?>
                   </span>
                   <?php if (!empty($company['review_notes'])): ?>
-                    <button class="review-note" type="button" title="<?= htmlspecialchars($company['review_notes'], ENT_QUOTES, 'UTF-8') ?>">
+                    <button
+                      class="review-note js-review-note"
+                      type="button"
+                      title="Ver motivo"
+                      data-company-name="<?= htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8') ?>"
+                      data-review-note="<?= htmlspecialchars($company['review_notes'], ENT_QUOTES, 'UTF-8') ?>"
+                    >
                       <i data-lucide="message-square-text"></i> Ver motivo
                     </button>
                   <?php endif; ?>
@@ -216,6 +222,18 @@ $counts = $companyStatusCounts ?? [];
   </form>
 </dialog>
 
+<dialog class="company-action-dialog" id="reviewNoteDialog">
+  <div class="review-note-dialog-content">
+    <div class="dialog-icon"><i data-lucide="message-square-text"></i></div>
+    <h2>Motivo registrado</h2>
+    <p>Empresa: <strong id="reviewNoteCompany"></strong></p>
+    <div class="review-note-text" id="reviewNoteText"></div>
+    <div class="dialog-actions">
+      <button class="btn-primary" type="button" id="reviewNoteClose">Fechar</button>
+    </div>
+  </div>
+</dialog>
+
 <script>
 document.getElementById('menuToggle')?.addEventListener('click', () => {
   document.getElementById('navbar')?.classList.toggle('open');
@@ -238,6 +256,19 @@ document.querySelectorAll('.js-reason-action').forEach((button) => {
 document.getElementById('dialogCancel')?.addEventListener('click', () => dialog.close());
 dialog?.addEventListener('click', (event) => {
   if (event.target === dialog) dialog.close();
+});
+
+const reviewDialog = document.getElementById('reviewNoteDialog');
+document.querySelectorAll('.js-review-note').forEach((button) => {
+  button.addEventListener('click', () => {
+    document.getElementById('reviewNoteCompany').textContent = button.dataset.companyName || '';
+    document.getElementById('reviewNoteText').textContent = button.dataset.reviewNote || 'Nenhum motivo informado.';
+    reviewDialog.showModal();
+  });
+});
+document.getElementById('reviewNoteClose')?.addEventListener('click', () => reviewDialog.close());
+reviewDialog?.addEventListener('click', (event) => {
+  if (event.target === reviewDialog) reviewDialog.close();
 });
 
 lucide.createIcons();

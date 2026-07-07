@@ -146,6 +146,7 @@
       const cep          = $('cep').value.replace(/\D/g, '');
       const endereco     = $('endereco').value.trim();
       const numero       = $('numero').value.trim();
+      const bairro       = $('bairro').value.trim();
       const estado       = $('estado').value;
       const cidade       = $('cidade').value.trim();
       const segmento     = $('segmento').value;
@@ -156,6 +157,7 @@
       if (cep.length !== 8) { setError('cep', 'CEP deve ter 8 dígitos.'); ok = false; }
       if (!endereco) { setError('endereco', 'Informe o endereço.'); ok = false; }
       if (!numero)   { setError('numero', 'Informe o número.'); ok = false; }
+      if (!bairro)   { setError('bairro', 'Informe o bairro.'); ok = false; }
       if (!estado)  { setError('estado', 'Selecione o estado.'); ok = false; }
       if (!cidade)  { setError('cidade', 'Informe a cidade.'); ok = false; }
       if (!segmento){ setError('segmento', 'Selecione o segmento.'); ok = false; }

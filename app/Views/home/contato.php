@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $titulo_pagina = $titulo_pagina ?? "Contato — Re.Source";
+$contactWhatsApp = preg_replace('/\D+/', '', app_setting('support_whatsapp', '5547999999999') ?: '5547999999999');
 require_once __DIR__ . '/../components/header.php';
 ?>
 
@@ -77,6 +78,33 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--dark);
 }
 .btn-submit:hover { background: #128C7E; transform: translateY(-1px); }
 
+.contact-section { max-width: 1080px; }
+.form-container {
+    border-radius: 0;
+    border: 1px solid var(--dark);
+    box-shadow: 8px 8px 0 var(--green-d);
+}
+.contact-header h1 {
+    font-family: var(--font-stencil, var(--font-main));
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 400;
+    text-transform: uppercase;
+}
+.input-box label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+.input-box input[type="text"],
+.input-box textarea,
+.btn-submit { border-radius: 0; }
+.input-box input:focus,
+.input-box textarea:focus {
+    box-shadow: none;
+    outline: 2px solid rgba(21,115,71,0.16);
+}
+
 @media (max-width: 768px) {
     .form-container { padding: 2rem 1.5rem; }
     .contact-header h1 { font-size: 2rem; }
@@ -142,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const textoEncoded = encodeURIComponent(textoFinal);
 
         // O número usado no footer é 5547999999999
-        const numeroWhatsApp = "5547999999999";
+        const numeroWhatsApp = "<?= htmlspecialchars($contactWhatsApp, ENT_QUOTES, 'UTF-8') ?>";
         
         // Redirecionar
         window.open(`https://wa.me/${numeroWhatsApp}?text=${textoEncoded}`, '_blank');

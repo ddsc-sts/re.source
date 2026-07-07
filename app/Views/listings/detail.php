@@ -229,6 +229,150 @@ body {
 .mini-card-local { font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem; }
 .badge-card { position: absolute; color: white; font-size: 0.7rem; font-weight: bold; padding: 0.2rem 0.5rem; border-radius: 0.2rem; margin: 0.5rem; text-transform: uppercase; }
 
+body {
+    background-color: #fbf9f8;
+    background-image:
+        linear-gradient(to right, rgba(0,0,0,.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,.035) 1px, transparent 1px);
+    background-size: 32px 32px;
+}
+.anuncio-main {
+    max-width: 1320px;
+    margin: 3rem auto 6rem;
+}
+.anuncio-topo-titulo {
+    font-family: 'Bebas Neue', var(--font-main, sans-serif);
+    font-size: clamp(2.5rem, 6vw, 4.2rem);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    border-left: 4px solid #005131;
+    padding-left: 1rem;
+}
+.anuncio-header-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(320px, .9fr);
+}
+.olx-grid,
+.card-compra,
+.bloco-info,
+.mini-card {
+    border-radius: 0;
+    border: 1px solid #1b1c1c;
+    box-shadow: none;
+}
+.olx-grid {
+    padding: 0;
+    gap: 0;
+    background: #fff;
+}
+.olx-item {
+    border-radius: 0;
+    border-right: 1px solid #bec9bf;
+    border-bottom: 1px solid #bec9bf;
+}
+.olx-item img {
+    filter: grayscale(.45) contrast(1.08);
+}
+.olx-item:hover img {
+    filter: grayscale(0) contrast(1);
+}
+.card-compra {
+    position: sticky;
+    top: 8.5rem;
+    background: #fff;
+    color: #1b1c1c;
+    border-color: #b7c4bc;
+    border-top: 4px solid #005131;
+    box-shadow: 8px 8px 0 #dbe3de;
+}
+.preco-enorme {
+    font-family: 'Bebas Neue', var(--font-main, sans-serif);
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    font-weight: 400;
+    color: #005131;
+}
+.txt-parcelas,
+.disclaimer-contato {
+    color: #65736b;
+}
+.btn-acao {
+    border-radius: 0;
+    min-height: 56px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: .82rem;
+}
+.btn-chat {
+    background: #005131;
+}
+.btn-chat:hover {
+    filter: none;
+    background: #0d6b44;
+    color: #fff;
+}
+.bloco-info {
+    background: rgba(255,255,255,.86);
+    padding: 2rem;
+}
+.bloco-titulo,
+.carrosel-titulo {
+    font-family: 'Bebas Neue', var(--font-main, sans-serif);
+    font-size: 2rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    border-bottom: 0;
+    margin-bottom: 1rem;
+}
+.bloco-titulo {
+    border-left: 4px solid #005131;
+    padding: 0 0 0 .75rem;
+}
+.grid-detalhes {
+    border: 1px solid #bec9bf;
+    gap: 0;
+}
+.detalhe-item {
+    padding: 1rem;
+    border-right: 1px solid #bec9bf;
+    border-bottom: 1px solid #bec9bf;
+}
+.detalhe-label {
+    font-size: .68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+.texto-descricao {
+    line-height: 1.8;
+}
+.icone-cidade {
+    border-radius: 0;
+    color: #005131;
+}
+.carrosel-topo {
+    border-bottom: 2px solid #1b1c1c;
+    padding-bottom: 1rem;
+}
+.link-ver-todos {
+    color: #005131;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+.mini-card:hover {
+    box-shadow: 5px 5px 0 #005131;
+}
+.mini-card img {
+    filter: grayscale(.45) contrast(1.08);
+    border-bottom: 1px solid #bec9bf;
+}
+.mini-card:hover img {
+    filter: grayscale(0);
+}
+.badge-card {
+    border-radius: 0;
+    background: #005131 !important;
+}
+
 @media (max-width: 900px) {
     .anuncio-header-grid { grid-template-columns: 1fr; }
     .olx-grid { height: 350px; }
