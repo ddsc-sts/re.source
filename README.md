@@ -14,6 +14,23 @@ O Re.Source é um sistema desenvolvido como MVP acadêmico para apresentação d
 
 O foco atual é demonstrar o fluxo principal de ponta a ponta de forma funcional e apresentável.
 
+## Demonstração visual
+
+<table>
+  <tr>
+    <td align="center"><strong>Página inicial</strong><br><img src="Docs/screenshots/pagina-inicial.png" alt="Página inicial do Re.Source" width="420"></td>
+    <td align="center"><strong>Marketplace empresarial</strong><br><img src="Docs/screenshots/dashboard.png" alt="Marketplace da área empresarial" width="420"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Categorias de resíduos</strong><br><img src="Docs/screenshots/dashboard-2.png" alt="Categorias de resíduos" width="420"></td>
+    <td align="center"><strong>Busca e anúncios</strong><br><img src="Docs/screenshots/anuncios.png" alt="Busca e anúncios de resíduos" width="420"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Chat e negociação</strong><br><img src="Docs/screenshots/negociacao-chat.png" alt="Chat e negociação" width="420"></td>
+    <td align="center"><strong>Acompanhamento de entrega</strong><br><img src="Docs/screenshots/entregas.png" alt="Acompanhamento de entrega" width="420"></td>
+  </tr>
+</table>
+
 ## Funcionalidades principais
 
 - Cadastro de empresa com validação, confirmação por e-mail e status pendente.
@@ -41,6 +58,34 @@ O foco atual é demonstrar o fluxo principal de ponta a ponta de forma funcional
 - HTML, CSS e JavaScript
 - PHPUnit
 - XAMPP para ambiente local
+
+## Equipe e contribuições
+
+O projeto foi desenvolvido de forma colaborativa. Embora diversas partes tenham passado por revisões e integrações conjuntas, estas foram as principais frentes de atuação de cada integrante:
+
+### Leonardo Becker — Desenvolvimento Full-Stack e integração do MVP
+
+- Planejamento das prioridades e integração do fluxo principal do MVP.
+- Implementação e evolução de anúncios, busca, negociações, chat e propostas comerciais.
+- Desenvolvimento dos fluxos de aprovação de empresas, frete, entrega por código, saldo interno e solicitação de saque.
+- Integração entre controllers, views, rotas e banco de dados na arquitetura MVC.
+- Revisão funcional, testes manuais, consolidação do banco e preparação final do repositório.
+
+### Daniel dos Santos — Desenvolvimento Full-Stack, interface e qualidade
+
+- Desenvolvimento da estrutura inicial, banco de dados, cadastro, login, verificação por e-mail e recuperação de senha.
+- Participação na migração para MVC e na organização das páginas e componentes da aplicação.
+- Redesign e evolução visual das páginas iniciais, autenticação, dashboard e demais telas do sistema.
+- Implementação da base dos fluxos de frete e entrega.
+- Criação e ampliação da suíte de testes automatizados com PHPUnit.
+
+### Geder (`Gedinn07`) — Frontend, administração e revisão
+
+- Padronização de CSS, correção de caminhos e ajustes de usabilidade e apresentação.
+- Desenvolvimento e evolução de telas do painel administrativo.
+- Implementação das áreas administrativas de empresas, anúncios e negociações.
+- Desenvolvimento da área de impacto ESG e de seus elementos visuais.
+- Revisão geral de interfaces, textos, ícones e integração visual do projeto.
 
 ## Estrutura do projeto
 
