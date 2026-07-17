@@ -13,6 +13,7 @@ class BaseController
         $profileNotifications = self::getProfileNotifications($pdo, $companyId);
         $baseCategories = self::getBaseCategories($pdo);
         $marketplaceStats = self::getMarketplaceStats($pdo);
+        $dashboardOverview = self::getDashboardOverview($pdo, $companyId);
 
         view('dashboard/index', [
             'titulo_pagina'  => 'Re.Source — Economia Circular em Joinville',
@@ -20,11 +21,126 @@ class BaseController
             'profileNotifications' => $profileNotifications,
             'baseCategories' => $baseCategories,
             'marketplaceStats' => $marketplaceStats,
+            'dashboardOverview' => $dashboardOverview,
             'unitLabel'      => [
                 'kg' => 'Kg', 'ton' => 'Ton', 'm2' => 'm²', 'm3' => 'm³',
                 'unidade' => 'un.', 'litro' => 'L', 'outro' => ''
             ],
         ]);
+    }
+
+    private static function getDashboardOverview(PDO $pdo, int $companyId): array
+    {
+        $empty = [
+            'active_listings' => 0,
+            'active_negotiations' => 0,
+            'completed_negotiations' => 0,
+            'unread_messages' => 0,
+            'unseen_notifications' => 0,
+            'released_revenue' => 0.0,
+            'reused_kg' => 0.0,
+            'avoided_co2_kg' => 0.0,
+            'monthly' => array_values(DashboardMetrics::emptyMonthlyEvolution()),
+        ];
+
+        if ($companyId <= 0) {
+            return $empty;
+        }
+
+        try {
+            $stmt = $pdo->prepare(
+                "SELECT
+                    (SELECT COUNT(*) FROM listings
+                     WHERE company_id = :company_listings AND status = 'active' AND deleted_at IS NULL) AS active_listings,
+                    (SELECT COUNT(*) FROM negotiations
+                     WHERE (buyer_company_id = :company_active_buyer OR seller_company_id = :company_active_seller)
+                       AND status NOT IN ('concluded', 'cancelled')) AS active_negotiations,
+                    (SELECT COUNT(*) FROM negotiations
+                     WHERE (buyer_company_id = :company_completed_buyer OR seller_company_id = :company_completed_seller)
+                       AND status = 'concluded') AS completed_negotiations,
+                    (SELECT COUNT(*) FROM notifications
+                     WHERE company_id = :company_notifications AND is_seen = 0) AS unseen_notifications,
+                    (SELECT COUNT(*)
+                     FROM messages m
+                     INNER JOIN negotiations n ON n.id = m.negotiation_id
+                     INNER JOIN users sender ON sender.id = m.sender_user_id
+                     WHERE m.read_at IS NULL
+                       AND sender.company_id <> :company_sender
+                       AND (n.buyer_company_id = :company_messages_buyer OR n.seller_company_id = :company_messages_seller)) AS unread_messages,
+                    (SELECT COALESCE(SUM(amount), 0) FROM financial_transactions
+                     WHERE company_id = :company_revenue AND type = 'sale' AND status = 'completed') AS released_revenue"
+            );
+            $stmt->execute([
+                'company_listings' => $companyId,
+                'company_active_buyer' => $companyId,
+                'company_active_seller' => $companyId,
+                'company_completed_buyer' => $companyId,
+                'company_completed_seller' => $companyId,
+                'company_notifications' => $companyId,
+                'company_sender' => $companyId,
+                'company_messages_buyer' => $companyId,
+                'company_messages_seller' => $companyId,
+                'company_revenue' => $companyId,
+            ]);
+            $summary = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $impactStmt = $pdo->prepare(
+                "SELECT COALESCE(SUM(
+                    CASE l.unit
+                        WHEN 'ton' THEN n.proposed_quantity * 1000
+                        WHEN 'kg' THEN n.proposed_quantity
+                        ELSE 0
+                    END
+                ), 0)
+                FROM negotiations n
+                INNER JOIN listings l ON l.id = n.listing_id
+                WHERE n.status = 'concluded'
+                  AND (n.buyer_company_id = ? OR n.seller_company_id = ?)"
+            );
+            $impactStmt->execute([$companyId, $companyId]);
+            $reusedKg = (float) $impactStmt->fetchColumn();
+
+            return [
+                'active_listings' => (int) ($summary['active_listings'] ?? 0),
+                'active_negotiations' => (int) ($summary['active_negotiations'] ?? 0),
+                'completed_negotiations' => (int) ($summary['completed_negotiations'] ?? 0),
+                'unread_messages' => (int) ($summary['unread_messages'] ?? 0),
+                'unseen_notifications' => (int) ($summary['unseen_notifications'] ?? 0),
+                'released_revenue' => (float) ($summary['released_revenue'] ?? 0),
+                'reused_kg' => $reusedKg,
+                'avoided_co2_kg' => DashboardMetrics::avoidedCo2($reusedKg),
+                'monthly' => self::getMonthlyEvolution($pdo, $companyId),
+            ];
+        } catch (Throwable $e) {
+            error_log('Falha ao carregar resumo do dashboard: ' . $e->getMessage());
+            return $empty;
+        }
+    }
+
+    private static function getMonthlyEvolution(PDO $pdo, int $companyId): array
+    {
+        $months = DashboardMetrics::emptyMonthlyEvolution();
+        $stmt = $pdo->prepare(
+            "SELECT DATE_FORMAT(concluded_at, '%Y-%m') AS month_key,
+                    COUNT(*) AS negotiations,
+                    COALESCE(SUM(CASE WHEN seller_company_id = :seller THEN proposed_total ELSE 0 END), 0) AS revenue
+             FROM negotiations
+             WHERE status = 'concluded'
+               AND concluded_at >= DATE_FORMAT(DATE_SUB(CURRENT_DATE, INTERVAL 5 MONTH), '%Y-%m-01')
+               AND (buyer_company_id = :buyer OR seller_company_id = :company_seller)
+             GROUP BY DATE_FORMAT(concluded_at, '%Y-%m')"
+        );
+        $stmt->execute(['seller' => $companyId, 'buyer' => $companyId, 'company_seller' => $companyId]);
+
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $key = (string) ($row['month_key'] ?? '');
+            if (isset($months[$key])) {
+                $months[$key]['negotiations'] = (int) $row['negotiations'];
+                $months[$key]['revenue'] = (float) $row['revenue'];
+            }
+        }
+
+        return array_values($months);
     }
 
     private static function getBaseCategories(PDO $pdo): array

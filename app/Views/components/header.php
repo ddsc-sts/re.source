@@ -72,6 +72,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
   <title><?php echo isset($titulo_pagina) ? $titulo_pagina : 'Re.Source — Economia Circular'; ?></title>
   
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/style.css'), ENT_QUOTES, 'UTF-8') ?>" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/design-system.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/profile.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <?php if (isset($css_especifico)): ?>

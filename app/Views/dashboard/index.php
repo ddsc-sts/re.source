@@ -22,6 +22,15 @@
     'eletronico' => 'Componentes e equipamentos destinados à recuperação.',
     'vidro' => 'Cacos, embalagens e vidro industrial reaproveitável.',
   ];
+  $dashboardOverview = $dashboardOverview ?? [];
+  $monthlyEvolution = $dashboardOverview['monthly'] ?? [];
+  $monthlyValues = array_map(static fn(array $month): int => (int) ($month['negotiations'] ?? 0), $monthlyEvolution);
+  $maxMonthlyNegotiations = max(1, ...$monthlyValues);
+  $formatImpact = static function (float $kilograms): string {
+    return $kilograms >= 1000
+      ? number_format($kilograms / 1000, 1, ',', '.') . ' t'
+      : number_format($kilograms, 0, ',', '.') . ' kg';
+  };
   require_once __DIR__ . '/../components/header.php';
   ?>
 
@@ -106,6 +115,77 @@
       <button class="hero-dot" data-index="1" aria-label="Slide 2"></button>
       <button class="hero-dot" data-index="2" aria-label="Slide 3"></button>
       <button class="hero-dot" data-index="3" aria-label="Slide 4"></button>
+    </div>
+  </section>
+
+  <section class="company-overview" aria-labelledby="companyOverviewTitle">
+    <div class="ui-container">
+      <div class="company-overview__heading">
+        <div>
+          <span class="ui-eyebrow">Visão da sua empresa</span>
+          <h2 id="companyOverviewTitle">Seu ciclo circular em um só lugar</h2>
+          <p>Acompanhe o que exige atenção e o impacto gerado pelas suas negociações.</p>
+        </div>
+        <a class="ui-btn ui-btn--primary" href="<?= htmlspecialchars(app_url('/anuncios/novo'), ENT_QUOTES, 'UTF-8') ?>">
+          <i data-lucide="plus" aria-hidden="true"></i> Novo anúncio
+        </a>
+      </div>
+
+      <div class="overview-metrics ui-grid">
+        <a class="overview-metric ui-card" href="<?= htmlspecialchars(app_url('/meus-anuncios'), ENT_QUOTES, 'UTF-8') ?>">
+          <span class="overview-metric__icon"><i data-lucide="package" aria-hidden="true"></i></span>
+          <span><strong><?= number_format((int) ($dashboardOverview['active_listings'] ?? 0), 0, ',', '.') ?></strong><small>Anúncios ativos</small></span>
+          <i class="overview-metric__arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <a class="overview-metric ui-card" href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>">
+          <span class="overview-metric__icon"><i data-lucide="handshake" aria-hidden="true"></i></span>
+          <span><strong><?= number_format((int) ($dashboardOverview['active_negotiations'] ?? 0), 0, ',', '.') ?></strong><small>Negociações em andamento</small></span>
+          <i class="overview-metric__arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <a class="overview-metric ui-card" href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>">
+          <span class="overview-metric__icon"><i data-lucide="message-circle" aria-hidden="true"></i></span>
+          <span><strong><?= number_format((int) ($dashboardOverview['unread_messages'] ?? 0), 0, ',', '.') ?></strong><small>Mensagens não lidas</small></span>
+          <i class="overview-metric__arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <a class="overview-metric ui-card" href="<?= htmlspecialchars(app_url('/estatisticas'), ENT_QUOTES, 'UTF-8') ?>">
+          <span class="overview-metric__icon"><i data-lucide="wallet-cards" aria-hidden="true"></i></span>
+          <span><strong>R$ <?= number_format((float) ($dashboardOverview['released_revenue'] ?? 0), 2, ',', '.') ?></strong><small>Receita liberada</small></span>
+          <i class="overview-metric__arrow" data-lucide="arrow-up-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <div class="overview-panels ui-grid">
+        <article class="evolution-card ui-card">
+          <div class="overview-card__head">
+            <div><span class="ui-eyebrow">Últimos 6 meses</span><h3>Evolução das negociações</h3></div>
+            <strong><?= number_format((int) ($dashboardOverview['completed_negotiations'] ?? 0), 0, ',', '.') ?> concluídas</strong>
+          </div>
+          <div class="evolution-chart" role="img" aria-label="Negociações concluídas nos últimos seis meses">
+            <?php foreach ($monthlyEvolution as $month):
+              $value = (int) ($month['negotiations'] ?? 0);
+              $height = $value > 0 ? max(12, (int) round(($value / $maxMonthlyNegotiations) * 100)) : 4;
+            ?>
+              <div class="evolution-chart__column" title="<?= htmlspecialchars($month['label'] . ': ' . $value . ' negociações', ENT_QUOTES, 'UTF-8') ?>">
+                <span><?= $value ?></span>
+                <div><i style="height: <?= $height ?>%"></i></div>
+                <small><?= htmlspecialchars((string) $month['label'], ENT_QUOTES, 'UTF-8') ?></small>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </article>
+
+        <article class="impact-card ui-card">
+          <div class="impact-card__icon"><i data-lucide="leaf" aria-hidden="true"></i></div>
+          <span class="ui-eyebrow">Impacto ambiental estimado</span>
+          <h3><?= $formatImpact((float) ($dashboardOverview['reused_kg'] ?? 0)) ?></h3>
+          <p>de resíduos reaproveitados em negociações concluídas.</p>
+          <div class="impact-card__co2">
+            <i data-lucide="cloud-sun" aria-hidden="true"></i>
+            <span><strong><?= $formatImpact((float) ($dashboardOverview['avoided_co2_kg'] ?? 0)) ?></strong> de CO₂e evitado</span>
+          </div>
+          <small>Estimativa acadêmica: 2,5 kg CO₂e por kg reaproveitado.</small>
+        </article>
+      </div>
     </div>
   </section>
 

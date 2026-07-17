@@ -28,6 +28,44 @@
 .base-hero-search button:hover { background: #005131; }.base-hero-search button svg{width:18px;height:18px}
 .hero-dots { bottom: 37px; }.hero-dot { width: 10px; height: 10px; background: #d0d0d0; border-radius: 50%; }.hero-dot.active { background: #0a8b55; transform: none; }
 
+.company-overview { padding: 4.5rem 0; background: var(--color-canvas); }
+.company-overview__heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 1.75rem; }
+.company-overview__heading h2 { margin: .45rem 0 .35rem; font: 400 clamp(2rem, 4vw, 3.2rem)/1 'Bebas Neue', sans-serif; letter-spacing: .02em; text-transform: uppercase; }
+.company-overview__heading p { color: var(--color-text-muted); font-size: .9rem; }
+.company-overview__heading .ui-btn svg { width: 17px; height: 17px; }
+.overview-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.overview-metric { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1rem; min-width: 0; padding: 1.25rem; transition: border-color .2s, transform .2s, box-shadow .2s; }
+.overview-metric:hover { transform: translateY(-3px); border-color: var(--color-primary-500); box-shadow: var(--shadow-md); }
+.overview-metric__icon { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; color: var(--color-primary-600); background: var(--color-primary-100); border-radius: var(--radius-sm); }
+.overview-metric__icon svg { width: 20px; height: 20px; }
+.overview-metric > span:nth-child(2) { display: flex; flex-direction: column; min-width: 0; }
+.overview-metric strong { overflow: hidden; color: var(--color-text); font: 400 1.55rem/1.2 'Bebas Neue', sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.overview-metric small { margin-top: .15rem; color: var(--color-text-muted); font-size: .68rem; font-weight: 700; letter-spacing: .045em; text-transform: uppercase; }
+.overview-metric__arrow { width: 16px; height: 16px; color: var(--color-text-muted); }
+.overview-panels { grid-template-columns: minmax(0, 1.7fr) minmax(280px, .8fr); margin-top: 1rem; }
+.evolution-card, .impact-card { padding: 1.5rem; }
+.overview-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.overview-card__head h3 { margin-top: .35rem; font-size: 1rem; text-transform: uppercase; }
+.overview-card__head > strong { color: var(--color-primary-600); font-size: .72rem; text-transform: uppercase; }
+.evolution-chart { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; height: 205px; margin-top: 1.5rem; padding-top: .5rem; border-bottom: 1px solid var(--color-border); }
+.evolution-chart__column { display: grid; grid-template-rows: 18px 1fr 22px; gap: .35rem; min-width: 0; text-align: center; }
+.evolution-chart__column > span { color: var(--color-text-muted); font-size: .65rem; font-weight: 700; }
+.evolution-chart__column > div { position: relative; display: flex; align-items: flex-end; justify-content: center; min-height: 0; background: linear-gradient(to top, var(--color-border) 1px, transparent 1px); background-size: 100% 33%; }
+.evolution-chart__column i { display: block; width: min(34px, 72%); min-height: 4px; background: var(--color-primary-600); border-radius: .25rem .25rem 0 0; transition: height .35s ease; }
+.evolution-chart__column small { color: var(--color-text-muted); font-size: .65rem; font-weight: 700; text-transform: uppercase; }
+.impact-card { position: relative; overflow: hidden; color: #f4fff8; background: #123c28; border-color: #245d3f; }
+.impact-card::after { position: absolute; right: -55px; bottom: -70px; width: 180px; height: 180px; content: ''; border: 28px solid rgba(142,230,173,.08); border-radius: 50%; }
+.impact-card__icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-bottom: 1.5rem; color: #123c28; background: #a1f4c2; border-radius: 50%; }
+.impact-card__icon svg { width: 21px; height: 21px; }
+.impact-card .ui-eyebrow { color: #a1f4c2; }
+.impact-card h3 { margin: .5rem 0 .15rem; font: 400 3rem/1 'Bebas Neue', sans-serif; }
+.impact-card > p { max-width: 300px; color: rgba(244,255,248,.75); font-size: .82rem; line-height: 1.5; }
+.impact-card__co2 { display: flex; align-items: center; gap: .75rem; margin: 1.5rem 0 .75rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.16); }
+.impact-card__co2 svg { width: 22px; height: 22px; color: #a1f4c2; }
+.impact-card__co2 span { display: flex; flex-direction: column; font-size: .7rem; text-transform: uppercase; }
+.impact-card__co2 strong { font-size: 1rem; }
+.impact-card > small { position: relative; z-index: 1; color: rgba(244,255,248,.55); font-size: .62rem; }
+
 .base-trust-strip { display: grid; grid-template-columns: 1.4fr repeat(4,1fr); align-items: center; gap: 1.5rem; min-height: 105px; padding: 1.5rem max(2rem,calc((100% - 1280px)/2)); color: rgba(255,255,255,.7); background: #191b1a; border-top: 1px solid #343735; border-bottom: 1px solid #343735; }
 .base-trust-strip span { font-size: .62rem; font-weight: 800; text-transform: uppercase; letter-spacing: .11em; }.base-trust-strip strong { text-align: center; font-size: .85rem; text-transform: uppercase; letter-spacing: .035em; }
 
@@ -40,8 +78,8 @@
 
 .listings-section{background:#191b1a}.listings-inner{padding-top:5rem;padding-bottom:5rem}.listings-title{color:#fff}.listings-header{border-bottom-color:#687069}.listings-header::after{height:3px}.listings-section .btn-ver-todos{color:#a1f4c2;background:transparent;border-color:#a1f4c2;border-radius:0}.listings-section .ad-card{border-radius:0;box-shadow:none}.listings-section .btn-view{border-radius:0}
 
-@media(max-width:1050px){.category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.base-trust-strip{grid-template-columns:repeat(2,1fr)}.base-trust-strip span{grid-column:1/-1;text-align:center}}
-@media(max-width:700px){.hero{height:720px}.slide-content{padding:0 1.25rem 13rem}.slide-text h1{font-size:3rem}.base-hero-search{bottom:80px;grid-template-columns:1fr}.base-hero-search label{padding:.65rem 1rem;border-right:0;border-bottom:1px solid #bec9bf}.base-hero-search button{min-height:52px}.hero-dots{bottom:30px}.base-trust-strip{grid-template-columns:1fr 1fr;padding:1.5rem}.base-section-heading{align-items:flex-start;flex-direction:column;gap:.5rem}.category-grid{grid-template-columns:1fr}.category-card{min-height:0}.category-card-media{height:230px}}
+@media(max-width:1050px){.overview-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.base-trust-strip{grid-template-columns:repeat(2,1fr)}.base-trust-strip span{grid-column:1/-1;text-align:center}}
+@media(max-width:700px){.hero{height:720px}.slide-content{padding:0 1.25rem 13rem}.slide-text h1{font-size:3rem}.base-hero-search{bottom:80px;grid-template-columns:1fr}.base-hero-search label{padding:.65rem 1rem;border-right:0;border-bottom:1px solid #bec9bf}.base-hero-search button{min-height:52px}.hero-dots{bottom:30px}.company-overview{padding:3rem 0}.company-overview__heading{align-items:flex-start;flex-direction:column}.company-overview__heading .ui-btn{width:100%}.overview-metrics,.overview-panels{grid-template-columns:1fr}.overview-metric{padding:1rem}.evolution-card,.impact-card{padding:1.15rem}.evolution-chart{gap:.35rem;height:180px}.base-trust-strip{grid-template-columns:1fr 1fr;padding:1.5rem}.base-section-heading{align-items:flex-start;flex-direction:column;gap:.5rem}.category-grid{grid-template-columns:1fr}.category-card{min-height:0}.category-card-media{height:230px}}
 
 /* Fotografias coloridas: a Base deve transmitir atividade e vitalidade. */
 .category-card-media img,
