@@ -1,9 +1,0 @@
-As credenciais locais de demonstracao nao ficam versionadas.
-
-Configure no arquivo .env:
-DEMO_ADMIN_EMAIL
-DEMO_ADMIN_PASSWORD
-DEMO_STAFF_EMAIL
-DEMO_STAFF_PASSWORD
-
-Nunca adicione senhas reais a este documento.
