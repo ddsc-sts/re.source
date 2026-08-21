@@ -6,11 +6,9 @@ $companyName = $company['nome_fantasia'] ?: ($company['razao_social'] ?? 'Sua em
 $document = preg_replace('/\D/', '', (string) ($company['cnpj'] ?? ''));
 require_once __DIR__ . '/../components/header.php';
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/saque.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-<main class="dashboard-shell">
-  <?php $sidebarActive = 'statistics'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
+<main class="internal-page-shell">
   <div class="withdraw-page">
     <a href="/re.source/estatisticas" class="withdraw-back"><i data-lucide="arrow-left"></i> Voltar ao painel</a>
     <header class="withdraw-heading">

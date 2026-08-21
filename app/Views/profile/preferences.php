@@ -1,0 +1,8 @@
+<?php require __DIR__.'/_start.php'; ?>
+<header class="profile-heading"><span>Experiência personalizada</span><h2>Preferências</h2><p>Escolha aparência e quais eventos geram notificações.</p></header>
+<form class="profile-card" action="<?=app_url('/perfil/preferencias/salvar')?>" method="post"><?=csrf_field()?>
+ <div class="profile-card__title"><i data-lucide="sliders-horizontal"></i><div><h3>Configurações da experiência</h3><p>As alterações serão aplicadas em toda a plataforma.</p></div></div>
+ <fieldset class="profile-section"><legend>Aparência</legend><div class="choice-grid"><?php foreach(['light'=>['sun','Claro'],'dark'=>['moon','Escuro'],'system'=>['monitor','Sistema']] as $value=>[$icon,$label]):?><label class="choice"><input type="radio" name="theme" value="<?=$value?>" <?=($company['theme']??'system')===$value?'checked':''?>><i data-lucide="<?=$icon?>"></i><span><?=$label?></span></label><?php endforeach;?></div></fieldset>
+ <fieldset class="profile-section"><legend>Notificações</legend><label class="check-row"><input type="checkbox" name="notify_proposals" value="1" <?=!empty($company['notify_proposals'])?'checked':''?>><span><strong>Propostas comerciais</strong><small>Avisos quando uma proposta for criada ou respondida.</small></span></label><label class="check-row"><input type="checkbox" name="notify_chat" value="1" <?=!empty($company['notify_chat'])?'checked':''?>><span><strong>Mensagens do chat</strong><small>Avisos sobre novas mensagens em negociações.</small></span></label></fieldset>
+ <div class="profile-actions"><button type="submit">Salvar preferências <i data-lucide="check"></i></button></div>
+</form><?php require __DIR__.'/_end.php'; ?>

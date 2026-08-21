@@ -310,3 +310,4 @@
         text-align: center;
     }
 }
+.internal-page-shell{width:min(1180px,calc(100% - 36px));margin:0 auto;padding:42px 0 84px;display:block}.internal-page-shell .withdraw-page{width:100%;max-width:none}.withdraw-page,.withdraw-page button,.withdraw-page input,.withdraw-page select,.withdraw-page textarea{font-family:'Work Sans',var(--font-body),sans-serif}.withdraw-page h1,.withdraw-page h2,.withdraw-page h3{font-family:'Bebas Neue',var(--font-main),sans-serif}@media(max-width:700px){.internal-page-shell{width:min(100% - 24px,1180px);padding-top:24px}}

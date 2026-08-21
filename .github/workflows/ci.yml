@@ -1,0 +1,39 @@
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: resource_test
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo_mysql, mbstring
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+      - name: Prepare database
+        run: |
+          mysql -h127.0.0.1 -uroot -proot < database/seeders/re.sourcebanco.sql
+          mysql -h127.0.0.1 -uroot -proot resource < database/migrations/001_product_innovation.sql
+      - name: Test
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: resource
+          DB_USERNAME: root
+          DB_PASSWORD: root
+          APP_BASE_PATH: ""
+        run: vendor/bin/phpunit --colors=always

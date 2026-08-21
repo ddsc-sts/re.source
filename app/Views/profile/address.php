@@ -1,0 +1,7 @@
+<?php require __DIR__.'/_start.php'; ?>
+<header class="profile-heading"><span>Localização operacional</span><h2>Endereço comercial</h2><p>Usado nas buscas por proximidade, Match e simulações de frete.</p></header>
+<form class="profile-card" action="<?=app_url('/perfil/endereco/salvar')?>" method="post"><?=csrf_field()?>
+ <div class="profile-card__title"><i data-lucide="map"></i><div><h3>Local da empresa</h3><p>Preencha apenas os dados que deseja atualizar.</p></div></div>
+ <div class="profile-grid"><label>CEP<input name="zip_code" inputmode="numeric" maxlength="9" value="<?=htmlspecialchars($company['zip_code']??'')?>"></label><label>Logradouro<input name="street" maxlength="200" value="<?=htmlspecialchars($company['street']??'')?>"></label><label>Número<input name="number" maxlength="20" value="<?=htmlspecialchars($company['number']??'')?>"></label><label>Complemento<input name="complement" maxlength="100" value="<?=htmlspecialchars($company['complement']??'')?>"></label><label>Bairro<input name="district" maxlength="100" value="<?=htmlspecialchars($company['district']??'')?>"></label><label>Cidade<input name="city" maxlength="100" value="<?=htmlspecialchars($company['city']??'')?>"></label><label>UF<input name="state" maxlength="2" pattern="[A-Za-z]{2}" value="<?=htmlspecialchars($company['state']??'')?>"></label></div>
+ <div class="profile-actions"><button type="submit">Salvar endereço <i data-lucide="check"></i></button></div>
+</form><?php require __DIR__.'/_end.php'; ?>

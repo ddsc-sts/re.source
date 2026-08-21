@@ -1,9 +1,6 @@
 <?php require __DIR__ . '/../components/header.php'; ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/chat.css'), ENT_QUOTES, 'UTF-8') ?>">
-<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
-
-<main class="dashboard-shell">
-  <?php $sidebarActive = 'conversations'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
+<main class="internal-page-shell">
   <div class="chat-page chat-room-page">
   <div class="chat-room-header">
     <a class="chat-back" href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>" aria-label="Voltar às conversas"><i data-lucide="arrow-left"></i></a>
@@ -33,7 +30,22 @@
     'accepted' => 'Acordo confirmado', 'cancelled' => 'Cancelada',
     default => ucfirst(str_replace('_', ' ', $negotiationStatus)),
   };
+  $flowOrder = ['open'=>0,'proposal_sent'=>0,'buyer_accepted'=>1,'seller_accepted'=>1,'accepted'=>1,'awaiting_freight'=>2,'shipping'=>3,'delivered'=>4,'concluded'=>4];
+  $currentFlowStep = $flowOrder[$negotiationStatus] ?? 0;
   ?>
+
+  <section class="negotiation-progress" aria-label="Progresso da negociação">
+    <div><strong>Em qual etapa estou?</strong><span><?= htmlspecialchars($negotiationStatusLabel, ENT_QUOTES, 'UTF-8') ?></span></div>
+    <ol><?php foreach (['Proposta','Aceite','Frete','Transporte','Entrega'] as $stepIndex=>$stepLabel): ?><li class="<?= $stepIndex < $currentFlowStep ? 'is-done' : ($stepIndex === $currentFlowStep ? 'is-current' : '') ?>"><i><?= $stepIndex < $currentFlowStep ? '✓' : $stepIndex + 1 ?></i><span><?= $stepLabel ?></span></li><?php endforeach; ?></ol>
+    <p><?php echo match($currentFlowStep){0=>'Próxima ação: envie ou revise a proposta.',1=>'Próxima ação: confirme o acordo das duas empresas.',2=>'Próxima ação: escolha e contrate uma opção de frete.',3=>'O material está em transporte. Acompanhe a atualização logística.',default=>'Confirme a entrega e consulte o passaporte do material.'}; ?></p>
+  </section>
+  <?php if ($negotiationStatus === 'concluded'): ?>
+    <form method="post" action="<?= htmlspecialchars(app_url('/passaporte/criar'), ENT_QUOTES, 'UTF-8') ?>" class="passport-action">
+      <?= csrf_field() ?><input type="hidden" name="negotiation_id" value="<?= (int)$negotiation['id'] ?>">
+      <div><strong>Material reaproveitado</strong><span>Gere o registro rastreável desta negociação.</span></div>
+      <button type="submit"><i data-lucide="qr-code"></i> Ver passaporte digital</button>
+    </form>
+  <?php endif; ?>
 
   <details class="proposal-drawer">
     <summary class="proposal-drawer-trigger">

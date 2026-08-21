@@ -4,7 +4,7 @@ $host    = (string) env('DB_HOST', '127.0.0.1');
 $usuario = (string) env('DB_USERNAME', 'root');
 $senha   = (string) env('DB_PASSWORD', '');
 $banco   = (string) env('DB_DATABASE', 'resource');
-$port    = (string) env('DB_PORT', '3306');
+$port    = (string) env('DB_PORT', '3406');
 
 try {
 

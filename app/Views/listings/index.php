@@ -1,6 +1,5 @@
 <?php
 $titulo_pagina = 'Meus Anúncios — Re.Source';
-$hideSearchBar = true;
 $css_especifico = asset_url('/css/meus-anuncios.css');
 $unitLabels = ['kg'=>'kg','ton'=>'t','m2'=>'m²','m3'=>'m³','unidade'=>'un.','litro'=>'L','outro'=>''];
 $statusLabels = [
@@ -8,10 +7,7 @@ $statusLabels = [
 ];
 require_once __DIR__ . '/../components/header.php';
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
-
-<main class="dashboard-shell listings-dashboard">
-  <?php $sidebarActive = 'listings'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
+<main class="internal-page-shell listings-dashboard">
 
   <section class="dashboard-content my-listings-content">
     <header class="my-listings-header">

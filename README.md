@@ -114,14 +114,37 @@ Docs/               Documentação acadêmica do projeto
 
 ## Como rodar localmente
 
-### 1. Clonar o projeto
+### Opção recomendada: Docker
+
+Pré-requisito: Docker Desktop ou Docker Engine com Compose.
+
+```bash
+git clone <url-do-repositorio>
+cd re.source
+docker compose up -d --build
+```
+
+Acesse `http://localhost:8080`. O MariaDB, schema, administrador e dados demonstrativos
+são inicializados automaticamente no primeiro volume. Para abrir também o phpMyAdmin:
+
+```bash
+docker compose --profile tools up -d
+```
+
+Ele ficará em `http://localhost:8081`. Para reaplicar a inicialização do zero, remova o
+volume do banco conscientemente com `docker compose down -v` e suba novamente; isso apaga
+os dados locais do ambiente Docker.
+
+### Opção XAMPP/manual
+
+#### 1. Clonar o projeto
 
 ```bash
 git clone <url-do-repositorio>
 cd re.source
 ```
 
-### 2. Configurar o ambiente
+#### 2. Configurar o ambiente
 
 Copie o arquivo de exemplo:
 
@@ -146,7 +169,7 @@ DB_PASSWORD=
 
 Para testar envio de e-mails, preencha também as variáveis SMTP no `.env`.
 
-### 3. Preparar o banco de dados
+#### 3. Preparar o banco de dados
 
 No phpMyAdmin, importe os arquivos SQL nesta ordem:
 
@@ -156,11 +179,12 @@ No phpMyAdmin, importe os arquivos SQL nesta ordem:
 3. database/inserts/empresa_demo.sql   (opcional, recomendado para demonstração)
 4. database/inserts/produto.sql        (opcional, depende do item 3)
 5. database/inserts/saldo_demo.sql     (opcional, depende dos itens 3 e 4)
+6. database/migrations/001_product_innovation.sql
 ```
 
 O arquivo `re.sourcebanco.sql` cria e seleciona automaticamente o banco `resource` e já contém a estrutura consolidada do MVP.
 
-### 4. Acessar o sistema
+#### 4. Acessar o sistema
 
 ```text
 http://localhost/re.source
@@ -236,6 +260,21 @@ O último relatório registrado no projeto indica:
 ```text
 OK (106 tests, 326 assertions)
 ```
+
+Cada push e pull request também executa a suíte em PHP 8.3 + MariaDB pelo workflow de
+GitHub Actions em `.github/workflows/ci.yml`.
+
+## Evolução Re.Source 2.0
+
+- Onboarding guiado e Central de Ajuda (`/ajuda`).
+- Tour demonstrativo reiniciável pelo usuário.
+- Re.Source Match com pontuação explicável (`/match`).
+- Passaporte digital público com identificação única e QR Code (`/passaporte`).
+- Migration inicial para fatores ambientais e rastreabilidade.
+- Docker, banco automático, CI, arquitetura cloud e revisões de segurança/acessibilidade.
+
+Documentos técnicos: `Docs/RELATORIO_EVOLUCAO_2_0.md`, `Docs/ARQUITETURA_CLOUD.md`,
+`Docs/RELATORIO_SEGURANCA.md` e `Docs/ACESSIBILIDADE.md`.
 
 ## Licença
 

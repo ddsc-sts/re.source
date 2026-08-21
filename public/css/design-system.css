@@ -52,3 +52,5 @@
   --color-primary-600: #5fbf86;
   --color-primary-700: #8ee6ad;
 }
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{outline:3px solid #f5a623;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

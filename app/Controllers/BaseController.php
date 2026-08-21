@@ -14,6 +14,12 @@ class BaseController
         $baseCategories = self::getBaseCategories($pdo);
         $marketplaceStats = self::getMarketplaceStats($pdo);
         $dashboardOverview = self::getDashboardOverview($pdo, $companyId);
+        $environmentalMethod = self::getEnvironmentalMethod($pdo);
+        if ($companyId > 0) {
+            $onboardingStmt = $pdo->prepare('SELECT onboarding_completed FROM companies WHERE id = ?');
+            $onboardingStmt->execute([$companyId]);
+            $_SESSION['onboarding_completed'] = (bool) $onboardingStmt->fetchColumn();
+        }
 
         view('dashboard/index', [
             'titulo_pagina'  => 'Re.Source — Economia Circular em Joinville',
@@ -22,11 +28,23 @@ class BaseController
             'baseCategories' => $baseCategories,
             'marketplaceStats' => $marketplaceStats,
             'dashboardOverview' => $dashboardOverview,
+            'environmentalMethod' => $environmentalMethod,
             'unitLabel'      => [
                 'kg' => 'Kg', 'ton' => 'Ton', 'm2' => 'm²', 'm3' => 'm³',
                 'unidade' => 'un.', 'litro' => 'L', 'outro' => ''
             ],
         ]);
+    }
+
+    private static function getEnvironmentalMethod(PDO $pdo): array
+    {
+        try {
+            $row = $pdo->query("SELECT factor_kg_co2e_per_kg,source_name,source_url,methodology_version,valid_from FROM emission_factors ORDER BY category_id IS NULL DESC, valid_from DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+            if ($row) return $row;
+        } catch (Throwable $e) {
+            error_log('Migration ESG ainda não aplicada: '.$e->getMessage());
+        }
+        return ['factor_kg_co2e_per_kg'=>2.5,'source_name'=>'Fator acadêmico provisório do MVP','source_url'=>null,'methodology_version'=>'MVP-2026.1','valid_from'=>'2026-01-01'];
     }
 
     private static function getDashboardOverview(PDO $pdo, int $companyId): array
@@ -390,13 +408,13 @@ class BaseController
         $company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 1;
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /re.source/conta");
+            header('Location: ' . app_url('/conta'));
             exit();
         }
 
         if (!csrf_validate()) {
             $_SESSION['error'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
-            header('Location: /re.source/conta');
+            header('Location: ' . app_url('/conta'));
             exit();
         }
 
@@ -417,7 +435,7 @@ class BaseController
 
         if (!$email_comercial) {
             $_SESSION['error'] = "E-mail comercial inválido.";
-            header("Location: /re.source/conta");
+            header('Location: ' . app_url('/conta'));
             exit();
         }
 
@@ -452,7 +470,7 @@ class BaseController
                             if ($logo_url && file_exists(ROOT_PATH . '/' . $logo_url)) {
                                 @unlink(ROOT_PATH . '/' . $logo_url);
                             }
-                            $logo_url = '/re.source/' . $dest_path;
+                            $logo_url = app_url('/' . $dest_path);
                         }
                     } else {
                         throw new \Exception("O logotipo excede o tamanho máximo de 2MB.");
@@ -506,7 +524,7 @@ class BaseController
             $_SESSION['error'] = "Erro ao atualizar: " . $e->getMessage();
         }
 
-        header("Location: /re.source/conta");
+        header('Location: ' . app_url('/conta'));
         exit();
     }
 
@@ -551,13 +569,13 @@ class BaseController
         $company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 1;
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /re.source/configuracoes");
+            header('Location: ' . app_url('/configuracoes'));
             exit();
         }
 
         if (!csrf_validate()) {
             $_SESSION['error'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
-            header('Location: /re.source/configuracoes');
+            header('Location: ' . app_url('/configuracoes'));
             exit();
         }
 
@@ -576,7 +594,7 @@ class BaseController
             $_SESSION['error'] = "Erro ao salvar preferências: " . $e->getMessage();
         }
 
-        header("Location: /re.source/configuracoes");
+        header('Location: ' . app_url('/configuracoes'));
         exit();
     }
 
@@ -586,13 +604,13 @@ class BaseController
         $company_id = $_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? null;
 
         if (!$company_id || $_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: /re.source/configuracoes");
+            header('Location: ' . app_url('/configuracoes'));
             exit();
         }
 
         if (!csrf_validate()) {
             $_SESSION['error'] = 'Sua sessão expirou. Recarregue a página e tente novamente.';
-            header('Location: /re.source/configuracoes');
+            header('Location: ' . app_url('/configuracoes'));
             exit();
         }
 
@@ -638,7 +656,7 @@ class BaseController
 
             session_destroy();
 
-            header("Location: /re.source/login?account=deleted");
+            header('Location: ' . app_url('/login?account=deleted'));
             exit();
         } catch (\PDOException $e) {
             if ($pdo->inTransaction()) {

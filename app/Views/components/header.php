@@ -74,8 +74,10 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
   
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/style.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/design-system.css'), ENT_QUOTES, 'UTF-8') ?>" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/workspace-ui.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/profile.css'), ENT_QUOTES, 'UTF-8') ?>" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/account-menu.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <?php if (isset($css_especifico)): ?>
     <link rel="stylesheet" href="<?php echo $css_especifico; ?>" />
   <?php endif; ?>
@@ -104,14 +106,14 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
 
       <div class="logo">
         <a href="<?= $headerHomeUrl ?>">
-          <img src="/re.source/public/img/logos/logo.png" alt="<?= htmlspecialchars($platformName, ENT_QUOTES, 'UTF-8') ?>" />
+          <img src="<?= htmlspecialchars(asset_url('/img/logos/logo.png'), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($platformName, ENT_QUOTES, 'UTF-8') ?>" />
         </a>
       </div>
 
       <nav class="desktop-nav">
         <a href="<?= $headerHomeUrl ?>"><i data-lucide="home"></i> Página Inicial</a>
-        <a href="/re.source/sobre"><i data-lucide="info"></i> Sobre Nós</a>
-        <a href="/re.source/contato"><i data-lucide="phone"></i> Contato</a>
+        <a href="<?= htmlspecialchars(app_url('/sobre'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="info"></i> Sobre Nós</a>
+        <a href="<?= htmlspecialchars(app_url('/contato'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="phone"></i> Contato</a>
       </nav>
 
       <?php if ($headerCompanyId && !$headerIsPending): ?>
@@ -166,23 +168,24 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
       </aside>
 
 
-      <div class="dropdown-menu" id="dropdownMenu">
-        <div class="dropdown-label">
-          <?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?>
+      <div class="dropdown-menu account-nav-panel" id="dropdownMenu">
+        <div class="account-nav-head">
+          <div class="account-nav-head__icon"><i data-lucide="building-2"></i></div>
+          <div><span>Workspace empresarial</span><strong><?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?></strong></div>
           <?php if ($headerIsPending): ?>
             <span class="header-status-note">
               <?= $headerCompanyStatus === 'changes_requested' ? 'CORREÇÃO SOLICITADA' : 'AGUARDANDO APROVAÇÃO' ?>
             </span>
           <?php endif; ?>
         </div>
+        <nav class="account-nav-grid" aria-label="Atalhos da conta">
         <?php if ($headerIsPending): ?>
-          <a href="/re.source/aguardando-aprovacao" class="menu-btn">Status da aprovação</a>
+          <a href="<?= htmlspecialchars(app_url('/aguardando-aprovacao'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="badge-check"></i><span><strong>Aprovação</strong><small>Status da empresa</small></span></a>
         <?php else: ?>
-          <a href="/re.source/estatisticas" class="menu-btn">Estatísticas</a>
-          <a href="/re.source/meus-anuncios" class="menu-btn">Meus Anúncios</a>
-          <a href="<?= htmlspecialchars(app_url('/entregas'), ENT_QUOTES, 'UTF-8') ?>" class="menu-btn">Minhas entregas</a>
-          <a href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>" class="menu-btn">
-            Conversas
+          <a href="<?= htmlspecialchars(app_url('/estatisticas'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="chart-no-axes-combined"></i><span><strong>Estatísticas</strong><small>Resultados e saldo</small></span></a>
+          <a href="<?= htmlspecialchars(app_url('/meus-anuncios'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="package-search"></i><span><strong>Anúncios</strong><small>Gerenciar materiais</small></span></a>
+          <a href="<?= htmlspecialchars(app_url('/entregas'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="truck"></i><span><strong>Entregas</strong><small>Fretes e rastreio</small></span></a>
+          <a href="<?= htmlspecialchars(app_url('/conversas'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="messages-square"></i><span><strong>Conversas</strong><small>Negociações abertas</small></span>
             <span
               id="headerUnreadBadge"
               class="header-unread-badge"
@@ -193,14 +196,13 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
             ><?= $headerUnreadMessages > 99 ? '99+' : $headerUnreadMessages ?></span>
           </a>
         <?php endif; ?>
-        <a href="/re.source/conta" class="menu-btn">Detalhes da conta</a>
-        <a href="/re.source/configuracoes" class="menu-btn">Configurações</a>
+        <a href="<?= htmlspecialchars(app_url('/match'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="sparkles"></i><span><strong>Match</strong><small>Empresas compatíveis</small></span></a>
+        <a href="<?= htmlspecialchars(app_url('/ajuda'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="circle-help"></i><span><strong>Ajuda</strong><small>Guias da plataforma</small></span></a>
+        <a href="<?= htmlspecialchars(app_url('/perfil/empresa'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="settings-2"></i><span><strong>Perfil</strong><small>Dados e preferências</small></span></a>
+        </nav>
 
         <?php if (!$headerIsPending): ?>
-          <div class="dropdown-divider"></div>
-          <a href="/re.source/anuncios/novo">
-            <button class="btn-announce">Anunciar Resíduo</button>
-          </a>
+          <a class="account-nav-primary" href="<?= htmlspecialchars(app_url('/anuncios/novo'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="plus"></i> Criar novo anúncio</a>
         <?php endif; ?>
       </div>
 
@@ -210,7 +212,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
   <?php if (empty($hideSearchBar)): ?>
   <div>
     <div class="search-bar-inner">
-      <form action="/re.source/busca" method="GET" class="search-pill">
+      <form action="<?= htmlspecialchars(app_url('/busca'), ENT_QUOTES, 'UTF-8') ?>" method="GET" class="search-pill">
         
         <div class="search-field">
           <label>O que busca?</label>

@@ -1,0 +1,7 @@
+.git
+.env
+.phpunit.cache
+vendor
+tmp
+output
+Docs

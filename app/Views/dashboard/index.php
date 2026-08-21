@@ -32,7 +32,9 @@
       : number_format($kilograms, 0, ',', '.') . ' kg';
   };
   require_once __DIR__ . '/../components/header.php';
-  ?>
+?>
+<div data-onboarding data-completed="<?= !empty($_SESSION['onboarding_completed']) ? '1' : '0' ?>" data-complete-url="<?= htmlspecialchars(app_url('/onboarding/concluir'), ENT_QUOTES, 'UTF-8') ?>" data-csrf="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>"></div>
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/experience.css'), ENT_QUOTES, 'UTF-8') ?>">
 
   <!-- ══ HERO ══ -->
   <section class="hero" aria-label="Banner principal">
@@ -183,7 +185,7 @@
             <i data-lucide="cloud-sun" aria-hidden="true"></i>
             <span><strong><?= $formatImpact((float) ($dashboardOverview['avoided_co2_kg'] ?? 0)) ?></strong> de CO₂e evitado</span>
           </div>
-          <small>Estimativa acadêmica: 2,5 kg CO₂e por kg reaproveitado.</small>
+          <details class="impact-method"><summary>Como este indicador foi calculado?</summary><p>Quantidade reaproveitada × <?= number_format((float)($environmentalMethod['factor_kg_co2e_per_kg'] ?? 2.5), 2, ',', '.') ?> kg CO₂e/kg.</p><p><strong>Fonte:</strong> <?= htmlspecialchars((string)($environmentalMethod['source_name'] ?? 'Fator acadêmico provisório'), ENT_QUOTES, 'UTF-8') ?> · versão <?= htmlspecialchars((string)($environmentalMethod['methodology_version'] ?? 'MVP-2026.1'), ENT_QUOTES, 'UTF-8') ?>.</p><p>Estimativa acadêmica; transporte e particularidades do material ainda não estão incluídos.</p></details>
         </article>
       </div>
     </div>
@@ -234,14 +236,14 @@
     <div class="listings-inner">
       <div class="listings-header">
         <h2 class="listings-title">Anúncios Recentes</h2>
-        <a href="/re.source/busca" class="btn-ver-todos">Ver todos <i data-lucide="arrow-right"></i></a>
+        <a href="<?= htmlspecialchars(app_url('/busca'), ENT_QUOTES, 'UTF-8') ?>" class="btn-ver-todos">Ver todos <i data-lucide="arrow-right"></i></a>
       </div>
 
       <?php if (empty($recentListings)): ?>
         <div class="empty-state">
           <i data-lucide="package-open" style="width:48px;height:48px;margin-bottom:1rem;opacity:.5"></i>
           <p>Nenhum anúncio disponível no momento.</p>
-          <a href="/re.source/anuncios/novo" class="btn-view first-listing">Seja o primeiro a anunciar</a>
+          <a href="<?= htmlspecialchars(app_url('/anuncios/novo'), ENT_QUOTES, 'UTF-8') ?>" class="btn-view first-listing">Seja o primeiro a anunciar</a>
         </div>
       <?php else: ?>
         <div class="listings-grid">
@@ -276,7 +278,7 @@
                   <?php else: ?>
                     <span class="ad-price demand-price">Busca</span>
                   <?php endif; ?>
-                  <a href="/re.source/anuncio?id=<?= (int) $item['id'] ?>" class="btn-view">Ver Detalhes</a>
+                  <a href="<?= htmlspecialchars(app_url('/anuncio?id=' . (int) $item['id']), ENT_QUOTES, 'UTF-8') ?>" class="btn-view">Ver Detalhes</a>
                 </div>
               </div>
             </article>
@@ -286,4 +288,5 @@
     </div>
   </section>
 
+  <script src="<?= htmlspecialchars(asset_url('/js/onboarding.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
   <?php require_once __DIR__ . '/../components/footer.php'; ?>

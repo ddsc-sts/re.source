@@ -28,7 +28,7 @@ $footerPlatformName = app_setting('platform_name', 'Re.Source') ?: 'Re.Source';
   <div class="footer-main">
     <div class="footer-logo">
       <div class="footer-logo-wrap">
-        <img src="/re.source/public/img/logos/logo.png" alt="<?= htmlspecialchars($footerPlatformName, ENT_QUOTES, 'UTF-8') ?>" />
+        <img src="<?= htmlspecialchars(asset_url('/img/logos/logo.png'), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($footerPlatformName, ENT_QUOTES, 'UTF-8') ?>" />
       </div>
       <p class="footer-desc">Conectando empresas para uma economia circular sustentável em Joinville.</p>
     </div>
@@ -36,21 +36,22 @@ $footerPlatformName = app_setting('platform_name', 'Re.Source') ?: 'Re.Source';
     <div class="footer-col">
       <h4>O que você procura?</h4>
       <ul>
-        <li><a href="/re.source/busca?category_id=3">Plástico</a></li>
-        <li><a href="/re.source/busca?category_id=2">Metal</a></li>
-        <li><a href="/re.source/busca?category_id=4">Madeira</a></li>
-        <li><a href="/re.source/busca?category_id=1">Têxtil</a></li>
-        <li><a href="/re.source/busca?category_id=8">Eletrônicos</a></li>
+        <li><a href="<?= app_url('/busca?category_id=3') ?>">Plástico</a></li>
+        <li><a href="<?= app_url('/busca?category_id=2') ?>">Metal</a></li>
+        <li><a href="<?= app_url('/busca?category_id=4') ?>">Madeira</a></li>
+        <li><a href="<?= app_url('/busca?category_id=1') ?>">Têxtil</a></li>
+        <li><a href="<?= app_url('/busca?category_id=8') ?>">Eletrônicos</a></li>
       </ul>
     </div>
 
     <div class="footer-col">
       <h4>Na Re.Source</h4>
       <ul>
-        <li><a href="/re.source/">Início</a></li>
-        <li><a href="/re.source/sobre">Sobre Nós</a></li>
-        <li><a href="/re.source/contato">Contato</a></li>
-        <li><a href="/re.source/busca">Anúncios</a></li>
+        <li><a href="<?= app_url('/') ?>">Início</a></li>
+        <li><a href="<?= app_url('/sobre') ?>">Sobre Nós</a></li>
+        <li><a href="<?= app_url('/contato') ?>">Contato</a></li>
+        <li><a href="<?= app_url('/busca') ?>">Anúncios</a></li>
+        <li><a href="<?= app_url('/ajuda') ?>">Central de Ajuda</a></li>
       </ul>
     </div>
 
@@ -71,10 +72,10 @@ $footerPlatformName = app_setting('platform_name', 'Re.Source') ?: 'Re.Source';
 
   <div class="footer-bottom">
     <p>© 2026 Re.Source. Todos os direitos reservados.</p>
-    <p><a href="/re.source/termos">Termos de Uso</a> · <a href="/re.source/privacidade">Política de Privacidade</a></p>
+    <p><a href="<?= app_url('/termos') ?>">Termos de Uso</a> · <a href="<?= app_url('/privacidade') ?>">Política de Privacidade</a></p>
   </div>
 </footer>
 
-<script src="/re.source/public/js/base.js"></script>
+<script src="<?= htmlspecialchars(asset_url('/js/base.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 </body>
 </html>

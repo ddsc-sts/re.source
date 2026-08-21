@@ -1,18 +1,13 @@
 <?php
 $nome_exibicao = $nome_empresa;
 $titulo_pagina = $titulo_pagina ?? 'Estatísticas do Painel — Re.Source';
-require_once __DIR__ . '/../components/header.php';
+$css_especifico = asset_url('/css/estatisticas.css');
+require VIEW_PATH.'/components/header.php';
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
-<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/estatisticas.css'), ENT_QUOTES, 'UTF-8') ?>">
-
-<main class="dashboard-shell">
-    <?php $sidebarActive = 'statistics'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
-
-    <div class="dashboard-content">
+<main class="statistics-main"><div class="dashboard-content">
         
         <div class="dash-header">
-            <h1 class="dash-title">Visão Geral</h1>
+            <div><span class="dash-eyebrow">Inteligência empresarial</span><h1 class="dash-title">Visão Geral</h1><p>Acompanhe o desempenho comercial e financeiro da <?=htmlspecialchars($nome_exibicao,ENT_QUOTES,'UTF-8')?>.</p></div>
             <div class="dash-date">
                 <i data-lucide="calendar"></i> 
                 Atualizado Hoje
@@ -34,7 +29,7 @@ require_once __DIR__ . '/../components/header.php';
                 </div>
                 <div class="dash-card-value">R$ <?= number_format($saldo_disponivel, 2, ',', '.'); ?></div>
                 <?php if($saldo_disponivel > 0): ?>
-                    <a class="btn-sacar" href="/re.source/estatisticas/saque">Solicitar Saque</a>
+                    <a class="btn-sacar" href="<?=app_url('/estatisticas/saque')?>">Solicitar Saque</a>
                 <?php else: ?>
                     <button class="btn-sacar" disabled>Saldo Insuficiente</button>
                 <?php endif; ?>
@@ -244,4 +239,4 @@ require_once __DIR__ . '/../components/header.php';
     });
 </script>
 
-<?php require_once __DIR__ . '/../components/footer.php'; ?>
+<?php require VIEW_PATH.'/components/footer.php'; ?>

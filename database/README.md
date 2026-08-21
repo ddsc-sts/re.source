@@ -18,7 +18,11 @@ No phpMyAdmin, importe os arquivos nesta ordem:
 3. database/inserts/empresa_demo.sql      (opcional, recomendado para apresentação)
 4. database/inserts/produto.sql           (opcional, depende de empresa_demo.sql)
 5. database/inserts/saldo_demo.sql        (opcional, depende dos dois anteriores)
+6. database/migrations/001_product_innovation.sql
 ```
+
+No ambiente Docker essa ordem é aplicada automaticamente. Em instalações existentes,
+execute apenas as migrations ainda não aplicadas, na ordem numérica.
 
 O primeiro arquivo cria o banco `resource`, seleciona o banco com `USE` e monta toda a estrutura necessária para um reset completo.
 

@@ -612,3 +612,4 @@
     .freight-history li { grid-template-columns: auto 1fr; }
     .freight-history time { grid-column: 2; }
 }
+.internal-page-shell{width:min(1280px,calc(100% - 36px));margin:0 auto;padding:42px 0 84px;display:block}.internal-page-shell .freight-page{width:100%;max-width:none}.freight-page,.freight-page button,.freight-page input,.freight-page textarea,.freight-page select{font-family:'Work Sans',var(--font-body),sans-serif}.freight-page h1,.freight-page h2,.freight-page .eyebrow{font-family:'Bebas Neue',var(--font-main),sans-serif}@media(max-width:700px){.internal-page-shell{width:min(100% - 24px,1280px);padding-top:24px}}

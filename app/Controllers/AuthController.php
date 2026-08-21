@@ -291,11 +291,11 @@ class AuthController
             ob_clean();
 
             if (in_array($user['role'], ['admin', 'staff'], true)) {
-                $redirect = '/re.source/admin';
+                $redirect = app_url('/admin');
             } elseif (in_array($user['company_status'], ['pending', 'changes_requested'], true)) {
-                $redirect = '/re.source/aguardando-aprovacao';
+                $redirect = app_url('/aguardando-aprovacao');
             } else {
-                $redirect = '/re.source/base';
+                $redirect = app_url('/base');
             }
 
             echo json_encode([
@@ -342,7 +342,7 @@ class AuthController
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['ok' => false, 'erro' => $msg, 'campos' => $campos]);
             } else {
-                header('Location: /re.source/cadastro?erro=' . urlencode($msg));
+                header('Location: ' . app_url('/cadastro?erro=' . urlencode($msg)));
             }
             exit;
         }
@@ -475,7 +475,7 @@ class AuthController
             voltarComErro('Não foi possível enviar o e-mail de verificação. Tente novamente.');
         }
 
-        voltarComSucesso('/re.source/pendente');
+        voltarComSucesso(app_url('/pendente'));
     }
 
     // ══════════════════════════════════════════
@@ -508,7 +508,7 @@ class AuthController
         $isXhr = ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$isXhr) {
-            header('Location: /re.source/cadastro');
+            header('Location: ' . app_url('/cadastro'));
             exit;
         }
 
@@ -684,9 +684,7 @@ class AuthController
 
             $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
             $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            // TODO: ambiente XAMPP precisa do prefixo /re.source/ na URL.
-            // Se mudar de ambiente, remover esse prefixo.
-            $link   = "{$scheme}://{$host}/re.source/reset?token={$token}";
+            $link   = "{$scheme}://{$host}" . app_url('/reset?token=' . urlencode($token));
 
             $enviado = enviarEmailRecuperacao($email, $user['name'], $link);
             if (!$enviado) responder(false, 'Falha ao enviar o e-mail. Tente novamente.');
@@ -745,7 +743,7 @@ class AuthController
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(['ok' => false, 'erro' => $msg]);
             } else {
-                header('Location: /re.source/pendente?erro=' . urlencode($msg));
+                header('Location: ' . app_url('/pendente?erro=' . urlencode($msg)));
             }
             exit;
         }
@@ -764,7 +762,7 @@ class AuthController
         }
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /re.source/cadastro');
+            header('Location: ' . app_url('/cadastro'));
             exit;
         }
 
@@ -833,13 +831,13 @@ class AuthController
             $pdo->rollBack();
             if ($e->getCode() === '23000') {
                 unset($_SESSION['cadastro_pendente']);
-                responderSucesso('/re.source/login?aviso=' . urlencode('Esta conta já está ativa. Faça login.'));
+                responderSucesso(app_url('/login?aviso=' . urlencode('Esta conta já está ativa. Faça login.')));
             }
             responderErro('Erro interno ao salvar. Tente novamente.');
         }
 
         unset($_SESSION['cadastro_pendente']);
-        responderSucesso('/re.source/login?sucesso=' . urlencode('Conta confirmada! Faça login para acompanhar a aprovação.'));
+        responderSucesso(app_url('/login?sucesso=' . urlencode('Conta confirmada! Faça login para acompanhar a aprovação.')));
     }
 
     // ══════════════════════════════════════════
@@ -900,7 +898,7 @@ class AuthController
 
         session_destroy();
 
-        header('Location: /re.source/login');
+        redirect_to('/login');
         exit;
     }
         // ══════════════════════════════════════════

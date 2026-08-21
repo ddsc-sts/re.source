@@ -24,6 +24,29 @@ return [
         'action' => ['BaseController', 'privacidade'],
     ],
 
+    '/ajuda' => [
+        'action' => ['ExperienceController', 'help'],
+    ],
+
+    '/onboarding/concluir' => [
+        'action' => ['ExperienceController', 'completeOnboarding'],
+        'middleware' => [['UserAuth', 'required']],
+    ],
+
+    '/match' => [
+        'action' => ['MatchController', 'index'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
+    '/passaporte' => [
+        'action' => ['PassportController', 'show'],
+    ],
+
+    '/passaporte/criar' => [
+        'action' => ['PassportController', 'create'],
+        'middleware' => [['UserAuth', 'required'], ['ApprovedCompany', 'required']],
+    ],
+
     // ── Auth (páginas) ────────────────────────────────────
     '/login' => [
         'action' => ['AuthController', 'login'],
@@ -120,29 +143,40 @@ return [
 
     // ── Conta / Configurações usuário ─────────────────────
     '/conta' => [
-        'action'     => ['BaseController', 'conta'],
+        'action'     => ['ProfileController', 'company'],
         'middleware' => [['UserAuth', 'required']],
     ],
 
     '/conta/atualizar' => [
-        'action'     => ['BaseController', 'atualizarConta'],
+        'action'     => ['ProfileController', 'saveCompany'],
         'middleware' => [['UserAuth', 'required']],
     ],
 
     '/conta/excluir' => [
-        'action'     => ['BaseController', 'excluirConta'],
+        'action'     => ['ProfileController', 'deactivate'],
         'middleware' => [['UserAuth', 'required']],
     ],
 
     '/configuracoes' => [
-        'action'     => ['BaseController', 'configuracoes'],
+        'action'     => ['ProfileController', 'preferences'],
         'middleware' => [['UserAuth', 'required']],
     ],
 
     '/configuracoes/salvar' => [
-        'action'     => ['BaseController', 'salvarPreferencias'],
+        'action'     => ['ProfileController', 'savePreferences'],
         'middleware' => [['UserAuth', 'required']],
     ],
+
+    '/perfil/empresa' => ['action'=>['ProfileController','company'],'middleware'=>[['UserAuth','required']]],
+    '/perfil/empresa/salvar' => ['action'=>['ProfileController','saveCompany'],'middleware'=>[['UserAuth','required']]],
+    '/perfil/endereco' => ['action'=>['ProfileController','address'],'middleware'=>[['UserAuth','required']]],
+    '/perfil/endereco/salvar' => ['action'=>['ProfileController','saveAddress'],'middleware'=>[['UserAuth','required']]],
+    '/perfil/contato' => ['action'=>['ProfileController','contact'],'middleware'=>[['UserAuth','required']]],
+    '/perfil/contato/salvar' => ['action'=>['ProfileController','saveContact'],'middleware'=>[['UserAuth','required']]],
+    '/perfil/preferencias' => ['action'=>['ProfileController','preferences'],'middleware'=>[['UserAuth','required']]],
+    '/perfil/preferencias/salvar' => ['action'=>['ProfileController','savePreferences'],'middleware'=>[['UserAuth','required']]],
+    '/perfil/seguranca' => ['action'=>['ProfileController','security'],'middleware'=>[['UserAuth','required']]],
+    '/perfil/seguranca/desativar' => ['action'=>['ProfileController','deactivate'],'middleware'=>[['UserAuth','required']]],
 
     '/estatisticas' => [
         'action'     => ['EstatisticasController', 'index'],

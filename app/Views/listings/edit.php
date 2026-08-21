@@ -5,7 +5,6 @@ $hideSearchBar = true;
 $css_especifico = asset_url('/css/listing-create.css');
 require_once __DIR__ . '/../components/header.php';
 ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/dashboard-sidebar.css'), ENT_QUOTES, 'UTF-8') ?>">
 
 <style>
 .form-container { max-width: 850px; margin: 3rem auto; padding: 3rem; background: var(--white); border-radius: 1rem; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
@@ -45,8 +44,7 @@ require_once __DIR__ . '/../components/header.php';
 </style>
 <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/listing-edit.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-<main class="dashboard-shell create-listing-shell edit-listing-shell">
-    <?php $sidebarActive = 'listings'; require __DIR__ . '/../components/dashboard_sidebar.php'; ?>
+<main class="internal-page-shell create-listing-shell edit-listing-shell">
     <section class="dashboard-content">
     <div class="form-container">
 
