@@ -1,0 +1,58 @@
+@import url("./accessibility.css?v=2.3");
+
+/* Camada final do painel RE.SOURCE V2. Carregada por último nas telas administrativas. */
+:root {
+  --green: #103c36;
+  --green-d: #0a2f2a;
+  --green-mid: #18564d;
+  --green-light: #b7e45a;
+  --green-pale: #edf7d6;
+  --dark: #17221f;
+  --muted: #66716d;
+  --bg: #f4f1e8;
+  --white: #fffefa;
+  --border: #dce3df;
+  --radius: 18px;
+  --shadow-sm: 0 10px 32px rgba(16,60,54,.07);
+}
+body { background: radial-gradient(circle at 84% 0, rgba(185,220,224,.28), transparent 28rem), var(--bg) !important; color: var(--dark); font-family: "Manrope", "Sora", "Inter", sans-serif !important; }
+.site-header { position: sticky; top: 0; z-index: 1000; box-shadow: 0 10px 35px rgba(16,60,54,.06); }
+.topbar { height: 68px; padding: 0 max(24px, calc((100vw - 1480px)/2)); background: rgba(255,254,250,.97) !important; border-color: var(--border) !important; }
+.topbar-logo img { display: none !important; }
+.topbar-logo::before { content: "re.source"; color: var(--green); font: 800 1.35rem/1 "Manrope", sans-serif; letter-spacing: -.06em; }
+.topbar-logo-text { padding-left: 12px; border-left: 1px solid var(--border); }
+.topbar-logo-name { color: var(--green); }
+.topbar-logo-sub { display: none; }
+.topbar-search { border: 1px solid var(--border) !important; border-radius: 12px !important; background: #fff !important; }
+.topbar-btn, .topbar-user, .topbar-avatar { border-radius: 12px !important; }
+.topbar-avatar { background: var(--green) !important; }
+.navbar { min-height: 50px; padding: 0 max(24px, calc((100vw - 1480px)/2)); gap: 4px; overflow-x: auto; background: rgba(255,254,250,.97) !important; border-color: var(--border) !important; }
+.nav-item { position: relative; min-height: 50px; padding: 0 14px; border-radius: 0 !important; background: transparent !important; color: #4b5753 !important; font-weight: 650; text-transform: none !important; white-space: nowrap; }
+.nav-item::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 3px; background: var(--green); transform: scaleX(0); transition: transform .2s; }
+.nav-item.active, .nav-item:hover { color: var(--green) !important; }
+.nav-item.active::after, .nav-item:hover::after { transform: scaleX(1); }
+.admin-content { width: min(1480px, calc(100% - 48px)) !important; max-width: 1480px !important; margin: 0 auto !important; padding: 40px 0 76px !important; }
+.dash-hero, .admin-page-heading { border: 1px solid var(--border) !important; border-radius: 22px !important; background: linear-gradient(125deg, var(--white), #edf7f8) !important; color: var(--dark) !important; box-shadow: var(--shadow-sm) !important; }
+.dash-hero { min-height: auto !important; padding: 28px 30px !important; }
+.hero-title, .admin-page-heading h1 { color: var(--green) !important; font-family: "Manrope", sans-serif !important; font-weight: 800 !important; letter-spacing: -.05em !important; text-transform: none !important; }
+.hero-subtitle, .hero-breadcrumb, .hero-meta-item, .admin-page-heading p { color: var(--muted) !important; }
+.hero-right { border-radius: 17px !important; background: var(--green) !important; }
+.metrics-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px !important; }
+.metric-card, .card, .chart-card, .admin-panel, .company-filters, .support-summary-card, .companies-table-wrap { border: 1px solid var(--border) !important; border-radius: 18px !important; background: rgba(255,254,250,.95) !important; box-shadow: var(--shadow-sm) !important; }
+.metric-value, .chart-total, .card-title, .admin-panel h2 { color: var(--green) !important; font-family: "Manrope", sans-serif !important; }
+.metric-label, .metric-footer, .card-sub { color: var(--muted) !important; text-transform: none !important; }
+.companies-table th, .admin-table th, .admin-simple-table th { background: #f1f4f1 !important; color: var(--muted) !important; }
+.status-badge, .admin-status-pill, .filter-chip { border-radius: 999px !important; }
+.quick-action, .btn-primary, .admin-primary-action, .btn-icon, .dialog-cancel, input, select, textarea { border-radius: 12px !important; }
+.btn-primary, .admin-primary-action { background: var(--green) !important; color: #fff !important; text-transform: none !important; }
+.company-action-dialog { border: 1px solid var(--border) !important; border-radius: 18px !important; box-shadow: 0 28px 80px rgba(16,60,54,.2) !important; }
+@media (max-width: 1100px) { .metrics-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; } }
+@media (max-width: 700px) {
+  .admin-content { width: min(100% - 24px, 1480px) !important; padding-top: 24px !important; }
+  .topbar { padding-inline: 12px; }
+  .topbar-search, .topbar-logo-text, .topbar-user-info { display: none !important; }
+  .navbar { padding-inline: 8px; }
+  .metrics-grid { grid-template-columns: 1fr !important; }
+  .dash-hero { padding: 22px !important; }
+  .hero-right { display: none !important; }
+}

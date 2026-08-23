@@ -11,9 +11,11 @@ $homeSupportWhatsApp = preg_replace('/\D+/', '', app_setting('support_whatsapp',
   <link rel="icon" href="<?= htmlspecialchars(asset_url('/img/logos/favicon.svg'), ENT_QUOTES, 'UTF-8') ?>" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <link rel="stylesheet" href="public/css/index.css" />
+  <link rel="stylesheet" href="public/css/accessibility.css?v=2.3" />
+  <link rel="stylesheet" href="public/css/home-v2.css?v=2.3" />
 </head>
 <body>
 
@@ -54,6 +56,42 @@ $homeSupportWhatsApp = preg_replace('/\D+/', '', app_setting('support_whatsapp',
   </header>
 
   <main class="page-content">
+
+    <section class="v2-public-hero" aria-labelledby="v2HeroTitle">
+      <div class="v2-public-copy">
+        <span class="v2-public-eyebrow"><i data-lucide="refresh-cw"></i> Economia circular entre empresas</span>
+        <h1 id="v2HeroTitle">Resíduo parado é<br>recurso em movimento.</h1>
+        <p>A plataforma B2B que conecta indústrias para comprar, vender e reutilizar resíduos e excedentes com segurança, rastreabilidade e impacto real.</p>
+
+        <form class="v2-discovery" action="<?= htmlspecialchars(app_url('/busca'), ENT_QUOTES, 'UTF-8') ?>" method="get">
+          <label class="v2-discovery-main"><i data-lucide="search"></i><span class="sr-only">Material</span><input type="search" name="q" placeholder="O que sua empresa precisa encontrar?"></label>
+          <label><span>Categoria</span><select name="category_id"><option value="">Todas</option><option value="2">Metais</option><option value="3">Polímeros</option><option value="4">Madeira</option><option value="1">Têxteis</option></select></label>
+          <label><span>Localização</span><input name="city" placeholder="Todo o Brasil"></label>
+          <button type="submit">Buscar materiais</button>
+        </form>
+
+        <div class="v2-quick-search" aria-label="Buscas rápidas">
+          <a href="<?= app_url('/busca?category_id=2') ?>">Metais</a>
+          <a href="<?= app_url('/busca?category_id=3') ?>">Polímeros</a>
+          <a href="<?= app_url('/busca?category_id=4') ?>">Madeira</a>
+          <a class="v2-sell-link" href="<?= app_url('/cadastro') ?>"><i data-lucide="plus-circle"></i> Quero anunciar um material</a>
+        </div>
+
+        <div class="v2-trust-row">
+          <div><i data-lucide="badge-check"></i><span><strong>Empresas verificadas</strong><small>negociações mais seguras</small></span></div>
+          <div><strong>+2.500</strong><small>empresas na rede</small></div>
+          <div><strong>+8.000</strong><small>negociações realizadas</small></div>
+        </div>
+      </div>
+
+      <div class="v2-material-flow" aria-label="Materiais em movimento na plataforma">
+        <div class="v2-flow-card v2-flow-a"><img src="<?= asset_url('/img/base-carousel/triagem-industrial.png') ?>" alt="Cavaco de alumínio"><span><small>MAT-AL-0001</small><strong>Cavaco de alumínio</strong><em>12.500 kg disponíveis</em></span></div>
+        <div class="v2-flow-card v2-flow-b"><img src="<?= asset_url('/img/base-carousel/materiais-reutilizaveis.png') ?>" alt="Polímeros reutilizáveis"><span><small>MAT-PP-0456</small><strong>Polímeros recuperados</strong><em>8.300 kg disponíveis</em></span></div>
+        <div class="v2-flow-card v2-flow-c"><img src="<?= asset_url('/img/base-carousel/logistica-circular.png') ?>" alt="Madeira para reaproveitamento"><span><small>MAT-MD-0312</small><strong>Aparas de madeira</strong><em>5.700 kg disponíveis</em></span></div>
+        <div class="v2-flow-center"><strong>1.248 t</strong><span>em movimento agora</span></div>
+        <svg viewBox="0 0 600 520" aria-hidden="true"><path d="M132 120 C320 20 505 88 515 228"/><path d="M510 300 C410 470 182 455 115 315"/><path d="M100 268 C54 195 74 145 126 119"/></svg>
+      </div>
+    </section>
 
     <!-- ══ HERO ══ -->
     <section class="hero">
@@ -398,7 +436,7 @@ $homeSupportWhatsApp = preg_replace('/\D+/', '', app_setting('support_whatsapp',
         <div class="f-col">
           <strong>Legal</strong>
           <a href="/re.source/termos">Termos de Uso</a>
-          <a href="/re.source/privacidade">PolÃ­tica de Privacidade</a>
+          <a href="/re.source/privacidade">Política de Privacidade</a>
         </div>
 
         <div class="f-col">
@@ -424,6 +462,7 @@ $homeSupportWhatsApp = preg_replace('/\D+/', '', app_setting('support_whatsapp',
 
   </main>
 
+<?php require_once __DIR__ . '/../components/accessibility.php'; ?>
 <script src="public/js/index.js"></script>
 </body>
 </html>

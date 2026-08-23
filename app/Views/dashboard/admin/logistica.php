@@ -34,6 +34,7 @@ function renderDelta(?array $delta): string {
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <link rel="stylesheet" href="/re.source/public/css/admin-dashboard.css" />
+  <link rel="stylesheet" href="/re.source/public/css/admin-v2.css" />
 </head>
 
 <body>

@@ -7,6 +7,8 @@ $css_especifico = "/re.source/public/css/legal.css";
 require_once __DIR__ . '/../components/header.php';
 ?>
 
+<main id="main-content">
+
 <section class="legal-hero">
   <div class="legal-hero-inner">
     <div class="legal-eyebrow">
@@ -124,6 +126,8 @@ require_once __DIR__ . '/../components/header.php';
   </div>
 
 </div>
+
+</main>
 
 <?php
 // 3. Puxa o rodapé global

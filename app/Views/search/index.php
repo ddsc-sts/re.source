@@ -408,7 +408,7 @@ body {
 <main class="search-page">
     
     <aside class="filters-sidebar">
-        <h3><i data-lucide="sliders-horizontal"></i> Filtros</h3>
+        <h3><i data-lucide="search"></i> Encontre o material certo</h3>
         
         <form action="/re.source/busca" method="GET">
             <?php if (!empty($company_id)): ?>
@@ -420,21 +420,12 @@ body {
             </div>
 
             <div class="filter-group">
-                <label>Tipo de Anúncio</label>
-                <div class="radio-group-vertical">
-                    <label>
-                        <input type="radio" name="type" value="" <?php echo empty($type) ? 'checked' : ''; ?>> 
-                        Todos
-                    </label>
-                    <label>
-                        <input type="radio" name="type" value="offer" <?php echo ($type === 'offer') ? 'checked' : ''; ?>> 
-                        Ofertas (Disponíveis)
-                    </label>
-                    <label>
-                        <input type="radio" name="type" value="demand" <?php echo ($type === 'demand') ? 'checked' : ''; ?>> 
-                        Demandas (Procurando)
-                    </label>
-                </div>
+                <label for="type">Tipo de anúncio</label>
+                <select id="type" name="type">
+                    <option value="" <?php echo empty($type) ? 'selected' : ''; ?>>Todos</option>
+                    <option value="offer" <?php echo ($type === 'offer') ? 'selected' : ''; ?>>Materiais disponíveis</option>
+                    <option value="demand" <?php echo ($type === 'demand') ? 'selected' : ''; ?>>Empresas procurando</option>
+                </select>
             </div>
 
             <div class="filter-group">
@@ -463,15 +454,15 @@ body {
                 </select>
             </div>
 
-            <button type="submit" class="btn-filter">Aplicar Filtros</button>
-            <a href="/re.source/busca" class="btn-clear">Limpar Busca</a>
+            <button type="submit" class="btn-filter"><i data-lucide="search"></i> Buscar</button>
+            <a href="/re.source/busca" class="btn-clear">Limpar</a>
         </form>
     </aside>
 
     <section class="results-area">
         <div class="results-header">
-            <h2>Resultados da Busca</h2>
-            <span class="results-count"><?php echo count($anuncios); ?> anúncio(s) encontrado(s)</span>
+            <div><span class="ui-eyebrow">Marketplace circular</span><h1>Materiais disponíveis</h1></div>
+            <span class="results-count"><?php echo count($anuncios); ?> oportunidade(s)</span>
         </div>
 
         <?php if (empty($anuncios)): ?>

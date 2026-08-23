@@ -529,3 +529,22 @@
 .negotiation-progress{margin:0 0 18px;padding:20px;border:1px solid #dce8e1;border-radius:16px;background:#fff}.negotiation-progress>div{display:flex;justify-content:space-between;gap:12px}.negotiation-progress ol{display:grid;grid-template-columns:repeat(5,1fr);list-style:none;padding:18px 0 8px;margin:0}.negotiation-progress li{position:relative;text-align:center;color:#829089}.negotiation-progress li:not(:last-child)::after{content:"";position:absolute;top:15px;left:60%;width:80%;height:2px;background:#dce8e1}.negotiation-progress li.is-done::after{background:#1f7a4d}.negotiation-progress li i{position:relative;z-index:1;display:grid;place-items:center;width:30px;height:30px;margin:auto;border-radius:50%;background:#e8eeea;font-style:normal}.negotiation-progress li.is-done i,.negotiation-progress li.is-current i{background:#1f7a4d;color:#fff}.negotiation-progress li span{display:block;margin-top:7px;font-size:.82rem}.negotiation-progress p{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:#f0f8f3}@media(max-width:640px){.negotiation-progress ol{overflow-x:auto}.negotiation-progress li{min-width:95px}}
 .passport-action{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:0 0 18px;padding:18px 20px;border-radius:15px;background:#17352b;color:#fff}.passport-action span{display:block;opacity:.8}.passport-action button{display:flex;align-items:center;gap:8px;padding:11px 15px;border:0;border-radius:10px;background:#d9f99d;color:#17352b;font-weight:800}@media(max-width:640px){.passport-action{align-items:stretch;flex-direction:column}}
 .internal-page-shell{width:min(1280px,calc(100% - 36px));margin:0 auto;padding:42px 0 84px;display:block}.internal-page-shell .chat-page{width:100%;max-width:none}.chat-page,.chat-page button,.chat-page input,.chat-page textarea,.chat-page select{font-family:'Work Sans',var(--font-body),sans-serif}.chat-page h1,.chat-page h2,.chat-page h3,.chat-eyebrow{font-family:'Bebas Neue',var(--font-main),sans-serif}@media(max-width:700px){.internal-page-shell{width:min(100% - 24px,1280px);padding-top:24px}}
+
+/* RE.SOURCE V2 — negociações */
+.internal-page-shell { width: min(1400px, calc(100% - 48px)); padding: 48px 0 76px; }
+.chat-page, .chat-page button, .chat-page input, .chat-page textarea, .chat-page select { font-family: "Manrope", sans-serif; }
+.chat-page h1, .chat-page h2, .chat-page h3, .chat-eyebrow { font-family: "Manrope", sans-serif; text-transform: none; }
+.chat-page-heading, .chat-room-header { min-height: 210px !important; padding: 30px !important; border: 1px solid #dce3df !important; border-radius: 20px !important; background: linear-gradient(125deg, #fffefa, #edf7f8) !important; color: #17221f !important; box-shadow: 0 10px 32px rgba(16,60,54,.07) !important; }
+.chat-page-heading::after { display: none !important; }
+.chat-eyebrow { color: #103c36 !important; font-family: "Manrope", sans-serif !important; letter-spacing: .08em !important; }
+.chat-page h1 { margin: 6px 0 !important; color: #103c36 !important; font-family: "Manrope", sans-serif !important; font-size: clamp(2.2rem, 4vw, 3.6rem) !important; font-weight: 800 !important; letter-spacing: -.055em !important; line-height: 1 !important; text-transform: none !important; }
+.chat-page-heading p { color: #66716d !important; }
+.chat-page-heading > a { border-color: #dce3df !important; background: white !important; color: #103c36 !important; font-family: "Manrope", sans-serif !important; text-transform: none !important; }
+.chat-secondary-button, .chat-back { border-radius: 12px; border-color: #dce3df; color: #103c36; }
+.chat-filter-bar, .conversation-card, .chat-room, .deal-panel, .message-composer { border-color: #dce3df; border-radius: 18px; background: rgba(255,254,250,.95); box-shadow: 0 10px 32px rgba(16,60,54,.06); }
+.chat-filter-bar input, .chat-filter-bar select { border-radius: 0; }
+.conversation-card:hover, .conversation-card.is-active { border-color: #103c36; background: #f5f8ef; }
+.message.is-mine .message-bubble { background: #103c36; color: white; border-radius: 16px 16px 4px 16px; }
+.message:not(.is-mine) .message-bubble { background: #edf7f8; border-radius: 16px 16px 16px 4px; }
+.chat-primary-button, .message-composer button { border-radius: 12px; background: #103c36; color: white; }
+@media(max-width:700px){.internal-page-shell{width:min(100% - 24px,1400px);padding-top:24px}}

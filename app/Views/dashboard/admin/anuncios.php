@@ -14,6 +14,7 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <link rel="stylesheet" href="/re.source/public/css/empresas.css" />
 <link rel="stylesheet" href="/re.source/public/css/flash.css" />
+<link rel="stylesheet" href="/re.source/public/css/admin-v2.css" />
 </head>
 <body>
 

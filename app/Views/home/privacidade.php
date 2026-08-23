@@ -5,6 +5,8 @@ $privacyEmail = app_setting('support_email', 'contato@resource.com.br') ?: 'cont
 require_once __DIR__ . '/../components/header.php';
 ?>
 
+<main id="main-content">
+
 <section class="legal-hero">
   <div class="legal-hero-inner">
     <div class="legal-eyebrow">
@@ -72,5 +74,7 @@ require_once __DIR__ . '/../components/header.php';
     </div>
   </div>
 </div>
+
+</main>
 
 <?php require_once __DIR__ . '/../components/footer.php'; ?>

@@ -31,6 +31,7 @@ $counts = $companyStatusCounts ?? [];
 <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/admin-dashboard.css'), ENT_QUOTES, 'UTF-8') ?>" />
 <link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/empresas.css'), ENT_QUOTES, 'UTF-8') ?>" />
 <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/admin-v2.css'), ENT_QUOTES, 'UTF-8') ?>" />
 </head>
 <body>
 

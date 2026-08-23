@@ -15,16 +15,18 @@ $guides = [
 ?>
 <main class="help-page">
   <header class="help-hero">
-    <span>Aprenda no seu ritmo</span>
-    <h1>Central de Ajuda</h1>
-    <p>Respostas rápidas para completar todo o ciclo de uma negociação circular.</p>
-    <a href="<?= htmlspecialchars(app_url('/base?tour=1'), ENT_QUOTES, 'UTF-8') ?>" class="help-tour"><i data-lucide="play-circle"></i> Fazer tour guiado</a>
+    <span>Suporte re.source</span>
+    <h1>Como podemos ajudar?</h1>
+    <p>Encontre respostas rápidas para completar todo o ciclo de uma negociação circular.</p>
+    <label class="v2-help-search"><i data-lucide="search"></i><span class="sr-only">Buscar ajuda</span><input id="helpSearch" type="search" placeholder="Busque uma dúvida ou assunto"></label>
   </header>
   <section class="help-grid" aria-label="Tutoriais da plataforma">
     <?php foreach ($guides as [$icon, $title, $copy]): ?>
-      <article class="help-card"><i data-lucide="<?= $icon ?>"></i><h2><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h2><p><?= htmlspecialchars($copy, ENT_QUOTES, 'UTF-8') ?></p></article>
+      <article class="help-card" data-help-card data-search="<?= htmlspecialchars(mb_strtolower($title . ' ' . $copy), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="<?= $icon ?>"></i><h2><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h2><p><?= htmlspecialchars($copy, ENT_QUOTES, 'UTF-8') ?></p></article>
     <?php endforeach; ?>
   </section>
+  <p class="v2-help-empty" id="helpEmpty" hidden>Nenhum guia encontrado. Tente outro termo ou fale com nossa equipe.</p>
   <section class="help-flow"><h2>Uma negociação, cinco etapas</h2><ol><li>Publique ou encontre um material</li><li>Converse e envie a proposta</li><li>Comprador e vendedor aceitam</li><li>Organize e acompanhe o frete</li><li>Confirme a entrega e consulte o impacto</li></ol></section>
+  <section class="v2-help-contact"><div><span class="ui-eyebrow">Ainda precisa de ajuda?</span><h2>Converse com nossa equipe</h2><p>Atendimento de segunda a sexta, das 8h às 18h.</p></div><a class="ui-btn ui-btn--primary" href="<?= htmlspecialchars(app_url('/contato'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="message-circle"></i> Falar com o suporte</a></section>
 </main>
 <?php require VIEW_PATH . '/components/footer.php'; ?>

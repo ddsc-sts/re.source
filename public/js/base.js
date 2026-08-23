@@ -34,7 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (categoryTrigger && categoryDropdown) {
     categoryTrigger.addEventListener('click', (event) => {
       event.stopPropagation();
-      categoryDropdown.classList.toggle('open');
+      const open = !categoryDropdown.classList.contains('open');
+      categoryDropdown.classList.toggle('open', open);
+      categoryTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 
     categoryDropdown.addEventListener('click', (event) => {
@@ -44,6 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
       categoryInput.value = option.dataset.categoryId || '';
       categoryTrigger.classList.toggle('selected', Boolean(categoryInput.value));
       categoryDropdown.classList.remove('open');
+      categoryTrigger.setAttribute('aria-expanded', 'false');
+      categoryTrigger.focus();
     });
   }
 
@@ -136,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (categoryTrigger && categoryDropdown && !categoryTrigger.contains(event.target) && !categoryDropdown.contains(event.target)) {
       categoryDropdown.classList.remove('open');
+      categoryTrigger.setAttribute('aria-expanded', 'false');
     }
     if (notificationButton && notificationPanel && !notificationButton.contains(event.target) && !notificationPanel.contains(event.target)) {
       setOpen(notificationButton, notificationPanel, false);
@@ -146,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (event.key !== 'Escape') return;
     dropdownMenu?.classList.remove('open');
     categoryDropdown?.classList.remove('open');
+    if (categoryTrigger) categoryTrigger.setAttribute('aria-expanded', 'false');
     if (userMenuBtn) userMenuBtn.setAttribute('aria-expanded', 'false');
     setOpen(notificationButton, notificationPanel, false);
   });

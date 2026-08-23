@@ -1098,3 +1098,95 @@ body {
   border: 1px solid #1b1c1c;
   box-shadow: 8px 8px 0 #005131;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   RE.SOURCE V2 — CIRCULAR INTELLIGENCE / ADMIN
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --green: #103c36;
+  --green-d: #0a2f2a;
+  --green-mid: #18564d;
+  --green-light: #b7e45a;
+  --green-pale: #edf7d6;
+  --green-xpale: #f5f8ef;
+  --dark: #17221f;
+  --dark-2: #26322e;
+  --muted: #66716d;
+  --muted-2: #89938f;
+  --bg: #f4f1e8;
+  --white: #fffefa;
+  --border: #dce3df;
+  --hero-bg: #fffefa;
+  --hero-bg-2: #edf7f8;
+  --radius: 18px;
+  --shadow-sm: 0 10px 32px rgba(16,60,54,.07);
+}
+
+body { background: radial-gradient(circle at 84% 0, rgba(185,220,224,.28), transparent 28rem), var(--bg); color: var(--dark); font-family: "Manrope", "Sora", "Inter", sans-serif; }
+.site-header { position: sticky; top: 0; z-index: 1000; box-shadow: 0 10px 35px rgba(16,60,54,.06); }
+.topbar { height: 68px; padding: 0 max(24px, calc((100vw - 1480px)/2)); background: rgba(255,254,250,.96); border-color: var(--border); }
+.topbar-logo { min-width: 200px; }
+.topbar-logo img { width: 138px; height: auto; }
+.topbar-logo-text { padding-left: 12px; border-left: 1px solid var(--border); }
+.topbar-logo-name { color: var(--green); font-size: .72rem; font-weight: 800; }
+.topbar-logo-name::after { content: " Admin"; }
+.topbar-logo-sub { display: none; }
+.topbar-search { max-width: 560px; min-height: 42px; border-radius: 12px !important; border: 1px solid var(--border); background: #fff; }
+.topbar-btn, .topbar-user { border-radius: 12px !important; border: 1px solid transparent; }
+.topbar-btn:hover, .topbar-user:hover { border-color: var(--border); background: #f5f8f6; }
+.topbar-avatar { background: var(--green); color: #fff; border-radius: 50%; }
+.navbar { min-height: 50px; padding: 0 max(24px, calc((100vw - 1480px)/2)); gap: 4px; overflow-x: auto; background: rgba(255,254,250,.96); border-color: var(--border); }
+.nav-item { min-height: 50px; padding: 0 14px; border-radius: 0 !important; color: #4b5753; font-weight: 650; text-transform: none; letter-spacing: -.01em; white-space: nowrap; }
+.nav-item::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 3px; background: var(--green); transform: scaleX(0); transition: transform .2s; }
+.nav-item.active, .nav-item:hover { color: var(--green); background: transparent; }
+.nav-item.active::after, .nav-item:hover::after { transform: scaleX(1); }
+.nav-item .badge { border-radius: 999px; background: var(--green-light); color: var(--green); }
+
+.admin-main { background: transparent; }
+.admin-content { width: min(1480px, calc(100% - 48px)); max-width: 1480px; margin: 0 auto; padding: 40px 0 76px; }
+.dash-hero { min-height: auto; margin-bottom: 18px; padding: 28px 30px; border: 1px solid var(--border); border-radius: 22px; background: linear-gradient(125deg, var(--white), #edf7f8); color: var(--dark); box-shadow: var(--shadow-sm); }
+.hero-title { color: var(--green); font-family: "Manrope", "Sora", sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 750; letter-spacing: -.05em; text-transform: none; }
+.hero-subtitle, .hero-breadcrumb, .hero-meta-item { color: var(--muted); }
+.hero-breadcrumb strong, .hero-meta-item strong { color: var(--green); }
+.hero-right { min-width: 190px; border-radius: 17px; background: var(--green); color: white; }
+.hero-badge-num { color: var(--green-light); font-family: "Manrope", sans-serif; }
+
+.metrics-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 18px; }
+.metric-card, .card, .chart-card, .admin-panel, .company-filters, .support-summary-card { border: 1px solid var(--border); border-radius: 18px !important; background: rgba(255,254,250,.94); box-shadow: var(--shadow-sm); }
+.metric-card { min-height: 145px; padding: 20px; }
+.metric-card:hover { transform: translateY(-2px); border-color: #b9c7c1; box-shadow: 0 16px 38px rgba(16,60,54,.1); }
+.metric-icon, .quick-action-icon { border-radius: 14px !important; }
+.metric-icon.green { background: var(--green-pale); color: var(--green); }
+.metric-icon.orange { background: #fff0e9; color: #bd5635; }
+.metric-icon.blue, .metric-icon.teal { background: #edf7f8; color: #286b73; }
+.metric-icon.purple { background: #f0edfa; color: #6551a0; }
+.metric-label { color: var(--muted); font-size: .76rem; font-weight: 700; letter-spacing: 0; text-transform: none; }
+.metric-value, .chart-total { color: var(--green); font-family: "Manrope", sans-serif; font-weight: 750; letter-spacing: -.045em; }
+.metric-footer { color: var(--muted-2); }
+.main-grid, .bottom-grid { gap: 18px; margin-bottom: 18px; }
+.card-header { border-color: var(--border); }
+.card-title { color: var(--green); font-family: "Manrope", sans-serif; letter-spacing: -.025em; }
+.card-sub { color: var(--muted); }
+.card-link { color: var(--green); font-weight: 750; }
+.companies-table th, .admin-table th, .admin-simple-table th { background: #f1f4f1; color: var(--muted); font-size: .68rem; letter-spacing: .04em; }
+.companies-table tr:hover td, .admin-table tr:hover td { background: #fafcf9; }
+.company-initials { border-radius: 12px; }
+.status-badge, .admin-status-pill { border-radius: 999px !important; }
+.quick-actions-grid { gap: 10px; }
+.quick-action { border: 1px solid var(--border); border-radius: 14px !important; background: #fff; }
+.quick-action:hover { background: var(--green-xpale); border-color: #b9c7c1; }
+.btn-primary, .admin-primary-action { border-radius: 12px !important; background: var(--green); text-transform: none; letter-spacing: -.01em; }
+.btn-primary:hover, .admin-primary-action:hover { background: var(--green-mid); }
+.btn-icon, .dialog-cancel, .company-action-dialog, .company-action-dialog textarea { border-radius: 12px !important; }
+.company-action-dialog { border: 1px solid var(--border); box-shadow: 0 28px 80px rgba(16,60,54,.2); }
+
+@media (max-width: 1100px) { .metrics-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (max-width: 700px) {
+  .admin-content { width: min(100% - 24px, 1480px); padding-top: 24px; }
+  .topbar { padding-inline: 12px; }
+  .topbar-search, .topbar-logo-text, .topbar-user-info { display: none; }
+  .navbar { padding-inline: 8px; }
+  .metrics-grid { grid-template-columns: 1fr; }
+  .dash-hero { padding: 22px; }
+  .hero-right { display: none; }
+}

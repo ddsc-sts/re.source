@@ -1,5 +1,5 @@
 <?php require __DIR__ . '/../components/header.php'; ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/chat.css'), ENT_QUOTES, 'UTF-8') ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(app_url('/public/css/chat.css?v=2.1'), ENT_QUOTES, 'UTF-8') ?>">
 <main class="internal-page-shell">
   <div class="chat-page">
   <div class="chat-page-heading">

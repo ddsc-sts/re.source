@@ -52,6 +52,7 @@
     const field  = $( fieldId );
     if (errEl) errEl.textContent = msg;
     if (field) {
+      field.setAttribute('aria-invalid', 'true');
       const wrap = field.closest('.form-field');
       if (wrap) wrap.classList.add('has-error');
     }
@@ -62,6 +63,7 @@
     const field  = $(fieldId);
     if (errEl) errEl.textContent = '';
     if (field) {
+      field.removeAttribute('aria-invalid');
       const wrap = field.closest('.form-field');
       if (wrap) wrap.classList.remove('has-error');
     }
@@ -82,6 +84,7 @@
     // atualiza visual do step-item saindo
     const oldItem = $('si' + currentStep);
     oldItem.classList.remove('active');
+    oldItem.removeAttribute('aria-current');
     if (target > currentStep) oldItem.classList.add('done');
     else                        oldItem.classList.remove('done');
 
@@ -108,6 +111,13 @@
 
     // barra de progresso
     progressFill.style.width = ((currentStep / TOTAL_STEPS) * 100) + '%';
+
+    const stepNames = ['Sobre você', 'Empresa', 'Acesso'];
+    const stepStatus = $('stepStatus');
+    if (stepStatus) stepStatus.textContent = `Etapa ${currentStep} de ${TOTAL_STEPS}: ${stepNames[currentStep - 1]}`;
+
+    const heading = $('step' + currentStep).querySelector('h1');
+    if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
 
     // rola para o topo do painel
     document.querySelector('.register-panel')?.scrollTo({ top: 0, behavior: 'smooth' });

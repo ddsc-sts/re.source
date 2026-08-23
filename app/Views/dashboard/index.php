@@ -36,8 +36,25 @@
 <div data-onboarding data-completed="<?= !empty($_SESSION['onboarding_completed']) ? '1' : '0' ?>" data-complete-url="<?= htmlspecialchars(app_url('/onboarding/concluir'), ENT_QUOTES, 'UTF-8') ?>" data-csrf="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>"></div>
 <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/experience.css'), ENT_QUOTES, 'UTF-8') ?>">
 
-  <!-- ══ HERO ══ -->
-  <section class="hero" aria-label="Banner principal">
+  <section class="v2-dashboard-welcome" aria-labelledby="dashboardWelcomeTitle">
+    <div class="v2-dashboard-heading">
+      <div>
+        <span class="ui-eyebrow">Visão geral</span>
+        <h1 id="dashboardWelcomeTitle">Olá, <?= htmlspecialchars($headerCompanyName, ENT_QUOTES, 'UTF-8') ?></h1>
+        <p>Acompanhe oportunidades, negociações e o impacto da sua empresa.</p>
+      </div>
+      <a class="v2-dashboard-publish" href="<?= htmlspecialchars(app_url('/anuncios/novo'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="plus"></i> Publicar material</a>
+    </div>
+    <form class="v2-dashboard-search" action="<?= htmlspecialchars(app_url('/busca'), ENT_QUOTES, 'UTF-8') ?>" method="get">
+      <i data-lucide="search"></i>
+      <label><span class="sr-only">Busca</span><input type="search" name="q" placeholder="Buscar materiais, oportunidades ou empresas"></label>
+      <label class="v2-dashboard-category"><span class="sr-only">Categoria</span><select name="category_id"><option value="">Todas as categorias</option><?php foreach ($baseCategories as $category): ?><option value="<?= (int) $category['id'] ?>"><?= htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></label>
+      <button type="submit">Buscar</button>
+    </form>
+  </section>
+
+  <!-- Hero legado mantido como fonte de conteúdo, oculto pela camada V2 -->
+  <section class="hero legacy-dashboard-hero" aria-label="Banner principal">
     <div class="slides-container" id="slider">
 
       <div class="slide active">

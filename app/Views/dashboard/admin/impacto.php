@@ -22,6 +22,7 @@ $userName = htmlspecialchars($user['name'] ?? 'Administrador');
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <link rel="stylesheet" href="/re.source/public/css/admin-dashboard.css">
+    <link rel="stylesheet" href="/re.source/public/css/admin-v2.css">
 </head>
 
 <body>

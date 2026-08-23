@@ -8,9 +8,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <link rel="stylesheet" href="/re.source/public/css/cadastro.css">
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/auth-v2.css?v=2.3'), ENT_QUOTES, 'UTF-8') ?>">
 </head>
 <body>
 
@@ -101,23 +102,25 @@
 
       <div class="panel-inner">
 
-        <div class="stepper" id="stepper" aria-label="Etapas do cadastro">
-          <div class="step-item active" id="si1" aria-current="step">
+        <div class="stepper" id="stepper" role="list" aria-label="Etapas do cadastro">
+          <div class="step-item active" id="si1" role="listitem" aria-current="step">
             <div class="step-circle" aria-hidden="true">1</div>
             <span class="step-label">Sobre você</span>
           </div>
           <div class="step-line" id="sl1" aria-hidden="true"></div>
-          <div class="step-item" id="si2">
+          <div class="step-item" id="si2" role="listitem">
             <div class="step-circle" aria-hidden="true">2</div>
             <span class="step-label">Empresa</span>
           </div>
           <div class="step-line" id="sl2" aria-hidden="true"></div>
-          <div class="step-item" id="si3">
+          <div class="step-item" id="si3" role="listitem">
             <div class="step-circle" aria-hidden="true">3</div>
             <span class="step-label">Acesso</span>
           </div>
         </div>
 
+        <p class="sr-only" id="stepStatus" aria-live="polite">Etapa 1 de 3: Sobre você</p>
+        <p class="required-note"><span aria-hidden="true">*</span> Campos obrigatórios</p>
         <form id="formCadastro" novalidate
               action="/re.source/process?action=cadastro&tipo=empresa"
               method="POST">
@@ -136,7 +139,7 @@
                   <input type="text" id="nome" name="nome"
                          placeholder="Ex.: Maria"
                          autocomplete="given-name"
-                         aria-required="true" />
+                         required aria-describedby="err-nome" />
                   <p class="field-error" id="err-nome" role="alert" aria-live="polite"></p>
                 </div>
                 <div class="form-field">
@@ -144,7 +147,7 @@
                   <input type="text" id="sobrenome" name="sobrenome"
                          placeholder="Ex.: Silva"
                          autocomplete="family-name"
-                         aria-required="true" />
+                         required aria-describedby="err-sobrenome" />
                   <p class="field-error" id="err-sobrenome" role="alert" aria-live="polite"></p>
                 </div>
               </div>
@@ -154,7 +157,7 @@
                 <input type="email" id="email" name="email"
                        placeholder="contato@empresa.com.br"
                        autocomplete="email"
-                       aria-required="true" />
+                       required aria-describedby="err-email" />
                 <p class="field-error" id="err-email" role="alert" aria-live="polite"></p>
               </div>
 
@@ -171,7 +174,7 @@
                          placeholder="(00) 00000-0000"
                          maxlength="15"
                          autocomplete="tel"
-                         aria-required="true" />
+                         required aria-describedby="err-telefone" />
                   <p class="field-error" id="err-telefone" role="alert" aria-live="polite"></p>
                 </div>
               </div>
@@ -179,7 +182,7 @@
               <div class="form-field">
                 <label for="tipoConta">PERFIL DA CONTA <span class="req" aria-hidden="true">*</span></label>
                 <div class="select-wrap">
-                  <select id="tipoConta" name="tipo_conta" aria-required="true">
+                  <select id="tipoConta" name="tipo_conta" required aria-describedby="err-tipoConta">
                     <option value="" disabled selected>Selecione seu perfil</option>
                     <option value="geradora">Empresa geradora de resíduos</option>
                     <option value="cooperativa">Cooperativa / Recicladora</option>
@@ -216,7 +219,7 @@
                          placeholder="00.000.000/0001-00"
                          maxlength="18"
                          autocomplete="off"
-                         aria-required="true" />
+                         required aria-describedby="err-cnpj" />
                   <span class="cnpj-tag" id="cnpjStatus" aria-live="polite"></span>
                 </div>
                 <p class="field-error" id="err-cnpj" role="alert" aria-live="polite"></p>
@@ -227,7 +230,7 @@
                 <input type="text" id="razao" name="razao_social"
                        placeholder="Nome da empresa ou cooperativa"
                        autocomplete="organization"
-                       aria-required="true" />
+                       required aria-describedby="err-razao" />
                 <p class="field-error" id="err-razao" role="alert" aria-live="polite"></p>
               </div>
 
@@ -236,7 +239,7 @@
                 <input type="text" id="nomeFantasia" name="nome_fantasia"
                        placeholder="Como sua empresa é conhecida no mercado"
                        autocomplete="organization"
-                       aria-required="true" />
+                       required aria-describedby="err-nomeFantasia" />
                 <p class="field-error" id="err-nomeFantasia" role="alert" aria-live="polite"></p>
               </div>
 
@@ -247,7 +250,7 @@
                          placeholder="00000-000"
                          maxlength="9"
                          autocomplete="postal-code"
-                         aria-required="true" />
+                         required aria-describedby="err-cep" />
                   <p class="field-error" id="err-cep" role="alert" aria-live="polite"></p>
                 </div>
                 <div class="form-field">
@@ -255,7 +258,7 @@
                   <input type="text" id="numero" name="numero"
                          placeholder="Ex.: 1200"
                          autocomplete="address-line2"
-                         aria-required="true" />
+                         required aria-describedby="err-numero" />
                   <p class="field-error" id="err-numero" role="alert" aria-live="polite"></p>
                 </div>
               </div>
@@ -265,7 +268,7 @@
                 <input type="text" id="endereco" name="endereco"
                        placeholder="Ex.: Rua das Indústrias"
                        autocomplete="address-line1"
-                       aria-required="true" />
+                       required aria-describedby="err-endereco" />
                 <p class="field-error" id="err-endereco" role="alert" aria-live="polite"></p>
               </div>
 
@@ -275,7 +278,7 @@
                   <input type="text" id="bairro" name="bairro"
                          placeholder="Ex.: Distrito Industrial"
                          autocomplete="address-level3"
-                         aria-required="true" />
+                         required aria-describedby="err-bairro" />
                   <p class="field-error" id="err-bairro" role="alert" aria-live="polite"></p>
                 </div>
                 <div class="form-field">
@@ -290,7 +293,7 @@
                 <div class="form-field">
                   <label for="estado">ESTADO <span class="req" aria-hidden="true">*</span></label>
                   <div class="select-wrap">
-                    <select id="estado" name="estado" aria-required="true" autocomplete="address-level1">
+                    <select id="estado" name="estado" required aria-describedby="err-estado" autocomplete="address-level1">
                       <option value="" disabled selected>Selecione</option>
                       <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
                       <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
@@ -309,7 +312,7 @@
                   <input type="text" id="cidade" name="cidade"
                          placeholder="Ex.: São Paulo"
                          autocomplete="address-level2"
-                         aria-required="true" />
+                         required aria-describedby="err-cidade" />
                   <p class="field-error" id="err-cidade" role="alert" aria-live="polite"></p>
                 </div>
               </div>
@@ -317,7 +320,7 @@
               <div class="form-field">
                 <label for="segmento">SEGMENTO DE RESÍDUOS <span class="req" aria-hidden="true">*</span></label>
                 <div class="select-wrap">
-                  <select id="segmento" name="segmento" aria-required="true">
+                  <select id="segmento" name="segmento" required aria-describedby="err-segmento">
                     <option value="" disabled selected>Qual tipo de resíduo você movimenta?</option>
                     <option value="plasticos">Plásticos e polímeros</option>
                     <option value="metais">Metais ferrosos e não-ferrosos</option>
@@ -359,7 +362,7 @@
                   <input type="password" id="senha" name="senha"
                          placeholder="Mínimo 8 caracteres"
                          autocomplete="new-password"
-                         aria-required="true" />
+                         required aria-describedby="strengthHint err-senha" />
                   <button type="button" class="pw-toggle" id="toggleSenha"
                           aria-label="Mostrar senha">
                     <i data-lucide="eye" id="eyeSenha"></i>
@@ -378,7 +381,7 @@
                   <input type="password" id="senhaConf" name="senha_conf"
                          placeholder="Repita a senha"
                          autocomplete="new-password"
-                         aria-required="true" />
+                         required aria-describedby="err-senhaConf" />
                   <button type="button" class="pw-toggle" id="toggleConf"
                           aria-label="Mostrar confirmação de senha">
                     <i data-lucide="eye" id="eyeConf"></i>
@@ -389,7 +392,7 @@
 
               <div class="check-group">
                 <label class="check-label">
-                  <input type="checkbox" id="chkTermos" name="termos" aria-required="true" />
+                  <input type="checkbox" id="chkTermos" name="termos" required aria-describedby="err-termos" />
                   <span class="check-box">
                     <i data-lucide="check" class="check-icon" aria-hidden="true"></i>
                   </span>
@@ -445,7 +448,8 @@
     <a href="/re.source/privacidade">Política de Privacidade</a>
   </footer>
 
+  <?php require_once __DIR__ . '/../components/accessibility.php'; ?>
   <script>lucide.createIcons();</script>
-  <script src="/re.source/public/js/cadastro.js?v=2"></script>
+  <script src="/re.source/public/js/cadastro.js?v=3"></script>
 </body>
 </html>

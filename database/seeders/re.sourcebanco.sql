@@ -236,6 +236,29 @@ INSERT IGNORE INTO categories (parent_id, name, slug) VALUES
 
 
 -- ============================================================
+-- 9A. FATORES DE EMISSÃO PARA INDICADORES ESG
+-- ============================================================
+CREATE TABLE IF NOT EXISTS emission_factors (
+    id                         INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+    category_id                INT UNSIGNED      NULL,
+    factor_kg_co2e_per_kg      DECIMAL(10,4) NOT NULL,
+    source_name                VARCHAR(200)  NOT NULL,
+    source_url                 VARCHAR(500)      NULL,
+    methodology_version        VARCHAR(80)   NOT NULL,
+    valid_from                 DATE          NOT NULL,
+    created_at                 TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    INDEX idx_emission_category (category_id),
+    CONSTRAINT fk_factor_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO emission_factors
+    (category_id, factor_kg_co2e_per_kg, source_name, source_url, methodology_version, valid_from)
+SELECT NULL, 2.5000, 'Fator acadêmico provisório do MVP', NULL, 'MVP-2026.1', '2026-01-01'
+WHERE NOT EXISTS (SELECT 1 FROM emission_factors);
+
+
+-- ============================================================
 -- 10. ANÚNCIOS
 -- ============================================================
 CREATE TABLE IF NOT EXISTS listings (
@@ -335,6 +358,28 @@ CREATE TABLE IF NOT EXISTS negotiations (
     CONSTRAINT fk_neg_listing FOREIGN KEY (listing_id)        REFERENCES listings  (id),
     CONSTRAINT fk_neg_buyer   FOREIGN KEY (buyer_company_id)  REFERENCES companies (id),
     CONSTRAINT fk_neg_seller  FOREIGN KEY (seller_company_id) REFERENCES companies (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ============================================================
+-- 13A. PASSAPORTES DIGITAIS DE MATERIAIS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS material_passports (
+    id                  INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+    negotiation_id      INT UNSIGNED  NOT NULL,
+    passport_code       VARCHAR(30)   NOT NULL,
+    public_token        CHAR(64)      NOT NULL,
+    material_name       VARCHAR(200)  NOT NULL,
+    quantity_kg         DECIMAL(14,3) NOT NULL,
+    origin_company      VARCHAR(200)  NOT NULL,
+    destination_company VARCHAR(200)  NOT NULL,
+    reused_at           DATETIME      NOT NULL,
+    created_at          TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE idx_passport_negotiation (negotiation_id),
+    UNIQUE idx_passport_code (passport_code),
+    UNIQUE idx_passport_token (public_token),
+    CONSTRAINT fk_passport_negotiation FOREIGN KEY (negotiation_id) REFERENCES negotiations (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

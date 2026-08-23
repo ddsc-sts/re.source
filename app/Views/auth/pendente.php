@@ -9,10 +9,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/re.source/public/css/pendente.css" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/auth-v2.css?v=2.3'), ENT_QUOTES, 'UTF-8') ?>" />
 </head>
 <body>
 
-  <div class="pendente-card">
+  <main class="pendente-card" id="main-content">
 
     <a href="/re.source/" class="logo-wrap">
       <span class="logo-text">Re.<strong>Source</strong></span>
@@ -41,8 +42,8 @@
         <input type="text" inputmode="numeric" maxlength="1" class="code-digit" autocomplete="off" aria-label="Digito 2" />
         <input type="text" inputmode="numeric" maxlength="1" class="code-digit" autocomplete="off" aria-label="Digito 3" />
         <input type="text" inputmode="numeric" maxlength="1" class="code-digit" autocomplete="off" aria-label="Digito 4" />
-        <input type="text" inputmode="numeric" maxlength="1" class="code-digit" autocomplete="off" aria-label="Digito 5" />
-        <input type="text" inputmode="numeric" maxlength="1" class="code-digit" autocomplete="off" aria-label="Digito 6" />
+        <input type="text" inputmode="numeric" maxlength="1" class="code-digit" autocomplete="off" aria-label="Dígito 5" />
+        <input type="text" inputmode="numeric" maxlength="1" class="code-digit" autocomplete="off" aria-label="Dígito 6" />
       </div>
       <input type="hidden" name="codigo" id="codigoHidden" />
 
@@ -60,7 +61,8 @@
 
     <a href="/re.source/cadastro" class="link-voltar">← Voltar ao cadastro</a>
 
-  </div>
+  </main>
+    <?php require_once __DIR__ . '/../components/accessibility.php'; ?>
     <script src="/re.source/public/js/pendente.js?v=3"></script>
 
 </body>

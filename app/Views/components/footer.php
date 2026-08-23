@@ -76,6 +76,9 @@ $footerPlatformName = app_setting('platform_name', 'Re.Source') ?: 'Re.Source';
   </div>
 </footer>
 
-<script src="<?= htmlspecialchars(asset_url('/js/base.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<?php require_once __DIR__ . '/accessibility.php'; ?>
+
+<script src="<?= htmlspecialchars(asset_url('/js/base.js?v=2.3'), ENT_QUOTES, 'UTF-8') ?>"></script>
+<script src="<?= htmlspecialchars(asset_url('/js/v2.js'), ENT_QUOTES, 'UTF-8') ?>"></script>
 </body>
 </html>

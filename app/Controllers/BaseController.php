@@ -678,12 +678,20 @@ class BaseController
 
     public static function impacto(): void
     {
-        echo "Página de Impacto do Usuário (Em desenvolvimento)";
+        global $pdo;
+        $companyId = (int) ($_SESSION['user']['company_id'] ?? $_SESSION['company_id'] ?? 0);
+        $overview = self::getDashboardOverview($pdo, $companyId);
+        $method = self::getEnvironmentalMethod($pdo);
+        view('impact/index', [
+            'titulo_pagina' => 'Impacto circular — Re.Source',
+            'overview' => $overview,
+            'method' => $method,
+        ]);
     }
 
     public static function suporte(): void
     {
-        echo "Página de Suporte do Usuário (Em desenvolvimento)";
+        view('help/index', ['titulo_pagina' => 'Central de Ajuda — Re.Source']);
     }
 
     private static function getAnunciosRecentes($pdo): array

@@ -7,6 +7,8 @@ $css_especifico = "/re.source/public/css/sobre.css";
 require_once __DIR__ . '/../components/header.php'; 
 ?>
 
+<main id="main-content">
+
 <section class="about-hero">
   <div class="hero-bg-pattern"></div>
   <div class="hero-inner">
@@ -196,6 +198,8 @@ require_once __DIR__ . '/../components/header.php';
     observer.observe(el);
   });
 </script>
+
+</main>
 
 <?php 
 // 3. Puxa o rodapé global

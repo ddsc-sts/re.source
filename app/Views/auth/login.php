@@ -7,10 +7,11 @@
   <link rel="icon" href="<?= htmlspecialchars(asset_url('/img/logos/favicon.svg'), ENT_QUOTES, 'UTF-8') ?>" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <link rel="stylesheet" href="/re.source/public/css/login.css"/>
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>"/>
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/auth-v2.css?v=2.3'), ENT_QUOTES, 'UTF-8') ?>"/>
 </head>
 <body>
 
@@ -173,6 +174,7 @@
   </footer>
 
   <!-- 🚀 CORREÇÃO: Adicionado o '?v=2' para forçar o navegador a carregar o seu JavaScript novo sem usar o cache -->
+  <?php require_once __DIR__ . '/../components/accessibility.php'; ?>
   <script src="/re.source/public/js/login.js?v=3"></script>
 </body>
 </html>

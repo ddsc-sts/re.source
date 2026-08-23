@@ -24,6 +24,7 @@
       $topbarAlertCount = 0;
   }
 ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/accessibility.css?v=2.3'), ENT_QUOTES, 'UTF-8') ?>" />
 <div class="topbar">
     <a href="#" class="topbar-logo">
       <img src="/re.source/public/img/logos/logo.png" alt="<?= htmlspecialchars($topbarPlatformName, ENT_QUOTES, 'UTF-8') ?>" />
@@ -58,3 +59,4 @@
       </button>
     </div>
   </div>
+<?php require_once __DIR__ . '/accessibility.php'; ?>

@@ -62,7 +62,25 @@ if ($headerCompanyId) {
     $headerUnseenNotifications = (int) $stmtNotifications->fetchColumn();
 }
 $headerIsPending = in_array($headerCompanyStatus, ['pending', 'changes_requested'], true);
-$headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('/base');
+$headerHomeUrl = $headerIsPending
+    ? app_url('/aguardando-aprovacao')
+    : ($headerCompanyId ? app_url('/base') : app_url('/'));
+$headerPath = strtok((string) ($_SERVER['REQUEST_URI'] ?? ''), '?');
+$headerPath = preg_replace('#^' . preg_quote(APP_BASE_PATH, '#') . '#', '', $headerPath) ?: '/';
+$headerNavItems = $headerCompanyId && !$headerIsPending
+    ? [
+        ['/base', 'home', 'Início'],
+        ['/busca', 'search', 'Oportunidades'],
+        ['/meus-anuncios', 'package-search', 'Meus materiais'],
+        ['/conversas', 'messages-square', 'Negociações'],
+        ['/impacto', 'chart-no-axes-combined', 'Impacto'],
+      ]
+    : [
+        ['/', 'home', 'Início'],
+        ['/busca', 'search', 'Materiais'],
+        ['/sobre', 'info', 'Sobre nós'],
+        ['/ajuda', 'circle-help', 'Ajuda'],
+      ];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="<?php echo $theme; ?>">
@@ -78,13 +96,15 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/profile.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/account-menu.css'), ENT_QUOTES, 'UTF-8') ?>" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/accessibility.css?v=2.3'), ENT_QUOTES, 'UTF-8') ?>" />
   <?php if (isset($css_especifico)): ?>
     <link rel="stylesheet" href="<?php echo $css_especifico; ?>" />
   <?php endif; ?>
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/v2.css?v=2.3'), ENT_QUOTES, 'UTF-8') ?>" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -110,14 +130,22 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
         </a>
       </div>
 
-      <nav class="desktop-nav">
-        <a href="<?= $headerHomeUrl ?>"><i data-lucide="home"></i> Página Inicial</a>
-        <a href="<?= htmlspecialchars(app_url('/sobre'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="info"></i> Sobre Nós</a>
-        <a href="<?= htmlspecialchars(app_url('/contato'), ENT_QUOTES, 'UTF-8') ?>"><i data-lucide="phone"></i> Contato</a>
+      <nav class="desktop-nav" id="headerPrimaryNav">
+        <?php foreach ($headerNavItems as [$navPath, $navIcon, $navLabel]):
+          $navActive = $headerPath === $navPath || ($navPath !== '/' && str_starts_with($headerPath, $navPath . '/'));
+        ?>
+          <a href="<?= htmlspecialchars(app_url($navPath), ENT_QUOTES, 'UTF-8') ?>"<?= $navActive ? ' aria-current="page"' : '' ?>>
+            <i data-lucide="<?= htmlspecialchars($navIcon, ENT_QUOTES, 'UTF-8') ?>"></i>
+            <?= htmlspecialchars($navLabel, ENT_QUOTES, 'UTF-8') ?>
+          </a>
+        <?php endforeach; ?>
       </nav>
 
       <?php if ($headerCompanyId && !$headerIsPending): ?>
       <div class="header-user-actions">
+        <a class="header-publish" href="<?= htmlspecialchars(app_url('/anuncios/novo'), ENT_QUOTES, 'UTF-8') ?>">
+          <span>Publicar material</span><i data-lucide="plus"></i>
+        </a>
         <button
           class="header-bell<?= $headerUnseenNotifications > 0 ? ' has-unread' : '' ?>"
           id="notificationButton"
@@ -155,7 +183,16 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
           <i data-lucide="chevron-down" class="header-user-caret"></i>
         </button>
       </div>
+      <?php else: ?>
+      <div class="header-public-actions">
+        <a href="<?= htmlspecialchars(app_url('/login'), ENT_QUOTES, 'UTF-8') ?>">Entrar</a>
+        <a class="header-public-cta" href="<?= htmlspecialchars(app_url('/cadastro'), ENT_QUOTES, 'UTF-8') ?>">Cadastrar empresa</a>
+      </div>
       <?php endif; ?>
+
+      <button class="header-mobile-toggle" id="headerMobileToggle" type="button" aria-label="Abrir navegação" aria-expanded="false" aria-controls="headerPrimaryNav">
+        <i data-lucide="menu"></i>
+      </button>
 
       <aside class="notification-panel" id="notificationPanel" aria-label="Notificações" hidden>
         <div class="notification-panel-head">
@@ -215,13 +252,13 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
       <form action="<?= htmlspecialchars(app_url('/busca'), ENT_QUOTES, 'UTF-8') ?>" method="GET" class="search-pill">
         
         <div class="search-field">
-          <label>O que busca?</label>
-          <input type="text" name="q" placeholder="Ex: Serragem" />
+          <label for="headerSearchQ">O que busca?</label>
+          <input type="search" id="headerSearchQ" name="q" placeholder="Ex: Serragem" />
         </div>
 
         <div class="category-field">
-          <label>Categoria</label>
-          <button type="button" class="category-trigger" id="categoryTrigger">
+          <span class="field-label" id="headerCategoryLabel">Categoria</span>
+          <button type="button" class="category-trigger" id="categoryTrigger" aria-labelledby="headerCategoryLabel categoryLabel" aria-haspopup="listbox" aria-expanded="false">
             <span id="categoryLabel">Todas as categorias</span>
             <i data-lucide="chevron-down"></i>
           </button>
@@ -240,7 +277,7 @@ $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('
           <input type="hidden" name="category_id" id="categoryIdInput" value="">
         </div>
 
-        <button type="submit" class="search-btn"><i data-lucide="search"></i></button>
+        <button type="submit" class="search-btn" aria-label="Buscar materiais"><i data-lucide="search" aria-hidden="true"></i></button>
         
       </form>
     </div>
