@@ -1,0 +1,132 @@
+@import url("./accessibility.css?v=3.2");
+
+:root {
+  --auth3-paper: #f3f1e9;
+  --auth3-surface: #fffefa;
+  --auth3-green: #0b443b;
+  --auth3-green-2: #166153;
+  --auth3-lime: #c5ed70;
+  --auth3-ink: #15211e;
+  --auth3-muted: #5e6c67;
+  --auth3-border: #d4ddd8;
+  --auth3-danger: #973b2b;
+  --auth3-shadow: 0 24px 70px rgba(16, 54, 47, .11);
+}
+
+body {
+  min-height: 100vh !important;
+  margin: 0 !important;
+  overflow-x: hidden !important;
+  color: var(--auth3-ink) !important;
+  background: radial-gradient(circle at 8% 12%, rgba(185,220,224,.34), transparent 25rem), radial-gradient(circle at 92% 88%, rgba(197,237,112,.12), transparent 28rem), var(--auth3-paper) !important;
+  font-family: "Manrope", "Inter", system-ui, -apple-system, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.login-header, .site-header {
+  position: fixed !important; inset: 0 0 auto !important; z-index: 1000 !important;
+  min-height: 72px !important; padding: 0 max(22px, calc((100vw - 1280px)/2)) !important;
+  display: flex !important; align-items: center !important;
+  background: rgba(255,254,250,.94) !important; border-bottom: 1px solid rgba(21,33,30,.09) !important;
+  box-shadow: 0 8px 30px rgba(21,33,30,.04) !important; backdrop-filter: blur(18px) saturate(1.12) !important;
+}
+.header-inner { width: 100% !important; }
+.login-logo, .site-header .logo-mark {
+  display: inline-flex !important; align-items: center !important; width: auto !important; min-height: 44px !important;
+  padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important;
+}
+.login-logo img, .site-header .logo-mark-img { display: none !important; }
+.login-logo::after, .site-header .logo-mark::after { content: "re.source"; color: var(--auth3-green); font: 800 1.5rem/1 "Manrope", sans-serif; letter-spacing: -.065em; }
+.login-header-ctas, .header-nav { display: flex !important; align-items: center !important; gap: 12px !important; }
+.login-header-ctas a, .header-nav a { min-height: 42px; display: inline-flex !important; align-items: center !important; padding: 0 12px !important; color: var(--auth3-green) !important; border-radius: 11px !important; font: 750 .88rem/1 "Manrope", sans-serif !important; text-transform: none !important; }
+.login-header-ctas .btn-cta-nav { padding-inline: 18px !important; color: #fff !important; background: var(--auth3-green) !important; box-shadow: 0 8px 20px rgba(11,68,59,.15) !important; }
+
+.login-main, .register-main {
+  width: min(1280px, calc(100% - 44px)) !important; min-height: calc(100vh - 72px) !important;
+  margin: 72px auto 0 !important; padding: 34px 0 64px !important;
+  display: grid !important; grid-template-columns: minmax(330px,.78fr) minmax(560px,1.22fr) !important;
+  align-items: start !important; gap: 32px !important; background: transparent !important;
+}
+.login-aside, .register-aside {
+  position: sticky !important; top: 104px !important; align-self: start !important; display: block !important;
+  width: auto !important; height: auto !important; min-height: 0 !important; margin: 0 !important;
+  padding: clamp(34px,4vw,54px) !important; overflow: hidden !important; color: #f9fbf6 !important;
+  border: 1px solid rgba(255,255,255,.1) !important; border-radius: 30px !important;
+  background: radial-gradient(circle at 90% 6%, rgba(197,237,112,.18), transparent 17rem), linear-gradient(145deg,#0b443b,#123a34 72%) !important;
+  box-shadow: 0 24px 65px rgba(11,68,59,.17) !important;
+}
+.login-aside { min-height: min(670px, calc(100vh - 138px)) !important; }
+.login-aside::before, .register-aside::before { content:""; position:absolute; right:-90px; bottom:-110px; width:300px; height:300px; border:1px solid rgba(197,237,112,.22); border-radius:50%; box-shadow:0 0 0 36px rgba(197,237,112,.035),0 0 0 74px rgba(197,237,112,.025); pointer-events:none; }
+.login-aside-photo, .aside-photo, .login-aside-scrim, .aside-scrim { display: none !important; }
+.login-aside-content, .aside-content { position: relative !important; z-index: 1 !important; width: 100% !important; max-width: 570px !important; height: auto !important; padding: 0 !important; overflow: visible !important; color: inherit !important; transform: none !important; }
+.login-aside-heading, .aside-title { max-width: 10.5em !important; margin: 18px 0 22px !important; color: #fffefa !important; font: 650 clamp(2.65rem,4vw,4.25rem)/1.01 "Manrope",sans-serif !important; letter-spacing: -.065em !important; text-transform: none !important; }
+.login-aside-heading br { display: none !important; }
+.login-aside-heading em, .aside-title em { color: var(--auth3-lime) !important; font-style: normal !important; }
+.accent-sq { display: none !important; }
+.login-aside-sub, .aside-desc { max-width: 520px !important; margin: 0 !important; color: rgba(255,255,255,.76) !important; font-size: 1.02rem !important; line-height: 1.72 !important; }
+.aside-badge { min-height: 34px; padding: 0 12px !important; color: var(--auth3-lime) !important; border: 1px solid rgba(255,255,255,.2) !important; border-radius: 999px !important; background: rgba(255,255,255,.07) !important; }
+.aside-benefits { margin-top: 30px !important; gap: 16px !important; color: #fff !important; }
+.benefit-icon { width: 40px !important; height: 40px !important; flex: 0 0 40px !important; color: var(--auth3-green) !important; border: 0 !important; border-radius: 13px !important; background: var(--auth3-lime) !important; }
+.benefit strong { color: #fff !important; }
+.benefit span, .aside-quote p, .aside-quote cite, .aside-stat-label { color: rgba(255,255,255,.68) !important; }
+.aside-quote { border-color: var(--auth3-lime) !important; }
+.aside-stat-val { color: var(--auth3-lime) !important; }
+.login-floater { display: none !important; }
+
+.login-panel, .register-panel { align-self: start !important; display: flex !important; align-items: flex-start !important; width: auto !important; height: auto !important; min-height: 0 !important; padding: 0 !important; background: transparent !important; }
+.login-panel-bg-lines, .register-panel-bg-lines { display: none !important; }
+.login-card, .panel-inner { width: 100% !important; max-width: 720px !important; height: auto !important; min-height: 0 !important; flex: none !important; margin: 0 auto !important; padding: clamp(32px,4.2vw,54px) !important; overflow: visible !important; border: 1px solid rgba(21,33,30,.09) !important; border-radius: 28px !important; background: rgba(255,254,250,.98) !important; box-shadow: var(--auth3-shadow) !important; }
+.login-card { min-height: min(670px, calc(100vh - 138px)) !important; display: flex !important; flex-direction: column !important; justify-content: center !important; }
+.register-panel .progress-bar { position: fixed !important; inset: 72px 0 auto !important; z-index: 1001 !important; height: 3px !important; background: rgba(11,68,59,.08) !important; }
+.progress-fill { background: linear-gradient(90deg,var(--auth3-green),var(--auth3-lime)) !important; }
+
+.card-title, .step-heading h1 { margin: 0 0 9px !important; color: var(--auth3-green) !important; font: 620 clamp(2rem,3.3vw,3rem)/1.05 "Manrope",sans-serif !important; letter-spacing: -.055em !important; text-transform: none !important; }
+.card-sub, .step-heading p { color: var(--auth3-muted) !important; font-size: .98rem !important; line-height: 1.55 !important; }
+.step-heading { margin-bottom: 28px !important; }
+.required-note { margin: -18px 0 23px !important; color: var(--auth3-muted) !important; font-size: .8rem !important; }
+.required-note span { color: var(--auth3-danger) !important; font-weight: 900 !important; }
+.form-field label { margin-bottom: 8px !important; color: var(--auth3-ink) !important; font: 780 .76rem/1.25 "Manrope",sans-serif !important; letter-spacing: .025em !important; text-transform: none !important; }
+.input-wrap, .pw-wrap, .input-suffix-wrap, .select-wrap { border-radius: 13px !important; background: #fff !important; }
+.form-field > input, .form-field select, .input-wrap input, .pw-wrap input, .input-suffix-wrap input { min-height: 52px !important; padding-inline: 15px !important; color: var(--auth3-ink) !important; border: 1px solid #cbd6d1 !important; border-radius: 13px !important; background: #fff !important; box-shadow: 0 1px 0 rgba(21,33,30,.02) !important; font: 500 .96rem/1.2 "Manrope",sans-serif !important; transition: border-color .18s ease,box-shadow .18s ease !important; }
+.input-wrap input, .pw-wrap input, .input-suffix-wrap input { border: 0 !important; box-shadow: none !important; }
+.login-card .input-wrap input { padding-left: 3rem !important; padding-right: 3rem !important; }
+.input-wrap, .pw-wrap, .input-suffix-wrap { border: 1px solid #cbd6d1 !important; }
+.form-field input:focus, .form-field select:focus, .input-wrap:focus-within, .pw-wrap:focus-within, .input-suffix-wrap:focus-within { border-color: var(--auth3-green-2) !important; outline: 0 !important; box-shadow: 0 0 0 4px rgba(22,97,83,.13) !important; }
+.form-field.has-error input, .form-field.has-error select, .form-field.has-error .pw-wrap, .form-field.has-error .input-wrap { border: 2px solid var(--auth3-danger) !important; }
+.field-error, .alert-danger { color: var(--auth3-danger) !important; }
+
+.btn-submit, .btn-next, .btn-back { min-height: 52px !important; border-radius: 13px !important; font: 800 .94rem/1 "Manrope",sans-serif !important; letter-spacing: -.01em !important; text-transform: none !important; transition: transform .18s ease,box-shadow .18s ease,background .18s ease !important; }
+.btn-submit, .btn-next { color: #fff !important; background: var(--auth3-green) !important; box-shadow: 0 10px 24px rgba(11,68,59,.15) !important; }
+.btn-submit:hover, .btn-next:hover { background: #073a32 !important; transform: translateY(-1px) !important; box-shadow: 0 14px 28px rgba(11,68,59,.2) !important; }
+.btn-back { color: var(--auth3-green) !important; border: 1px solid var(--auth3-border) !important; background: #fff !important; }
+.link-btn, .login-link a, .header-nav a { color: var(--auth3-green) !important; }
+.info-box { border: 1px solid rgba(11,68,59,.12) !important; border-radius: 13px !important; background: rgba(185,220,224,.2) !important; }
+.stepper { margin-bottom: 34px !important; }
+.step-circle { width: 34px !important; height: 34px !important; color: var(--auth3-muted) !important; border: 1px solid var(--auth3-border) !important; background: #fff !important; }
+.step-item.active .step-circle, .step-item.done .step-circle { color: var(--auth3-green) !important; border-color: var(--auth3-lime) !important; background: var(--auth3-lime) !important; }
+.step-label { color: var(--auth3-muted) !important; font: 700 .72rem/1.2 "Manrope",sans-serif !important; text-transform: none !important; }
+.step-item.active .step-label { color: var(--auth3-green) !important; }
+.login-footer, .site-footer { color: var(--auth3-muted) !important; border-top: 1px solid var(--auth3-border) !important; background: transparent !important; }
+
+@media (max-width: 1080px) {
+  .login-main, .register-main { grid-template-columns: minmax(300px,.72fr) minmax(500px,1.28fr) !important; gap: 24px !important; }
+  .login-aside-heading, .aside-title { font-size: clamp(2.35rem,4vw,3.35rem) !important; }
+}
+@media (max-width: 900px) {
+  .login-main, .register-main { width: min(720px,calc(100% - 28px)) !important; grid-template-columns: 1fr !important; padding-top: 24px !important; }
+  .login-aside, .register-aside { display: none !important; }
+  .login-card { min-height: 0 !important; }
+  .login-panel, .register-panel { width: 100% !important; }
+}
+@media (max-width: 600px) {
+  .login-header, .site-header { min-height: 66px !important; padding-inline: 14px !important; }
+  .login-main, .register-main { width: min(100% - 20px,620px) !important; margin-top: 66px !important; padding: 16px 0 42px !important; }
+  .register-panel .progress-bar { top: 66px !important; }
+  .login-logo::after, .site-header .logo-mark::after { font-size: 1.3rem !important; }
+  .login-header-ctas .link-login, .site-header .header-nav a:first-child { display: none !important; }
+  .login-header-ctas .btn-cta-nav, .site-header .header-nav a:last-child { min-height: 42px !important; display: inline-flex !important; align-items: center !important; padding: 0 12px !important; color: #fff !important; border: 0 !important; border-radius: 10px !important; background: var(--auth3-green) !important; }
+  .login-card, .panel-inner { padding: 27px 18px !important; border-radius: 20px !important; }
+  .form-row { grid-template-columns: 1fr !important; }
+  .card-title, .step-heading h1 { font-size: clamp(1.85rem,9vw,2.35rem) !important; }
+}

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/re.source/public/css/login.css"/>
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>"/>
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/auth-v2.css?v=2.3'), ENT_QUOTES, 'UTF-8') ?>"/>
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/auth-v3.css?v=3.2'), ENT_QUOTES, 'UTF-8') ?>"/>
 </head>
 <body>
 

@@ -14,7 +14,7 @@ $homeSupportWhatsApp = preg_replace('/\D+/', '', app_setting('support_whatsapp',
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <link rel="stylesheet" href="public/css/index.css" />
-  <link rel="stylesheet" href="public/css/accessibility.css?v=2.3" />
+  <link rel="stylesheet" href="public/css/accessibility.css?v=3.2" />
   <link rel="stylesheet" href="public/css/home-v2.css?v=2.3" />
 </head>
 <body>

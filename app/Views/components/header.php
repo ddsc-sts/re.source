@@ -96,7 +96,7 @@ $headerNavItems = $headerCompanyId && !$headerIsPending
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/flash.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/profile.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/account-menu.css'), ENT_QUOTES, 'UTF-8') ?>" />
-  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/accessibility.css?v=2.3'), ENT_QUOTES, 'UTF-8') ?>" />
+  <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/accessibility.css?v=3.2'), ENT_QUOTES, 'UTF-8') ?>" />
   <?php if (isset($css_especifico)): ?>
     <link rel="stylesheet" href="<?php echo $css_especifico; ?>" />
   <?php endif; ?>
