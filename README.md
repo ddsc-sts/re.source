@@ -114,6 +114,19 @@ Docs/               Documentação acadêmica do projeto
 
 ## Como rodar localmente
 
+### Inicializacao automatica no Windows (XAMPP)
+
+Com o XAMPP instalado em `C:\xampp`, execute `iniciar_ambiente.bat`. O script
+clona o repositorio em `C:\xampp\htdocs\re.source` caso ele ainda nao exista,
+cria o `.env` local, inicia MySQL e Apache, importa o schema e os dados de
+demonstracao e abre `http://localhost/re.source` no navegador. Ao fechar a janela
+do script, ele encerra somente os servicos que ele proprio iniciou. Nenhum
+arquivo auxiliar alem do proprio `.bat` e necessario para esse encerramento.
+
+O Git precisa estar instalado e disponivel no `PATH`. O script considera o MySQL
+padrao do XAMPP (`root` sem senha); se voce protegeu esse usuario, ajuste os
+comandos `mysql` e `mysqladmin` no arquivo antes de executa-lo.
+
 ### 1. Clonar o projeto
 
 ```bash
