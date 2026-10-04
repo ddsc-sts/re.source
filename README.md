@@ -1,150 +1,190 @@
+<div align="center">
+
+<img src="public/img/logos/logo.png" alt="Logo Re.Source" width="140" />
+
 # Re.Source
 
-<p align="center">
-  <img src="public/img/logos/logo.png" alt="Logo Re.Source" width="260">
-</p>
+**Marketplace B2B para negociação de resíduos industriais** ♻️
+Cadastro de empresas · Anúncios · Chat · Propostas · Frete simulado · Entrega por código · Saldo interno
 
-<p align="center">
-  Marketplace B2B acadêmico para negociação de resíduos industriais, com cadastro de empresas, aprovação administrativa, anúncios, chat, proposta, frete simulado, confirmação de entrega e saldo interno.
-</p>
+<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=500&size=18&pause=1200&color=2EA44F&center=true&vCenter=true&width=620&lines=Economia+circular+na+pr%C3%A1tica;Do+an%C3%BAncio+%C3%A0+entrega%2C+de+ponta+a+ponta;Empresas+negociando+res%C3%ADduos+reaproveit%C3%A1veis" alt="Typing SVG" />
 
-## Sobre o projeto
+![PHP](https://img.shields.io/badge/PHP-8+-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MariaDB%2FMySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![PHPUnit](https://img.shields.io/badge/PHPUnit-106_testes-3C9CD7?style=for-the-badge&logo=php&logoColor=white)
+![MVP](https://img.shields.io/badge/Projeto-Acad%C3%AAmico_(MVP)-orange?style=for-the-badge)
 
-O Re.Source é um sistema desenvolvido como MVP acadêmico para apresentação de curso. A proposta é simular uma plataforma B2B onde empresas podem anunciar, buscar e negociar resíduos industriais, incentivando economia circular e reaproveitamento de materiais.
+[📸 Demo](#-demonstração-visual) · [✨ Funcionalidades](#-funcionalidades) · [🔄 Fluxo](#-fluxo-principal) · [🚀 Rodar](#-como-rodar-localmente) · [👥 Equipe](#-equipe)
 
-O foco atual é demonstrar o fluxo principal de ponta a ponta de forma funcional e apresentável.
+</div>
 
-## Demonstração visual
+---
+
+## 📖 Sobre o projeto
+
+O **Re.Source** é um MVP acadêmico que simula uma plataforma B2B onde empresas **anunciam, buscam e negociam resíduos industriais**, incentivando a **economia circular** e o reaproveitamento de materiais.
+
+O foco é demonstrar o fluxo principal **de ponta a ponta**, de forma funcional e apresentável.
+
+---
+
+## 📸 Demonstração visual
 
 <table>
   <tr>
-    <td align="center"><strong>Página inicial</strong><br><img src="Docs/screenshots/pagina-inicial.png" alt="Página inicial do Re.Source" width="420"></td>
-    <td align="center"><strong>Marketplace empresarial</strong><br><img src="Docs/screenshots/dashboard.png" alt="Marketplace da área empresarial" width="420"></td>
+    <td align="center"><b>Página inicial</b><br/><img src="Docs/screenshots/pagina-inicial.png" alt="Página inicial" /></td>
+    <td align="center"><b>Marketplace empresarial</b><br/><img src="Docs/screenshots/dashboard.png" alt="Dashboard" /></td>
   </tr>
   <tr>
-    <td align="center"><strong>Categorias de resíduos</strong><br><img src="Docs/screenshots/dashboard-2.png" alt="Categorias de resíduos" width="420"></td>
-    <td align="center"><strong>Busca e anúncios</strong><br><img src="Docs/screenshots/anuncios.png" alt="Busca e anúncios de resíduos" width="420"></td>
+    <td align="center"><b>Categorias de resíduos</b><br/><img src="Docs/screenshots/dashboard-2.png" alt="Categorias" /></td>
+    <td align="center"><b>Busca e anúncios</b><br/><img src="Docs/screenshots/anuncios.png" alt="Anúncios" /></td>
   </tr>
   <tr>
-    <td align="center"><strong>Chat e negociação</strong><br><img src="Docs/screenshots/negociacao-chat.png" alt="Chat e negociação" width="420"></td>
-    <td align="center"><strong>Acompanhamento de entrega</strong><br><img src="Docs/screenshots/entregas.png" alt="Acompanhamento de entrega" width="420"></td>
+    <td align="center"><b>Chat e negociação</b><br/><img src="Docs/screenshots/negociacao-chat.png" alt="Chat" /></td>
+    <td align="center"><b>Acompanhamento de entrega</b><br/><img src="Docs/screenshots/entregas.png" alt="Entregas" /></td>
   </tr>
 </table>
 
-## Funcionalidades principais
+---
 
-- Cadastro de empresa com validação, confirmação por e-mail e status pendente.
-- Login de empresa pendente com navegação limitada.
-- Aprovação, solicitação de correção, rejeição, suspensão e reativação pelo administrador.
-- Dashboard empresarial com métricas, categorias e anúncios.
-- CRUD de anúncios de resíduos.
-- Busca pública por texto, categoria e filtros básicos.
-- Chat entre empresas com contador de mensagens não lidas e atualização por polling.
-- Propostas comerciais com quantidade, valor, prazo e responsabilidade pelo frete.
-- Aceite mútuo entre comprador e vendedor.
-- Frete simulado com opções persistidas no banco.
-- Código de entrega de seis dígitos com hash, validade, limite de tentativas e uso único.
-- Liberação interna de saldo após confirmação de entrega.
-- Solicitação de saque PIX/TED com aprovação ou recusa manual pelo administrador.
-- Painel administrativo com empresas, anúncios, negociações, logística, saques, suporte, impacto e configurações.
-- Termos de Uso e Política de Privacidade.
-- Testes automatizados com PHPUnit.
+## ✨ Funcionalidades
 
-## Tecnologias
+<details open>
+<summary><b>🏢 Para empresas</b></summary>
+<br/>
 
-- PHP 8+
-- MariaDB/MySQL
-- PDO
-- HTML, CSS e JavaScript
-- PHPUnit
-- XAMPP para ambiente local
+- Cadastro com validação, confirmação por e-mail e status pendente
+- Login de empresa pendente com navegação limitada
+- Dashboard com métricas, categorias e anúncios
+- CRUD de anúncios de resíduos
+- Busca pública por texto, categoria e filtros básicos
+- Chat entre empresas com contador de não lidas (polling)
+- Propostas com quantidade, valor, prazo e responsabilidade pelo frete
+- Aceite mútuo entre comprador e vendedor
 
-## Equipe e contribuições
+</details>
 
-O projeto foi desenvolvido de forma colaborativa. Embora diversas partes tenham passado por revisões e integrações conjuntas, estas foram as principais frentes de atuação de cada integrante:
+<details>
+<summary><b>🚚 Logística e pagamentos</b></summary>
+<br/>
 
-### Leonardo Becker — Desenvolvimento Full-Stack e integração do MVP
+- Frete simulado com opções persistidas no banco
+- Código de entrega de 6 dígitos com **hash**, validade, limite de tentativas e uso único
+- Liberação interna de saldo após confirmação de entrega
+- Solicitação de saque PIX/TED com aprovação ou recusa manual
 
-- Planejamento das prioridades e integração do fluxo principal do MVP.
-- Implementação e evolução de anúncios, busca, negociações, chat e propostas comerciais.
-- Desenvolvimento dos fluxos de aprovação de empresas, frete, entrega por código, saldo interno e solicitação de saque.
-- Integração entre controllers, views, rotas e banco de dados na arquitetura MVC.
-- Revisão funcional, testes manuais, consolidação do banco e preparação final do repositório.
+</details>
 
-### Daniel dos Santos — Desenvolvimento Full-Stack, interface e qualidade
+<details>
+<summary><b>🛡️ Painel administrativo</b></summary>
+<br/>
 
-- Desenvolvimento da estrutura inicial, banco de dados, cadastro, login, verificação por e-mail e recuperação de senha.
-- Participação na migração para MVC e na organização das páginas e componentes da aplicação.
-- Redesign e evolução visual das páginas iniciais, autenticação, dashboard e demais telas do sistema.
-- Implementação da base dos fluxos de frete e entrega.
-- Criação e ampliação da suíte de testes automatizados com PHPUnit.
+- Aprovação, correção, rejeição, suspensão e reativação de empresas
+- Gestão de anúncios, negociações, logística, saques e suporte
+- Área de impacto ESG e configurações
+- Termos de Uso e Política de Privacidade
 
-### Geder (`Gedinn07`) — Frontend, administração e revisão
+</details>
 
-- Padronização de CSS, correção de caminhos e ajustes de usabilidade e apresentação.
-- Desenvolvimento e evolução de telas do painel administrativo.
-- Implementação das áreas administrativas de empresas, anúncios e negociações.
-- Desenvolvimento da área de impacto ESG e de seus elementos visuais.
-- Revisão geral de interfaces, textos, ícones e integração visual do projeto.
+---
 
-## Estrutura do projeto
+## 🔄 Fluxo principal
 
-```text
+```mermaid
+flowchart LR
+    A[Cadastro] --> B[Confirmação por e-mail]
+    B --> C[Empresa pendente]
+    C --> D{Aprovação admin}
+    D -->|Aprovada| E[Dashboard liberado]
+    E --> F[Anúncio / Busca]
+    F --> G[Chat]
+    G --> H[Proposta comercial]
+    H --> I[Aceite mútuo]
+    I --> J[Frete simulado]
+    J --> K[Código de entrega]
+    K --> L[Liberação de saldo]
+    L --> M[Solicitação de saque]
+```
+
+---
+
+## 🧰 Tecnologias
+
+| Camada | Tecnologias |
+|--------|-------------|
+| **Back-end** | PHP 8+, PDO, arquitetura MVC |
+| **Banco de dados** | MariaDB / MySQL |
+| **Front-end** | HTML, CSS, JavaScript |
+| **Testes** | PHPUnit |
+| **Ambiente local** | XAMPP |
+
+---
+
+## 🗂️ Estrutura do projeto
+
+<details>
+<summary><b>Ver árvore de pastas</b></summary>
+
+```
 app/
   Controllers/      Controllers da aplicação
-  Middleware/       Middlewares de autenticação e autorização
+  Middleware/       Autenticação e autorização
   Services/         Serviços de domínio
   Views/            Telas e componentes PHP
 
-config/             Configurações auxiliares, incluindo envio de e-mail
+config/             Configurações auxiliares (e-mail)
 database/
   seeders/          Schema consolidado do banco
-  inserts/          Dados acadêmicos/demonstração
+  inserts/          Dados de demonstração
 
 public/
-  css/              Estilos
-  img/              Logos e imagens da interface
-  js/               Scripts do frontend
+  css/ img/ js/     Estilos, imagens e scripts
   index.php         Entrada pública
 
 routes/             Mapa de rotas
 tests/              Testes automatizados
-Docs/               Documentação acadêmica do projeto
+Docs/               Documentação acadêmica
 ```
 
-## Como rodar localmente
+</details>
 
-### Inicializacao automatica no Windows (XAMPP)
+---
 
-Com o XAMPP instalado em `C:\xampp`, execute `iniciar_ambiente.bat`. O script
-clona o repositorio em `C:\xampp\htdocs\re.source` caso ele ainda nao exista,
-cria o `.env` local, inicia MySQL e Apache, importa o schema e os dados de
-demonstracao e abre `http://localhost/re.source` no navegador. Ao fechar a janela
-do script, ele encerra somente os servicos que ele proprio iniciou. Nenhum
-arquivo auxiliar alem do proprio `.bat` e necessario para esse encerramento.
+## 🚀 Como rodar localmente
 
-O Git precisa estar instalado e disponivel no `PATH`. O script considera o MySQL
-padrao do XAMPP (`root` sem senha); se voce protegeu esse usuario, ajuste os
-comandos `mysql` e `mysqladmin` no arquivo antes de executa-lo.
+<details open>
+<summary><b>⚡ Opção rápida — Windows + XAMPP</b></summary>
+<br/>
 
-### 1. Clonar o projeto
+Com o XAMPP instalado em `C:\xampp` e o Git no `PATH`, execute:
+
+```bat
+iniciar_ambiente.bat
+```
+
+O script clona o projeto, cria o `.env`, inicia MySQL e Apache, importa o schema e os dados de demonstração e abre `http://localhost/re.source`.
+
+> Considera o MySQL padrão do XAMPP (`root` sem senha). Se você protegeu o usuário, ajuste os comandos `mysql` e `mysqladmin` no arquivo.
+
+</details>
+
+<details>
+<summary><b>🛠️ Opção manual</b></summary>
+<br/>
+
+**1. Clonar**
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/ddsc-sts/re.source.git
 cd re.source
 ```
 
-### 2. Configurar o ambiente
-
-Copie o arquivo de exemplo:
+**2. Configurar o ambiente**
 
 ```bash
 cp .env.example .env
 ```
-
-Em Windows, você também pode copiar manualmente o `.env.example` e renomear para `.env`.
-
-Configuração local esperada:
 
 ```env
 APP_URL=http://localhost/re.source
@@ -157,99 +197,101 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Para testar envio de e-mails, preencha também as variáveis SMTP no `.env`.
+Para testar e-mails, preencha também as variáveis SMTP.
 
-### 3. Preparar o banco de dados
+**3. Importar o banco (phpMyAdmin, nesta ordem)**
 
-No phpMyAdmin, importe os arquivos SQL nesta ordem:
-
-```text
+```
 1. database/seeders/re.sourcebanco.sql
 2. database/inserts/create_admin.sql
-3. database/inserts/empresa_demo.sql   (opcional, recomendado para demonstração)
-4. database/inserts/produto.sql        (opcional, depende do item 3)
-5. database/inserts/saldo_demo.sql     (opcional, depende dos itens 3 e 4)
+3. database/inserts/empresa_demo.sql   (opcional)
+4. database/inserts/produto.sql        (opcional, depende do 3)
+5. database/inserts/saldo_demo.sql     (opcional, depende do 3 e 4)
 ```
 
-O arquivo `re.sourcebanco.sql` cria e seleciona automaticamente o banco `resource` e já contém a estrutura consolidada do MVP.
+**4. Acessar:** `http://localhost/re.source`
 
-### 4. Acessar o sistema
+</details>
 
-```text
-http://localhost/re.source
-```
+---
 
-## Contas acadêmicas de demonstração
+## 🔑 Contas de demonstração
 
-Administrador:
+> Credenciais fictícias, apenas para demonstração acadêmica.
 
-```text
-URL:   http://localhost/re.source/admin
-E-mail: admin@resource.com.br
-Senha: Admin@2026!
-```
+<details>
+<summary><b>Ver contas</b></summary>
+<br/>
 
-Empresas demonstrativas:
+| Perfil | E-mail | Senha |
+|--------|--------|-------|
+| **Administrador** (`/admin`) | `admin@resource.com.br` | `Admin@2026!` |
+| Empresa | `carlos@metaljoin.com.br` | `Resource@2026` |
+| Empresa | `ana@madeirasul.com.br` | `Resource@2026` |
+| Empresa | `roberto@plasticonord.com.br` | `Resource@2026` |
+| Empresa | `fernanda@textilcat.com.br` | `Resource@2026` |
+| Empresa pendente | `marina@empresapendente.com.br` | `Resource@2026` |
 
-```text
-carlos@metaljoin.com.br
-ana@madeirasul.com.br
-roberto@plasticonord.com.br
-fernanda@textilcat.com.br
-marina@empresapendente.com.br
+</details>
 
-Senha comum: Resource@2026
-```
+---
 
-Essas credenciais são fictícias e existem apenas para demonstração acadêmica.
-
-## Fluxo principal da apresentação
-
-```text
-Cadastro
--> Confirmação por e-mail
--> Empresa pendente
--> Aprovação administrativa
--> Dashboard liberado
--> Criação/busca de anúncio
--> Chat entre empresas
--> Proposta comercial
--> Aceite mútuo
--> Frete simulado
--> Código de entrega
--> Liberação de saldo
--> Solicitação de saque
--> Aprovação/recusa manual pelo administrador
-```
-
-## Testes
-
-O projeto possui suíte de testes com PHPUnit.
-
-Instale as dependências:
+## 🧪 Testes
 
 ```bash
 composer install
+vendor/bin/phpunit        # Windows: vendor\bin\phpunit
 ```
 
-Execute:
+Último relatório registrado: `OK (106 tests, 326 assertions)` ✅
 
-```bash
-vendor/bin/phpunit
-```
+---
 
-No Windows, dependendo do terminal:
+## 👥 Equipe
 
-```bash
-vendor\bin\phpunit
-```
+<details>
+<summary><b>Leonardo Becker</b> — Full-Stack e integração do MVP</summary>
+<br/>
 
-O último relatório registrado no projeto indica:
+- Planejamento das prioridades e integração do fluxo principal
+- Anúncios, busca, negociações, chat e propostas
+- Aprovação de empresas, frete, entrega por código, saldo e saques
+- Integração entre controllers, views, rotas e banco (MVC)
+- Revisão funcional, testes manuais e preparação final do repositório
 
-```text
-OK (106 tests, 326 assertions)
-```
+</details>
 
-## Licença
+<details>
+<summary><b>Daniel dos Santos</b> — Full-Stack, interface e qualidade</summary>
+<br/>
 
-Projeto acadêmico. Defina uma licença formal antes de reutilizar ou distribuir em contexto não acadêmico.
+- Estrutura inicial, banco de dados, cadastro, login, verificação por e-mail e recuperação de senha
+- Migração para MVC e organização de páginas e componentes
+- Redesign e evolução visual das telas
+- Base dos fluxos de frete e entrega
+- Criação e ampliação da suíte de testes com PHPUnit
+
+</details>
+
+<details>
+<summary><b>Geder</b> (<code>Gedinn07</code>) — Front-end, administração e revisão</summary>
+<br/>
+
+- Padronização de CSS e ajustes de usabilidade
+- Telas do painel administrativo (empresas, anúncios, negociações)
+- Área de impacto ESG e elementos visuais
+- Revisão geral de interfaces, textos e ícones
+
+</details>
+
+---
+
+## 📄 Licença
+
+Projeto acadêmico. Defina uma licença formal antes de reutilizar ou distribuir fora do contexto acadêmico.
+
+<div align="center">
+
+⭐ Gostou do projeto? Deixe uma estrela no repositório!
+
+</div>
