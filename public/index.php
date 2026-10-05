@@ -7,7 +7,7 @@ require_once __DIR__ . '/../bootstrap.php';
 // (ex: Listingcontroller.php, Searchcontroller.php não seguem o padrão PascalCase)
 spl_autoload_register(function ($class) {
     $dirs = [CONTROLLER_PATH, APP_PATH . '/Middleware', APP_PATH . '/Services'];
-
+            
     foreach ($dirs as $dir) {
         $exact = $dir . '/' . $class . '.php';
         if (file_exists($exact)) {
