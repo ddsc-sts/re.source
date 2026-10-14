@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Bloqueia arquivos ocultos, exceto .well-known
+RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
+
+# Deixa o Apache servir arquivos e pastas existentes
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Encaminha as outras requisições para o roteador PHP
+RewriteRule ^ index.php [QSA,L]
