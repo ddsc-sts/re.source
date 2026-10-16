@@ -1,0 +1,16 @@
+
+.git/
+.github/
+.vscode/
+
+.env
+.env.*
+!.env.example
+
+vendor/
+node_modules/
+
+.DS_Store
+Thumbs.db
+
+*.log

@@ -10,7 +10,9 @@ RewriteBase /re.source/
 
 # Nunca servir segredos, metadados do Git ou codigo interno diretamente.
 RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
-RewriteRule ^(?:app|config|database|Docs|storage|tests|vendor|routes)(?:/|$) - [F,L,NC]
+
+RewriteRule ^(?:app|config|database|docker|Docs|storage|tests|vendor|routes)(?:/|$) - [F,L,NC]
+
 
 <FilesMatch "(^\.|\.env(?:\..*)?$|composer\.(?:json|lock)$|.*\.(?:sql|log|ini))$">
     Require all denied
