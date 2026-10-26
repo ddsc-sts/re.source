@@ -88,6 +88,10 @@ img { display: block; max-width: 100%; }
   gap: 1rem;
   padding: 0 1.75rem;
   border-bottom: 1px solid var(--border);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* Logo */
@@ -1098,3 +1102,81 @@ body {
   border: 1px solid #1b1c1c;
   box-shadow: 8px 8px 0 #005131;
 }
+
+
+@media (max-width: 640px) {
+  .topbar {
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .topbar-logo {
+    flex: 1;
+    min-width: 0;
+    gap: 6px;
+    overflow: hidden;
+  }
+
+  .topbar-logo img {
+    max-width: 32px;
+    height: auto;
+    flex-shrink: 0;
+  }
+
+  .topbar-logo-text {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .topbar-logo-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar-logo-sub {
+    display: none;
+  }
+
+  .topbar-search {
+    display: none;
+  }
+
+  .topbar-actions {
+    flex-shrink: 0;
+    gap: 2px;
+    margin-left: auto;
+  }
+
+  .topbar-btn {
+    width: 30px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+
+  .topbar-user {
+    margin-left: 0;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+
+  .topbar-user-info {
+    display: none;
+  }
+
+  .topbar-avatar {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 34px;
+  }
+}
+

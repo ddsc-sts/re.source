@@ -648,25 +648,43 @@ class BaseController
         }
     }
 
-    public static function negociacoes(): void
-    {
-        echo "Página de Negociações do Usuário (Em desenvolvimento)";
+    
+public static function negociacoes(): void
+{
+    self::paginaEmDesenvolvimento();
+}
+
+public static function logistica(): void
+{
+    self::paginaEmDesenvolvimento();
+}
+
+public static function impacto(): void
+{
+    self::paginaEmDesenvolvimento();
+}
+
+public static function suporte(): void
+{
+    self::paginaEmDesenvolvimento();
+}
+
+private static function paginaEmDesenvolvimento(): void
+{
+    http_response_code(200);
+
+    $arquivo = __DIR__ . '/../../public/em-desenvolvimento.html';
+
+    if (!is_file($arquivo)) {
+        http_response_code(500);
+        echo 'Página temporariamente indisponível.';
+        return;
     }
 
-    public static function logistica(): void
-    {
-        echo "Página de Logística do Usuário (Em desenvolvimento)";
-    }
+    header('Content-Type: text/html; charset=UTF-8');
+    readfile($arquivo);
+}
 
-    public static function impacto(): void
-    {
-        echo "Página de Impacto do Usuário (Em desenvolvimento)";
-    }
-
-    public static function suporte(): void
-    {
-        echo "Página de Suporte do Usuário (Em desenvolvimento)";
-    }
 
     private static function getAnunciosRecentes($pdo): array
     {

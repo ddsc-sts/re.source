@@ -1,10 +1,17 @@
-Teste Branch 
+Comandos git:
 
+Para Atualizar o sistema na sua branch após uma atualização
 
+git pull
 
+Para Enviar alguma nova alteração para o github:
 
+-git init
+-git add .
+-git commit -m "Sua mensagem de atualização"
+-git push 
 
+/\
+| 
 
-
-
-                    xcvxcvxvnxcvxcvioxvpxiojvpioj
+Caso o comando acima não funcione use este: git push --set-upstream origin TIzao-Manutencao-Welly
