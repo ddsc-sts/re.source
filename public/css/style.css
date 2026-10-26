@@ -106,7 +106,13 @@ nav.desktop-nav a::after {
   transition: transform .25s ease;
 }
 nav.desktop-nav a:hover::after,
-nav.desktop-nav a.active::after { transform: scaleX(1); }
+nav.desktop-nav a.active::after,
+nav.desktop-nav a:focus-visible::after { transform: scaleX(1); }
+nav.desktop-nav a:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 5px;
+  border-radius: 2px;
+}
 nav.desktop-nav a i { width: 14px; height: 14px; }
 
 /* Hambúrguer removido — chip do usuário virou o gatilho do menu */
@@ -144,6 +150,15 @@ nav.desktop-nav a i { width: 14px; height: 14px; }
 }
 .dropdown-menu .menu-btn:hover,
 .dropdown-menu a.menu-btn:hover { background: var(--green-l); color: var(--green-d); }
+.header-user-chip:focus-visible,
+.header-bell:focus-visible,
+.dropdown-menu .menu-btn:focus-visible,
+.category-trigger:focus-visible,
+.category-dropdown button:focus-visible,
+.notification-panel button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
 .dropdown-divider { border-top: 1px solid var(--border-color); margin: .5rem 0; }
 
 .btn-announce {
@@ -726,8 +741,7 @@ footer {
   --green-l:     rgba(21,115,71,.18);
   --shadow-card: 0 12px 30px rgba(0,0,0,.6);
 }
-[data-theme="dark"],
-body.theme-dark {
+[data-theme="dark"] {
   color-scheme: dark;
 }
 [data-theme="dark"] body {
@@ -911,4 +925,24 @@ body.theme-dark {
 [data-theme="dark"] .header-bell,
 [data-theme="dark"] .header-user-chip { background: var(--white); border-color: var(--border-color); }
 [data-theme="dark"] .header-user-text strong { color: var(--dark); }
-[data-theme="dark"] .header-user-avatar { background: var(--green-l); color: var(--green-d); }
+[data-theme="dark"] .header-user-text span,
+[data-theme="dark"] .notification-panel-head button { color: #78d99d; }
+[data-theme="dark"] .header-user-avatar { background: rgba(21,115,71,.28); color: #a7f3c2; }
+[data-theme="dark"] .dropdown-menu .menu-btn:hover,
+[data-theme="dark"] .dropdown-menu .menu-btn:focus-visible {
+  background: #20272d;
+  color: #b8f1cf;
+}
+[data-theme="dark"] .header-user-chip:focus-visible,
+[data-theme="dark"] .header-bell:focus-visible,
+[data-theme="dark"] .dropdown-menu .menu-btn:focus-visible,
+[data-theme="dark"] .category-trigger:focus-visible,
+[data-theme="dark"] .category-dropdown button:focus-visible,
+[data-theme="dark"] .notification-panel button:focus-visible {
+  outline-color: #78d99d;
+}
+[data-theme="dark"] .notification-panel {
+  border-color: var(--border-color);
+  background: var(--white);
+  box-shadow: 0 22px 56px rgba(0,0,0,.55);
+}

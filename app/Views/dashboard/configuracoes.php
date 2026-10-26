@@ -205,25 +205,6 @@ require_once __DIR__ . '/../components/header.php';
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        const currentTheme = "<?= $prefs['theme'] ?>";
-
-        function applyTheme(theme) {
-            if (theme === 'dark') {
-                document.body.classList.add('theme-dark');
-            } else if (theme === 'light') {
-                document.body.classList.remove('theme-dark');
-            } else if (theme === 'system') {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.body.classList.toggle('theme-dark', prefersDark);
-            }
-        }
-
-        applyTheme(currentTheme);
-
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            if (currentTheme === 'system') applyTheme('system');
-        });
-
         if (typeof lucide !== 'undefined') { lucide.createIcons(); }
     });
 </script>

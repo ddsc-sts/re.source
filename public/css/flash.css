@@ -15,4 +15,11 @@
 .message-popup p { overflow:hidden; margin:4px 0 0; color:#667085; font-size:.82rem; line-height:1.4; text-overflow:ellipsis; white-space:nowrap; }
 .message-popup button { align-self:start; margin:7px 7px 0 0; width:30px; height:30px; color:#667085; background:transparent; border:0; border-radius:0; cursor:pointer; font-size:1.3rem; }
 .message-popup button:hover { color:#18382a; background:#eef7f2; }
+.message-popup button:focus-visible { outline:2px solid var(--green, #157347); outline-offset:2px; }
+[data-theme="dark"] .message-popup { color:var(--dark); background:var(--white); border-color:var(--border-color); }
+[data-theme="dark"] .message-popup span { color:#78d99d; }
+[data-theme="dark"] .message-popup p,
+[data-theme="dark"] .message-popup button { color:var(--muted); }
+[data-theme="dark"] .message-popup button:hover { color:var(--dark); background:#20272d; }
+[data-theme="dark"] .message-popup button:focus-visible { outline-color:#78d99d; }
 @media(max-width:560px){.message-popup{right:16px;bottom:16px}}

@@ -29,9 +29,8 @@ if ($headerCompanyId) {
     $headerCompany = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($headerCompany) {
-        if (!empty($headerCompany['theme'])) {
-            $theme = $headerCompany['theme'];
-        }
+        $companyTheme = $headerCompany['theme'] ?? 'light';
+        $theme = in_array($companyTheme, ['light', 'dark', 'system'], true) ? $companyTheme : 'light';
         if (!empty($headerCompany['nome_fantasia'])) {
             $headerCompanyName = $headerCompany['nome_fantasia'];
         }
@@ -65,12 +64,30 @@ $headerIsPending = in_array($headerCompanyStatus, ['pending', 'changes_requested
 $headerHomeUrl = $headerIsPending ? app_url('/aguardando-aprovacao') : app_url('/base');
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="<?php echo $theme; ?>">
+<html lang="pt-BR" data-theme="<?= htmlspecialchars($theme, ENT_QUOTES, 'UTF-8') ?>">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?php echo isset($titulo_pagina) ? $titulo_pagina : 'Re.Source — Economia Circular'; ?></title>
   <link rel="icon" href="<?= htmlspecialchars(asset_url('/img/logos/favicon.svg'), ENT_QUOTES, 'UTF-8') ?>" type="image/svg+xml" />
+  <script>
+    (() => {
+      const root = document.documentElement;
+      if (root.dataset.theme !== 'system') return;
+
+      const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
+      const applySystemTheme = () => {
+        root.dataset.theme = colorScheme.matches ? 'dark' : 'light';
+      };
+
+      applySystemTheme();
+      if (typeof colorScheme.addEventListener === 'function') {
+        colorScheme.addEventListener('change', applySystemTheme);
+      } else {
+        colorScheme.addListener(applySystemTheme);
+      }
+    })();
+  </script>
   
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/style.css'), ENT_QUOTES, 'UTF-8') ?>" />
   <link rel="stylesheet" href="<?= htmlspecialchars(asset_url('/css/design-system.css'), ENT_QUOTES, 'UTF-8') ?>" />
