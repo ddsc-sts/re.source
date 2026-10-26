@@ -410,10 +410,10 @@
 
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* minmax(0,…) impede o card de crescer além da coluna */
   gap: 1.25rem;
 }
-@media (min-width: 768px) { .team-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 768px) { .team-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
 .team-card {
   background: var(--white);
@@ -421,6 +421,8 @@
   border: 1px solid var(--border-color);
   padding: 2rem 1.5rem;
   text-align: center;
+  min-width: 0;
+  overflow-wrap: anywhere;
   transition: transform 0.25s, box-shadow 0.25s, background 0.3s, border-color 0.3s;
 }
 .team-card:hover {
@@ -613,4 +615,34 @@ body {
 .cta-btn-secondary {
   text-transform: uppercase;
   letter-spacing: .06em;
+}
+
+/* ══════════ FIX #0154 — mobile: nada pode passar da largura da tela ══════════ */
+.about-hero,
+.cta-inner { overflow: hidden; }
+
+@media (max-width: 900px) {
+  /* coluna única: 1fr = minmax(auto,1fr) deixava o hero crescer com o conteúdo */
+  .about-hero { grid-template-columns: minmax(0, 1fr); }
+  .hero-inner,
+  .hero-visual { min-width: 0; }
+  .hero-title { font-size: clamp(2.4rem, 11vw, 4rem); overflow-wrap: anywhere; }
+
+  .hero-bg-pattern {
+    top: -40px; right: 0;
+    width: min(420px, 100%);
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .cta-glow {
+    top: -40px; right: 0;
+    width: min(220px, 60%);
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+
+@media (max-width: 767px) {
+  .team-card { padding: 1.5rem 1rem; }
+  .team-grid { gap: 1rem; }
 }
